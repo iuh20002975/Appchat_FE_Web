@@ -5,3 +5,7 @@ Cần làm là: chạy lần lượt các lệnh sau:
 * yarn add styled-components
 * yarn add react-icons 
 * yarn add react-router-dom
+
+Để chạy chương trình:
+=> cd "tên project"
+=> yarn start
