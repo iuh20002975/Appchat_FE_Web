@@ -1,0 +1,7 @@
+( Đọc thêm: Khởi tạo project: npx create-react-app my-react-app )
+
+Cần làm là: chạy lần lượt các lệnh sau:
+* yarn install
+* yarn add styled-components
+* yarn add react-icons 
+* yarn add react-router-dom
