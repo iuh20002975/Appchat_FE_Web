@@ -74,6 +74,7 @@ export default class MessageScreen extends React.Component {
         <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
           {users.map((user) => (
             <button
+              
               style={{
                 width: "100%",
                 outline: "0",
@@ -83,21 +84,37 @@ export default class MessageScreen extends React.Component {
             >
               <ItemUser key={user.id}>
                 <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
-                <div style={{ display: "block" }}>
+                <div
+                  style={{
+                    display: "block",
+                    width: "80%",
+                    padding: "5px 0 0 0",
+                  }}
+                >
                   <h3
                     style={{
-                      fontWeight: "500",
+                      fontWeight: "530",
+                      fontSize: 18,
                       margin: "0 0 0 5px",
                       padding: "0",
+                      textAlign: "left",
+                      position: "relative",
+                      height: "50%",
+                      top: "5%",
                     }}
                   >
                     {user.name}
                   </h3>
                   <h5
                     style={{
-                      fontWeight: "350",
+                      fontWeight: "400",
                       margin: "0 0 0 5px",
                       padding: "0",
+                      position: "relative",
+                      top: "9%",
+                      height: "50%",
+                      textAlign: "left",
+                      fontStyle: "italic",
                     }}
                   >
                     Hoạt động 15 phút trước
@@ -184,7 +201,7 @@ export default class MessageScreen extends React.Component {
             </ContentList>
           </ListPerson>
           <ContentBody className="ContentBodyMessage">
-            {this.renderContentMessage()}
+                {this.renderContentMessage()}
           </ContentBody>
         </Content>
       </>
@@ -193,7 +210,7 @@ export default class MessageScreen extends React.Component {
 }
 
 const ItemUser = styled.div`
-  border: 1px solid rgb(219, 223, 229);
+  /* border: 1px solid rgb(219, 223, 229); */
   padding: 10px;
   display: flex;
 `;
@@ -291,8 +308,8 @@ const InforMessage = styled.div`
 `;
 const Avatar = styled.div`
   background: black;
-  width: 55px;
-  height: 55px;
+  width: 50px;
+  height: 50px;
   margin: 15px auto;
   border-radius: 50%;
 `;

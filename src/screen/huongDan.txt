@@ -7,5 +7,5 @@ Cần làm là: chạy lần lượt các lệnh sau:
 * yarn add react-router-dom
 
 Để chạy chương trình:
-=> cd "tên project"
+=> cd Appchat_FE_Web
 => yarn start
