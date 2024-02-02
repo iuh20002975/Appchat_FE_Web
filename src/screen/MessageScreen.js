@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import React from "react";
 import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
@@ -9,7 +10,22 @@ export default class MessageScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        activeContentTab: 'Prioritize',
+      activeContentTab: "Prioritize",
+      users: [
+        { id: "1", name: "Người dùng 1", email: "user1@example.com" },
+        { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
+        { id: "3", name: "Nguyễn Hoàng Thái", email: "user1@example.com" },
+        { id: "4", name: "Lê Thị Ngọc Mai", email: "user2@example.com" },
+        { id: "5", name: "Nguyễn Văn Việt", email: "user1@example.com" },
+        { id: "6", name: "Nguyễn Văn Long", email: "user2@example.com" },
+        { id: "1", name: "Người dùng 1", email: "user1@example.com" },
+        { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
+        { id: "3", name: "Nguyễn Hoàng Thái", email: "user1@example.com" },
+        { id: "4", name: "Lê Thị Ngọc Mai", email: "user2@example.com" },
+        { id: "5", name: "Nguyễn Văn Việt", email: "user1@example.com" },
+        { id: "6", name: "Nguyễn Văn Long", email: "user2@example.com" },
+        // Thêm thông tin người dùng khác nếu cần
+      ],
     };
   }
   handleContentTab(tab) {
@@ -18,74 +34,106 @@ export default class MessageScreen extends React.Component {
     });
   }
   renderContentMessage() {
-      return (
-        <ChatMessage className="ChatMessage">
-          <ContentMessage className="ContentMessage">
-            <HeaderContentMessage className="HeaderContentMessage">
-              <LeftMessage>
-                <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
-                <InputName style={{ marginLeft: "10px" }}>Your name</InputName>
-              </LeftMessage>
-              <IconGroupMessage className="HeaderContentMessage">
-                <MdOutlineGroupAdd
-                  style={{ fontSize: "24px" }}
-                  className="AddPersonGroup"
-                />
-                <IoIosSearch
-                  style={{ fontSize: "24px" }}
-                  className="FindMessage"
-                />
-                <CiVideoOn style={{ fontSize: "24px" }} className="VideoCall" />
-              </IconGroupMessage>
-            </HeaderContentMessage>
-            <BodyContentMessage className="BodyContentMessage"></BodyContentMessage>
-          </ContentMessage>
-          <InforMessage className="InforMessage">
-            <HeaderInforMessage className="HeaderInforMessage">
-              <InputInfor>Thông tin nhóm</InputInfor>
-            </HeaderInforMessage>
-            <BodyInforMessage className="BodyInforMessage"></BodyInforMessage>
-          </InforMessage>
-        </ChatMessage>
-      );
+    return (
+      <ChatMessage className="ChatMessage">
+        <ContentMessage className="ContentMessage">
+          <HeaderContentMessage className="HeaderContentMessage">
+            <LeftMessage>
+              <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+              <InputName style={{ marginLeft: "10px" }}>Your name</InputName>
+            </LeftMessage>
+            <IconGroupMessage className="HeaderContentMessage">
+              <MdOutlineGroupAdd
+                style={{ fontSize: "24px" }}
+                className="AddPersonGroup"
+              />
+              <IoIosSearch
+                style={{ fontSize: "24px" }}
+                className="FindMessage"
+              />
+              <CiVideoOn style={{ fontSize: "24px" }} className="VideoCall" />
+            </IconGroupMessage>
+          </HeaderContentMessage>
+          <BodyContentMessage className="BodyContentMessage"></BodyContentMessage>
+        </ContentMessage>
+        <InforMessage className="InforMessage">
+          <HeaderInforMessage className="HeaderInforMessage">
+            <InputInfor>Thông tin nhóm</InputInfor>
+          </HeaderInforMessage>
+          <BodyInforMessage className="BodyInforMessage"></BodyInforMessage>
+        </InforMessage>
+      </ChatMessage>
+    );
   }
-  renderContentTab(){
-    const {activeContentTab} = this.state
-    if( activeContentTab === 'Orther'){
-        return(<>
-            <h1>Orther</h1>
-        </>)
-    }else if( activeContentTab === 'Prioritize'){
-        return(<>
-            <h1>Prioritize</h1>
-        </>)
-    }
-}
-  renderTab() {
+  renderContentTab() {
+    const { activeContentTab, users } = this.state;
+    if (activeContentTab === "Orther") {
+      return <h1>Orther</h1>;
+    } else if (activeContentTab === "Prioritize") {
       return (
-        <ListMessage className="ListMessage">
-          <TabsList className="Tabs">
-            <TabList
-              className="Tab"
-              $activeContentTab={this.state.activeContentTab === "Prioritize"}
-              onClick={() => this.handleContentTab("Prioritize")}
+        <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+          {users.map((user) => (
+            <button
+              style={{
+                width: "100%",
+                outline: "0",
+                background: "white",
+                border: "none",
+              }}
             >
-              Ưu tiên
-            </TabList>
-            <TabList
-              className="Tab"
-              $activeContentTab={this.state.activeContentTab === "Orther"}
-              onClick={() => this.handleContentTab("Orther")}
-            >
-              Khác
-            </TabList>
-          </TabsList>
-          <ContentTab className="ContentTab">
-            {this.renderContentTab()}
-          </ContentTab>
-        </ListMessage>
+              <ItemUser key={user.id}>
+                <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                <div style={{ display: "block" }}>
+                  <h3
+                    style={{
+                      fontWeight: "500",
+                      margin: "0 0 0 5px",
+                      padding: "0",
+                    }}
+                  >
+                    {user.name}
+                  </h3>
+                  <h5
+                    style={{
+                      fontWeight: "350",
+                      margin: "0 0 0 5px",
+                      padding: "0",
+                    }}
+                  >
+                    Hoạt động 15 phút trước
+                  </h5>
+                </div>
+              </ItemUser>
+            </button>
+          ))}
+        </div>
       );
-    
+    }
+  }
+  renderTab() {
+    return (
+      <ListMessage className="ListMessage">
+        <TabsList className="Tabs">
+          <TabList
+            className="Tab"
+            $activeContentTab={this.state.activeContentTab === "Prioritize"}
+            onClick={() => this.handleContentTab("Prioritize")}
+          >
+            Ưu tiên
+          </TabList>
+          <TabList
+            className="Tab"
+            $activeContentTab={this.state.activeContentTab === "Orther"}
+            onClick={() => this.handleContentTab("Orther")}
+          >
+            Khác
+          </TabList>
+        </TabsList>
+        <ContentTab className="ContentTab">
+          {this.renderContentTab()}
+        </ContentTab>
+      </ListMessage>
+    );
   }
   render() {
     return (
@@ -132,7 +180,7 @@ export default class MessageScreen extends React.Component {
               </button>
             </HeaderList>
             <ContentList className="ContentListMessage">
-                {this.renderTab()}
+              {this.renderTab()}
             </ContentList>
           </ListPerson>
           <ContentBody className="ContentBodyMessage">
@@ -144,6 +192,11 @@ export default class MessageScreen extends React.Component {
   }
 }
 
+const ItemUser = styled.div`
+  border: 1px solid rgb(219, 223, 229);
+  padding: 10px;
+  display: flex;
+`;
 const ListMessage = styled.div``;
 const TabList = styled.div`
   margin: 5px;
@@ -186,7 +239,7 @@ const HeaderList = styled.div`
 `;
 const ListPerson = styled.div`
   height: 100%;
-  width: 25%;
+  width: 350px;
   overflow: hidden;
   border-right: 1px solid rgb(219, 223, 229);
 `;
