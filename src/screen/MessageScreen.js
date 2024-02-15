@@ -4,13 +4,14 @@ import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { CiVideoOn } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
-
+import img from "../images/image_background.webp"
 export default class MessageScreen extends React.Component {
   // eslint-disable-next-line no-useless-constructor
   constructor(props) {
     super(props);
     this.state = {
       activeContentTab: "Prioritize",
+      selectedUserName: "",
       users: [
         { id: "1", name: "Người dùng 1", email: "user1@example.com" },
         { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
@@ -34,34 +35,44 @@ export default class MessageScreen extends React.Component {
     });
   }
   renderContentMessage() {
+    const { selectedUserName } = this.state; // Lấy tên người dùng từ state
     return (
       <ChatMessage className="ChatMessage">
-        <ContentMessage className="ContentMessage">
-          <HeaderContentMessage className="HeaderContentMessage">
-            <LeftMessage>
-              <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
-              <InputName style={{ marginLeft: "10px" }}>Your name</InputName>
-            </LeftMessage>
-            <IconGroupMessage className="HeaderContentMessage">
-              <MdOutlineGroupAdd
-                style={{ fontSize: "24px" }}
-                className="AddPersonGroup"
-              />
-              <IoIosSearch
-                style={{ fontSize: "24px" }}
-                className="FindMessage"
-              />
-              <CiVideoOn style={{ fontSize: "24px" }} className="VideoCall" />
-            </IconGroupMessage>
-          </HeaderContentMessage>
-          <BodyContentMessage className="BodyContentMessage"></BodyContentMessage>
-        </ContentMessage>
-        <InforMessage className="InforMessage">
-          <HeaderInforMessage className="HeaderInforMessage">
-            <InputInfor>Thông tin nhóm</InputInfor>
-          </HeaderInforMessage>
-          <BodyInforMessage className="BodyInforMessage"></BodyInforMessage>
-        </InforMessage>
+        {selectedUserName === "" ? (<Background></Background>) : (
+          <>
+            <ContentMessage className="ContentMessage">
+              <HeaderContentMessage className="HeaderContentMessage">
+                <LeftMessage>
+                  <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                  <InputName style={{ marginLeft: "10px" }}>
+                    {selectedUserName}
+                  </InputName>
+                </LeftMessage>
+                <IconGroupMessage className="HeaderContentMessage">
+                  <MdOutlineGroupAdd
+                    style={{ fontSize: "24px" }}
+                    className="AddPersonGroup"
+                  />
+                  <IoIosSearch
+                    style={{ fontSize: "24px" }}
+                    className="FindMessage"
+                  />
+                  <CiVideoOn
+                    style={{ fontSize: "24px" }}
+                    className="VideoCall"
+                  />
+                </IconGroupMessage>
+              </HeaderContentMessage>
+              <BodyContentMessage className="BodyContentMessage"></BodyContentMessage>
+            </ContentMessage>
+            <InforMessage className="InforMessage">
+              <HeaderInforMessage className="HeaderInforMessage">
+                <InputInfor>Thông tin</InputInfor>
+              </HeaderInforMessage>
+              <BodyInforMessage className="BodyInforMessage"></BodyInforMessage>
+            </InforMessage>
+          </>
+        )}
       </ChatMessage>
     );
   }
@@ -74,15 +85,16 @@ export default class MessageScreen extends React.Component {
         <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
           {users.map((user) => (
             <button
-              
+              onClick={() => this.setState({ selectedUserName: user.name })} // Sử dụng arrow function ở đây
               style={{
                 width: "100%",
                 outline: "0",
                 background: "white",
                 border: "none",
               }}
+              key={user.id}
             >
-              <ItemUser key={user.id}>
+              <ItemUser>
                 <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
                 <div
                   style={{
@@ -201,7 +213,7 @@ export default class MessageScreen extends React.Component {
             </ContentList>
           </ListPerson>
           <ContentBody className="ContentBodyMessage">
-                {this.renderContentMessage()}
+            {this.renderContentMessage()}
           </ContentBody>
         </Content>
       </>
@@ -213,6 +225,14 @@ const ItemUser = styled.div`
   /* border: 1px solid rgb(219, 223, 229); */
   padding: 10px;
   display: flex;
+`;
+const Background = styled.div`
+  width: 100%;
+  height: 100vh;
+  background-repeat: no-repeat;
+  background-image: url(${img});
+  background-size: cover;
+  background-position: center;
 `;
 const ListMessage = styled.div``;
 const TabList = styled.div`
@@ -235,7 +255,7 @@ const ContentBody = styled.div`
 `;
 const Content = styled.div`
   height: 100vb;
-  width: 96%;
+  width: 100%;
   display: flex;
   box-sizing: border-box;
 `;
@@ -256,7 +276,7 @@ const HeaderList = styled.div`
 `;
 const ListPerson = styled.div`
   height: 100%;
-  width: 350px;
+  width: 25%;
   overflow: hidden;
   border-right: 1px solid rgb(219, 223, 229);
 `;

@@ -61,7 +61,7 @@ export default class HomeScreen extends React.Component {
   }
 }
 const Content = styled.div`
-  height: 100vb;
+  height: 100vh;
   width: 96%;
   display: flex;
   box-sizing: border-box;
@@ -69,8 +69,8 @@ const Content = styled.div`
 
 const Avatar = styled.div`
   background: black;
-  width: 40px;
-  height: 40px;
+  width: 54px;
+  height: 54px;
   margin: 15px auto;
   border-radius: 50%;
 `;
@@ -87,7 +87,7 @@ const Tabs = styled.div`
   padding: 8px;
   background: rgb(0, 145, 255);
   border-bottom: 1px solid black;
-  width: 50px;
+  width: 4%;
   overflow: hidden;
 `;
 const AppContent = styled.div`
