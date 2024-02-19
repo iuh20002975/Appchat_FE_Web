@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { IoPerson } from "react-icons/io5";
 import { BsFillPeopleFill , BsPersonFillAdd } from "react-icons/bs";
+import { FaSearch } from "react-icons/fa";
 
 export default class Contact extends React.Component {
   // eslint-disable-next-line no-useless-constructor
@@ -27,12 +28,12 @@ export default class Contact extends React.Component {
                 <button
                   style={{ fontSize: "15px", padding: "5px", border: "none" }}
                 >
-                  <i style={{ width: "100%" }} class="ti-search"></i>
+                  <FaSearch />
                 </button>
                 <input
                   style={{
                     fontSize: "15px",
-                    padding: "5px",
+                    padding: "6px",
                     outline: "0",
                     border: "none",
                     background: "rgb(240,240,240)",
@@ -106,12 +107,14 @@ const ContentRight = styled.div`
 `;
 const Content = styled.div`
   height: 100vb;
-  width: 96%;
+  width: 100%;
   display: flex;
   box-sizing: border-box;
 `;
 const Search = styled.div`
   padding: 5px;
+  display: flex;
+  overflow: hidden;
 `;
 const ContentList = styled.div`
   height: 100vh;

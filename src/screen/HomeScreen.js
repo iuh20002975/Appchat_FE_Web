@@ -5,7 +5,7 @@ import MessageScreen from "./MessageScreen.js";
 import ContactScreen from "./ContactScreen.js";
 import { FaRegAddressBook } from "react-icons/fa6";
 import { MdOutlineChat } from "react-icons/md";
-
+import { IoSettings  } from "react-icons/io5";
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -54,6 +54,15 @@ export default class HomeScreen extends React.Component {
           >
             <FaRegAddressBook style={{fontSize:'30px'}} />
           </Tab>
+
+          {/* Nút cài đặt */}
+          <Tab
+            className="Tab"
+            $active={this.state.active === ""}
+            onClick={() => this.handleTab("")}
+          >
+            <IoSettings  style={{fontSize:'30px'}} />
+          </Tab>
         </Tabs>
         <Content>{this.renderLoadContent()}</Content>
       </AppContent>
@@ -61,7 +70,7 @@ export default class HomeScreen extends React.Component {
   }
 }
 const Content = styled.div`
-  height: 100vh;
+  height: 100%;
   width: 96%;
   display: flex;
   box-sizing: border-box;
@@ -88,11 +97,12 @@ const Tabs = styled.div`
   background: rgb(0, 145, 255);
   border-bottom: 1px solid black;
   width: 4%;
+  position: relative;
   overflow: hidden;
 `;
 const AppContent = styled.div`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   background-repeat: no-repeat;
   background-size: cover;
   display: flex;

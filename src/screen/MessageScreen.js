@@ -5,6 +5,8 @@ import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { CiVideoOn } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
 import img from "../images/image_background.webp"
+import { FaSearch } from "react-icons/fa";
+
 export default class MessageScreen extends React.Component {
   // eslint-disable-next-line no-useless-constructor
   constructor(props) {
@@ -63,7 +65,12 @@ export default class MessageScreen extends React.Component {
                   />
                 </IconGroupMessage>
               </HeaderContentMessage>
-              <BodyContentMessage className="BodyContentMessage"></BodyContentMessage>
+              <BodyContentMessage className="BodyContentMessage">
+
+              </BodyContentMessage>
+              <FooterContenMessate>
+                asdf
+              </FooterContenMessate>
             </ContentMessage>
             <InforMessage className="InforMessage">
               <HeaderInforMessage className="HeaderInforMessage">
@@ -82,7 +89,7 @@ export default class MessageScreen extends React.Component {
       return <h1>Orther</h1>;
     } else if (activeContentTab === "Prioritize") {
       return (
-        <div style={{ overflowY: "auto", maxHeight: "100vh" }}>
+        <div style={{ overflow: "scroll",maxHeight: "90vb" }}>
           {users.map((user) => (
             <button
               onClick={() => this.setState({ selectedUserName: user.name })} // Sử dụng arrow function ở đây
@@ -174,12 +181,12 @@ export default class MessageScreen extends React.Component {
                 <button
                   style={{ fontSize: "15px", padding: "5px", border: "none" }}
                 >
-                  <i style={{ width: "100%" }} class="ti-search"></i>
+                  <FaSearch />
                 </button>
                 <input
                   style={{
                     fontSize: "15px",
-                    padding: "5px",
+                    padding: "6px",
                     outline: "0",
                     border: "none",
                     background: "rgb(240,240,240)",
@@ -208,7 +215,7 @@ export default class MessageScreen extends React.Component {
                 <MdOutlineGroupAdd style={{ fontSize: "24px" }} />
               </button>
             </HeaderList>
-            <ContentList className="ContentListMessage">
+            <ContentList className="ContentListPerson">
               {this.renderTab()}
             </ContentList>
           </ListPerson>
@@ -220,9 +227,12 @@ export default class MessageScreen extends React.Component {
     );
   }
 }
-
+const FooterContenMessate = styled.div`
+  height: 50px;
+  width: 100%;
+  background: white;
+`;
 const ItemUser = styled.div`
-  /* border: 1px solid rgb(219, 223, 229); */
   padding: 10px;
   display: flex;
 `;
@@ -234,7 +244,10 @@ const Background = styled.div`
   background-size: cover;
   background-position: center;
 `;
-const ListMessage = styled.div``;
+const ListMessage = styled.div`
+  /* height: 100%; */
+  width: 100%;
+`;
 const TabList = styled.div`
   margin: 5px;
   opacity: ${(props) => (props.$activeContentTab ? "1" : "0.5")};
@@ -246,7 +259,7 @@ const TabsList = styled.div`
   display: inline-flex;
 `;
 const ContentTab = styled.div`
-  height: 95%;
+  /* height: 95%; */
 `;
 const ContentBody = styled.div`
   height: 100vb;
@@ -261,9 +274,11 @@ const Content = styled.div`
 `;
 const Search = styled.div`
   padding: 5px;
+  display: flex;
+  overflow: hidden;
 `;
 const ContentList = styled.div`
-  height: 100vh;
+  height: 95%;
   margin: 0;
 `;
 const HeaderList = styled.div`
@@ -321,6 +336,7 @@ const ContentMessage = styled.div`
   height: 100vb;
   width: 70%;
   border-right: 1px solid rgb(219, 223, 229);
+  
 `;
 const InforMessage = styled.div`
   height: 100vb;
