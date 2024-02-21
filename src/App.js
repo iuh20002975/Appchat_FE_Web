@@ -4,6 +4,7 @@ import SignInScreen from "./screen/SignInScreen.js";
 import HomeScreen from "./screen/HomeScreen.js"
 import MessageScreen  from "./screen/MessageScreen.js";
 import ContactScreen from "./screen/ContactScreen.js";
+import SettingScreen from "./screen/SettingScreen.js";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route path="/" element={<SignInScreen />} />
           <Route path="/message" element={<MessageScreen />} />
           <Route path="/contact" element={<ContactScreen />} />
+          <Route path="/setting" element={<SettingScreen />} />
           <Route path="/home" element={<HomeScreen />} />
         </Routes>
       </div>
