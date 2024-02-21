@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import MessageScreen from "./MessageScreen.js";
 import ContactScreen from "./ContactScreen.js";
+import SettingScreen from "./SettingScreen.js";
 import { FaRegAddressBook } from "react-icons/fa6";
 import { MdOutlineChat } from "react-icons/md";
 import { IoSettings  } from "react-icons/io5";
@@ -27,12 +28,20 @@ export default class HomeScreen extends React.Component {
           <MessageScreen></MessageScreen>
         </>
       );
-    } else {
+    } else if (active === "ContactScreen") {
       return (
         <>
           <ContactScreen></ContactScreen>
         </>
       );
+    } else if (active === "SettingScreen") {
+      return (
+        <>
+          <SettingScreen></SettingScreen>
+        </>
+      );
+    } else {
+      return null;
     }
   }
   render() {
@@ -58,8 +67,8 @@ export default class HomeScreen extends React.Component {
           {/* Nút cài đặt */}
           <Tab
             className="Tab"
-            $active={this.state.active === ""}
-            onClick={() => this.handleTab("")}
+            $active={this.state.active === "SettingScreen"}
+            onClick={() => this.handleTab("SettingScreen")}
           >
             <IoSettings  style={{fontSize:'30px'}} />
           </Tab>
