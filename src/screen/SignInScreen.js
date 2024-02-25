@@ -4,12 +4,14 @@ import styled from "styled-components";
 import img from "../images/image_background.webp";
 import { MdOutlinePhoneAndroid } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
-
+import { FaRegEye } from "react-icons/fa6";               // Icon hiển thị password
+import { FaRegEyeSlash } from "react-icons/fa6";          // Icon ẩn password
 export default class SignInScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       active: "QR",
+      showPassword:false,
     };
   }
   handleTab = (tab) => {
@@ -17,8 +19,13 @@ export default class SignInScreen extends React.Component {
       active: tab,
     });
   };
+  togglePasswordVisibility = () => {
+    this.setState((prevState) => ({
+      showPassword: !prevState.showPassword,
+    }));
+  };
   renderContentTab() {
-    const { active } = this.state;
+    const { active,showPassword} = this.state;
     if (active === "QR") {
       return (
         <>
@@ -70,9 +77,35 @@ export default class SignInScreen extends React.Component {
                   fontSize: "16px",
                   outline: "0",
                 }}
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu"
               />
+              {/*Hiển thị/ ẩn password ---------------------------------------------------------------*/} 
+              {showPassword ? (                              
+                <FaRegEye className="eyeOpen"
+                  style={{
+                    width:20,
+                    height:"60%",
+                    marginLeft:"20px",
+                    marginTop:"2px",
+                    paddingRight:"6%",
+                    cursor:"pointer",
+                  }}
+                  onClick={this.togglePasswordVisibility}/>
+                ):(
+                  <FaRegEyeSlash className="eyeClose"
+                  style={{
+                    width:20,
+                    height:"60%",
+                    marginLeft:"20px",
+                    marginTop:"2px",
+                    paddingRight:"6%",
+                    cursor:"pointer",
+                  }}
+                  onClick={this.togglePasswordVisibility}
+                  />)
+                }
+                {/* Đến chỗ này----------------------------------------------------------------------*/}
             </Row>
             <Row>
               <a
@@ -98,6 +131,7 @@ export default class SignInScreen extends React.Component {
                     fontWeight: "bold",
                     color: "white",
                     background: "rgb(0,104,255)",
+                    cursor:"pointer",
                   }}
                 >
                   Đăng nhập với mật khẩu
@@ -113,6 +147,7 @@ export default class SignInScreen extends React.Component {
                   borderRadius: "10px",
                   fontSize: "15px",
                   fontWeight: "bold",
+                  cursor:"pointer",
                 }}
               >
                 Đăng nhập bằng thiết bị di động
@@ -120,7 +155,7 @@ export default class SignInScreen extends React.Component {
             </Row>
             <Row style={{ display: "inline-block", margin: "10px" }}>
               <a
-                style={{ textDecoration: "none", margin: "0 0 15px 0" }}
+                style={{ textDecoration: "none", margin: "0 0 15px 0",cursor:"pointer",}}
               >
                 Quên mật khẩu?
               </a>

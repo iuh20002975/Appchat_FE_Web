@@ -6,6 +6,11 @@ import { CiVideoOn } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
 import img from "../images/image_background.webp"
 import { FaSearch } from "react-icons/fa";
+import { AiOutlineUsergroupAdd } from "react-icons/ai"; // Icon thêm thành viên
+import { AiOutlineUsergroupDelete } from "react-icons/ai"; // Xóa thành viên
+import { MdDeleteOutline } from "react-icons/md"; // Xóa chat
+import { IoMdArrowDropdown } from "react-icons/io"; // Icon hiển thị danh sách thành viên
+import { IoMdArrowDropup } from "react-icons/io"; // Icon ẩn danh sách thành viên
 
 export default class MessageScreen extends React.Component {
   // eslint-disable-next-line no-useless-constructor
@@ -14,6 +19,7 @@ export default class MessageScreen extends React.Component {
     this.state = {
       activeContentTab: "Prioritize",
       selectedUserName: "",
+      showMembers: false,
       users: [
         { id: "1", name: "Người dùng 1", email: "user1@example.com" },
         { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
@@ -73,11 +79,131 @@ export default class MessageScreen extends React.Component {
               </FooterContenMessate>
             </ContentMessage>
             <InforMessage className="InforMessage">
-              <HeaderInforMessage className="HeaderInforMessage">
-                <InputInfor>Thông tin</InputInfor>
-              </HeaderInforMessage>
-              <BodyInforMessage className="BodyInforMessage"></BodyInforMessage>
-            </InforMessage>
+          <HeaderInforMessage className="HeaderInforMessage">
+            <InputInfor>Thông tin </InputInfor>
+          </HeaderInforMessage>
+          <BodyInforMessage className="BodyInforMessage">
+            <BodyInforTop className="BodyInforTop">
+              <Infor className="Infor">
+              <Avatar className="Avatar"></Avatar>
+              <InputName>Your Name</InputName>
+              </Infor>
+              <MenutoGroup className="MenuToGroup">
+                <AddMemberToGroup className="AddMemberToGroup">
+                  <button
+                    style={{
+                      marginLeft: 30,
+                      width: "30px",
+                      height: "30px",
+                      background: "#f0f0f0",
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      borderColor: "gray",
+                    }}
+                  >
+                    <AiOutlineUsergroupAdd />
+                  </button>
+                  <h2></h2>
+                  <span style={{ fontSize: "13px" }}>Thêm thành viên</span>
+                </AddMemberToGroup>
+                <DeleteMember className="DeleteMember">
+                  <button
+                    style={{
+                      marginLeft: 20,
+                      width: "30px",
+                      height: "30px",
+                      background: "#f0f0f0",
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      borderColor: "gray",
+                    }}
+                  >
+                    <AiOutlineUsergroupDelete />
+                  </button>
+                  <h2></h2>
+                  <span style={{ fontSize: "13px" }}>Xóa thành viên</span>
+                </DeleteMember>
+                <DeleteGroup className="DeleteGroup">
+                  <button
+                    style={{
+                      marginLeft: 10,
+                      width: "30px",
+                      height: "30px",
+                      background: "#f0f0f0",
+                      borderRadius: "50%",
+                      cursor: "pointer",
+                      borderColor: "gray",
+                    }}
+                  >
+                    <MdDeleteOutline />
+                  </button>
+                  <h2></h2>
+                  <span style={{ fontSize: "13px" }}>Xóa nhóm</span>
+                </DeleteGroup>
+              </MenutoGroup>
+            </BodyInforTop>
+
+            <BodyInforBottom className="BodyInforBottom">
+              <button
+                style={{
+                  width: "100%",
+                  height: "34px",
+                  marginTop: "50px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  cursor: "pointer",
+                  border: "10px",
+                  outline: "none",
+                }}
+                onClick={() =>
+                  this.setState({ showMembers: !this.state.showMembers })
+                }
+              >
+                <span
+                  style={{
+                    fontSize: "20px",
+                  }}
+                >
+                  {this.state.showMembers ? "Ẩn danh sách " : "Thành viên nhóm"}
+                </span>
+                {this.state.showMembers ? (
+                  <IoMdArrowDropup
+                  style={{
+                    width: "10%",
+                    height: "auto",
+                    marginTop:'2px'
+                  }}  
+                />
+                ) : (
+                  <IoMdArrowDropdown
+                    style={{
+                      width: "10%",
+                      height: "auto",
+                    }}
+                  />
+                )}
+              </button>
+
+              {this.state.showMembers && (
+                <ul>
+                  {this.state.users.map((user) => (
+                    <li
+                      style={{
+                        listStyleType: "none",
+                        paddingRight: "40px",
+                        fontWeight: user._id === this.props.userId,
+                        
+                      }}
+                      key={user.id}
+                    >
+                      {user.name}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </BodyInforBottom>
+          </BodyInforMessage>
+        </InforMessage>
           </>
         )}
       </ChatMessage>
@@ -227,6 +353,38 @@ export default class MessageScreen extends React.Component {
     );
   }
 }
+
+const Infor = styled.div`
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+`;
+ 
+const MenutoGroup = styled.div`
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 25px;
+  
+`;
+
+const DeleteMember = styled.div``;
+const DeleteGroup = styled.div``;
+const AddMemberToGroup = styled.div`
+  display: block;
+  
+`;
+const BodyInforTop = styled.div`
+  overflow-y: auto;
+`;
+const BodyInforBottom = styled.div`
+  overflow-y: auto;
+`;
+const BodyInforMessage = styled.div`
+  overflow-y: auto;
+  max-height: 600px;
+`;
 const FooterContenMessate = styled.div`
   height: 50px;
   width: 100%;
@@ -307,7 +465,7 @@ const HeaderInforMessage = styled.div`
   justify-content: center;
   border-bottom: 2px solid rgb(241, 243, 245);
 `;
-const BodyInforMessage = styled.div``;
+
 const BodyContentMessage = styled.div`
   background: cyan;
   width: 100%;
@@ -326,11 +484,11 @@ const IconGroupMessage = styled.div`
   width: 20%;
 `;
 const InputName = styled.div`
-  margin-left: 70px;
   border: none;
   font-size: 23px;
   font-weight: bold;
   color: black;
+ 
 `;
 const ContentMessage = styled.div`
   height: 100vb;
