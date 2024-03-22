@@ -1,42 +1,50 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { FaUserCircle, FaCog, FaDatabase, FaTools, FaGlobe, FaSignOutAlt } from "react-icons/fa";
+import ModalThongTinTaiKhoan from "./ModalThongTinTaiKhoan";
 
-export default class SettingScreen extends React.Component {
-  render() {
-    return (
-      <>
-        <Content>
-          <SettingList>
-            <SettingItem onClick={() => {}}>
-              <FaUserCircle style={{ marginRight: "10px", fontSize: "25px" }} />
-              Thông tin tài khoản
-            </SettingItem>
-            <SettingItem onClick={() => {}}>
-              <FaCog style={{ marginRight: "10px", fontSize: "25px" }} />
-              Cài đặt
-            </SettingItem>
-            <SettingItem onClick={() => {}}>
-              <FaDatabase style={{ marginRight: "10px", fontSize: "25px" }} />
-              Dữ liệu
-            </SettingItem>
-            <SettingItem onClick={() => {}}>
-              <FaTools style={{ marginRight: "10px", fontSize: "25px" }} />
-              Công cụ
-            </SettingItem>
-            <SettingItem onClick={() => {}}>
-              <FaGlobe style={{ marginRight: "10px", fontSize: "25px" }} />
-              Ngôn ngữ
-            </SettingItem>
-            <SettingItem onClick={() => {}}>
-              <FaSignOutAlt style={{ marginRight: "10px", fontSize: "25px" }} />
-              Đăng xuất
-            </SettingItem>
-          </SettingList>
-        </Content>
-      </>
-    );
-  }
+export default function SettingScreen() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModalThongTinTaiKhoan = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModalThongTinTaiKhoan = () => {
+    setIsModalOpen(false);
+  };
+
+  return (
+    <Content>
+      <SettingList>
+        <SettingItem onClick={openModalThongTinTaiKhoan}>
+          <FaUserCircle style={{ marginRight: "10px", fontSize: "25px" }} />
+          Thông tin tài khoản
+        </SettingItem>
+        <SettingItem onClick={() => {}}>
+          <FaCog style={{ marginRight: "10px", fontSize: "25px" }} />
+          Cài đặt
+        </SettingItem>
+        <SettingItem onClick={() => {}}>
+          <FaDatabase style={{ marginRight: "10px", fontSize: "25px" }} />
+          Dữ liệu
+        </SettingItem>
+        <SettingItem onClick={() => {}}>
+          <FaTools style={{ marginRight: "10px", fontSize: "25px" }} />
+          Công cụ
+        </SettingItem>
+        <SettingItem onClick={() => {}}>
+          <FaGlobe style={{ marginRight: "10px", fontSize: "25px" }} />
+          Ngôn ngữ
+        </SettingItem>
+        <SettingItem onClick={() => {}}>
+          <FaSignOutAlt style={{ marginRight: "10px", fontSize: "25px" }} />
+          Đăng xuất
+        </SettingItem>
+      </SettingList>
+      {isModalOpen && <ModalThongTinTaiKhoan closeModal={closeModalThongTinTaiKhoan} />}
+    </Content>
+  );
 }
 
 const Content = styled.div`
