@@ -84,11 +84,12 @@ export default class SignInScreen extends React.Component {
               {showPassword ? (                              
                 <FaRegEye className="eyeOpen"
                   style={{
+                    position:"relative",
+                    right:"10px",
+
                     width:20,
                     height:"60%",
-                    marginLeft:"20px",
                     marginTop:"2px",
-                    paddingRight:"6%",
                     cursor:"pointer",
                   }}
                   onClick={this.togglePasswordVisibility}/>
@@ -96,10 +97,10 @@ export default class SignInScreen extends React.Component {
                   <FaRegEyeSlash className="eyeClose"
                   style={{
                     width:20,
+                    position:"relative",
+                    right:"10px",
                     height:"60%",
-                    marginLeft:"20px",
-                    marginTop:"2px",
-                    paddingRight:"6%",
+                    marginTop:"2px",  
                     cursor:"pointer",
                   }}
                   onClick={this.togglePasswordVisibility}

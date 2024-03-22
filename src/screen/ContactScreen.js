@@ -26,11 +26,11 @@ export default class Contact extends React.Component {
             <HeaderList className="HeaderList">
               <Search className="Search">
                 <button
-                  style={{ fontSize: "15px", padding: "5px", border: "none" }}
+                  style={{ fontSize: "15px", padding: "5px", border: "none"}}
                 >
                   <FaSearch />
                 </button>
-                <input
+                <input  
                   style={{
                     fontSize: "15px",
                     padding: "6px",

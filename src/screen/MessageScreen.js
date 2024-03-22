@@ -11,18 +11,25 @@ import { AiOutlineUsergroupDelete } from "react-icons/ai"; // Xóa thành viên
 import { MdDeleteOutline } from "react-icons/md"; // Xóa chat
 import { IoMdArrowDropdown } from "react-icons/io"; // Icon hiển thị danh sách thành viên
 import { IoMdArrowDropup } from "react-icons/io"; // Icon ẩn danh sách thành viên
+import { IoSendOutline } from "react-icons/io5";
+import { CiImageOn } from "react-icons/ci";
+import { MdOutlineAttachFile } from "react-icons/md";
 import Modal from "react-modal";
+
+
 export default class MessageScreen extends React.Component {
   // eslint-disable-next-line no-useless-constructor
   constructor(props) {
     super(props);
     this.state = {
+      activeName: "Name",
       activeContentTab: "Prioritize",
       selectedUserName: "",
       showMembers: false,
       showModal: false,
       showDeleteMemberModal: false, // Thêm trạng thái mới cho modal xóa thành viên
       selectedMembers: [],
+      messageInput: "",
       users: [
         { id: "1", name: "Người dùng 1", email: "user1@example.com" },
         { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
@@ -39,6 +46,64 @@ export default class MessageScreen extends React.Component {
         // Thêm thông tin người dùng khác nếu cần
       ],
     };
+  }
+handleSearchInputChange = (event) => {
+    const searchKeyword = event.target.value.toLowerCase(); // Chuyển đổi từ khóa tìm kiếm sang chữ thường để so sánh dễ dàng hơn
+    const filteredUsers = this.state.users.filter(user =>
+        user.name.toLowerCase().includes(searchKeyword) // Lọc ra các người dùng có tên chứa từ khóa tìm kiếm
+    );
+    this.setState({ users: filteredUsers }); // Cập nhật danh sách người dùng hiển thị trên giao diện
+};
+
+sendFileOfType = (acceptedFileType) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = acceptedFileType;
+    input.onchange = (event) => {
+        const file = event.target.files[0];
+        this.sendFile(file); 
+    };
+    input.click(); 
+};
+
+sendWordFile = () => {
+    this.sendFileOfType('.doc,.docx');
+};
+
+sendExcelFile = () => {
+    this.sendFileOfType('.xls,.xlsx'); 
+};
+
+sendPowerPointFile = () => {
+    this.sendFileOfType('.ppt,.pptx'); 
+};
+  sendImage = () => {
+  
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      const formData = new FormData();
+      formData.append('image', file);
+      alert('Đã chọn ảnh: ' + file.name);
+    };
+    input.click(); // Kích hoạt sự kiện click trên input để mở cửa sổ chọn file
+  };
+  sendMessage = () => {
+    const { messageInput } = this.state;
+    if (messageInput.trim() !== "") {
+      console.log("Đã gửi tin nhắn:", messageInput);
+      this.setState({ messageInput: "" });
+    } else {
+    
+      console.log("Không thể gửi tin nhắn trống.");
+    }
+  };
+  handlerName(tabName) {
+    this.setState({
+      activeName: tabName,
+    });
   }
   handleContentTab(tab) {
     this.setState({
@@ -123,7 +188,40 @@ export default class MessageScreen extends React.Component {
                 </IconGroupMessage>
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage"></BodyContentMessage>
-              <FooterContenMessate>asdf</FooterContenMessate>
+              <FooterContenMessate>
+                <ChatButton>
+                  <ImageButton onClick={this.sendImage}>
+                    <CiImageOn style={{ width: "100%", height: "100%" }} />
+                  </ImageButton>
+                  <FileButton onClick={this.sendFileOfType}>
+                    <MdOutlineAttachFile
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </FileButton>
+                </ChatButton>
+                <hr style={{width:"100%"}}/>
+                <ChatInputContainer>
+                  <input
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      border: "0",
+                      borderRadius: "5px",
+                      marginRight: "10px",
+                      outline: "none",
+                    }}
+                    type="text"
+                    placeholder="Nhập tin nhắn..."
+                    value={this.state.messageInput}
+                    onChange={(e) =>
+                      this.setState({ messageInput: e.target.value })
+                    }
+                  />
+                  <SendButton onClick={this.sendMessage}>
+                    <IoSendOutline style={{width:"23px",height:"23px"}} />
+                  </SendButton>
+                </ChatInputContainer>
+              </FooterContenMessate>
             </ContentMessage>
             <InforMessage className="InforMessage">
               <HeaderInforMessage className="HeaderInforMessage">
@@ -157,16 +255,15 @@ export default class MessageScreen extends React.Component {
                     <Modal
                       style={{
                         overlay: {
-                          backgroundColor: "rgba(0, 0, 0, 0.5)", 
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
                         },
                         content: {
                           width: "50%",
-                          margin: "auto", 
-                          maxHeight: "50%", 
+                          margin: "auto",
+                          maxHeight: "50%",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "space-between",
-                         
                         },
                       }}
                       isOpen={this.state.showModal}
@@ -174,27 +271,27 @@ export default class MessageScreen extends React.Component {
                       contentLabel="Example Modal"
                     >
                       <div>
-                      <h2>Thêm thành viên</h2>
+                        <h2>Thêm thành viên</h2>
                       </div>
-                      
-                        <form style={{ flex: 1, overflowY: "auto" }}>
-                          {this.state.users.map((user) => (
-                            <div
-                              key={user.id}
-                              style={{ display: "flex", alignItems: "center" }}
-                            >
-                              <input type="checkbox" id={user.id} />
-                              <AvatarModal className="AvatarModal"></AvatarModal>
-                              <label htmlFor={user.id}>{user.name}</label>
-                            </div>
-                          ))}
-                        </form>
-                      
+
+                      <form style={{ flex: 1, overflowY: "auto" }}>
+                        {this.state.users.map((user) => (
+                          <div
+                            key={user.id}
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <input type="checkbox" id={user.id} />
+                            <AvatarModal className="AvatarModal"></AvatarModal>
+                            <label htmlFor={user.id}>{user.name}</label>
+                          </div>
+                        ))}
+                      </form>
+
                       <div
                         style={{
                           display: "flex",
                           justifyContent: "space-between",
-                          marginBottom:"10px"
+                          marginBottom: "10px",
                         }}
                       >
                         <button
@@ -205,7 +302,7 @@ export default class MessageScreen extends React.Component {
                             borderRadius: 15,
                             borderWidth: 1,
                             outline: "none",
-                            cursor: "pointer"
+                            cursor: "pointer",
                           }}
                         >
                           Đóng
@@ -221,7 +318,7 @@ export default class MessageScreen extends React.Component {
                             outline: "none",
                             backgroundColor: "#2ADFEA",
                             color: "white",
-                            cursor: "pointer"
+                            cursor: "pointer",
                           }}
                         >
                           Thêm
@@ -270,12 +367,11 @@ export default class MessageScreen extends React.Component {
                         },
                         content: {
                           width: "50%",
-                          margin: "auto", 
-                          maxHeight: "50%", 
+                          margin: "auto",
+                          maxHeight: "50%",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "space-between",
-                         
                         },
                       }}
                       isOpen={this.state.showDeleteMemberModal}
@@ -318,7 +414,7 @@ export default class MessageScreen extends React.Component {
                             borderRadius: 15,
                             borderWidth: 1,
                             outline: "none",
-                            cursor: "pointer"
+                            cursor: "pointer",
                           }}
                           onClick={this.closeDeleteMemberModal}
                         >
@@ -333,7 +429,7 @@ export default class MessageScreen extends React.Component {
                             outline: "none",
                             backgroundColor: "#D22424",
                             color: "white",
-                            cursor: "pointer"
+                            cursor: "pointer",
                           }}
                           onClick={this.handleDeleteMembers}
                         >
@@ -432,7 +528,10 @@ export default class MessageScreen extends React.Component {
               }}
               key={user.id}
             >
-              <ItemUser>
+              <ItemUser
+                $activeName={this.state.activeName === "Name"}
+                onClick={() => this.handlerName("Name")}
+              >
                 <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
                 <div
                   style={{
@@ -511,7 +610,8 @@ export default class MessageScreen extends React.Component {
             <HeaderList className="HeaderList">
               <Search className="Search">
                 <button
-                  style={{ fontSize: "15px", padding: "5px", border: "none" }}
+                  style={{ fontSize: "15px", padding: "5px", border: "none",cursor:"pointer" }}
+                  onChange={this.handleSearchInputChange}
                 >
                   <FaSearch />
                 </button>
@@ -560,6 +660,37 @@ export default class MessageScreen extends React.Component {
   }
 }
 
+const FileButton = styled.div`
+  height: 30px;
+  width: 30px;
+  cursor:pointer;
+`;
+const ImageButton = styled.div`
+  marginLeft:10px;
+  height: 30px;
+  width: 30px;
+  cursor:pointer;
+`;
+const ChatButton = styled.div`
+  display: flex;
+  margin-left:7.5px;
+`;
+const ChatInputContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+
+
+const SendButton = styled.div`
+  position: relative;
+
+  border: none;
+  border-radius: 5px;
+  padding: 7px 13px;
+  cursor: pointer;
+`;
+
 const AvatarModal = styled.div`
   background: black;
   width: 35px;
@@ -605,14 +736,19 @@ const BodyInforMessage = styled.div`
   max-height: 600px;
 `;
 const FooterContenMessate = styled.div`
-  height: 50px;
+  height: 27%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
   background: white;
 `;
 const ItemUser = styled.div`
   padding: 10px;
   display: flex;
+  cursor: pointer;
 `;
+// background: ${(props) => (props.$activeName ? 'rgb(229,239,255)' : 'normal')};
+//   font-weight: ${(props) => (props.$activeName ? 'bold': 'normal')};
 const Background = styled.div`
   width: 100%;
   height: 100vh;
@@ -630,6 +766,7 @@ const TabList = styled.div`
   opacity: ${(props) => (props.$activeContentTab ? "1" : "0.5")};
   font-weight: ${(props) => (props.$activeContentTab ? "bold" : "normal")};
   transition: opacity 0.3s ease, font-weight 0.3s ease;
+  cursor: pointer;
 `;
 const TabsList = styled.div`
   height: 5%;
@@ -686,9 +823,9 @@ const HeaderInforMessage = styled.div`
 `;
 
 const BodyContentMessage = styled.div`
-  background: cyan;
+  background: gray;
   width: 100%;
-  height: 92%;
+  height: 73%;
 `;
 const LeftMessage = styled.div`
   float: left;
