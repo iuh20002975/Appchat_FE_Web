@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { FaUserCircle } from "react-icons/fa";
 
-const ModalThongTinTaiKhoan = ({ closeModal }) => {
+const ModalAccountInfor = ({ closeModal }) => {
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -112,4 +112,4 @@ const Button = styled.button`
   font-size: 16px;
 `;
 
-export default ModalThongTinTaiKhoan;
+export default ModalAccountInfor;

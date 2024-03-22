@@ -1,23 +1,23 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FaUserCircle, FaCog, FaDatabase, FaTools, FaGlobe, FaSignOutAlt } from "react-icons/fa";
-import ModalThongTinTaiKhoan from "./ModalThongTinTaiKhoan";
+import ModalAccountInfor from "./ModalAccountInfor";
 
 export default function SettingScreen() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModalThongTinTaiKhoan = () => {
+  const openModalAccountInfor = () => {
     setIsModalOpen(true);
   };
 
-  const closeModalThongTinTaiKhoan = () => {
+  const closeModalAccountInfor = () => {
     setIsModalOpen(false);
   };
 
   return (
     <Content>
       <SettingList>
-        <SettingItem onClick={openModalThongTinTaiKhoan}>
+        <SettingItem onClick={openModalAccountInfor}>
           <FaUserCircle style={{ marginRight: "10px", fontSize: "25px" }} />
           Thông tin tài khoản
         </SettingItem>
@@ -42,7 +42,7 @@ export default function SettingScreen() {
           Đăng xuất
         </SettingItem>
       </SettingList>
-      {isModalOpen && <ModalThongTinTaiKhoan closeModal={closeModalThongTinTaiKhoan} />}
+      {isModalOpen && <ModalAccountInfor closeModal={closeModalAccountInfor} />}
     </Content>
   );
 }
