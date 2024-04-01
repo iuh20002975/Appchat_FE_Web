@@ -5,25 +5,78 @@ import img from "../images/image_background.webp";
 import { MdOutlinePhoneAndroid } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { FaRegEye } from "react-icons/fa6";               // Icon hiển thị password
-import { FaRegEyeSlash } from "react-icons/fa6";          // Icon ẩn password
+import { FaRegEyeSlash } from "react-icons/fa6";  // Icon ẩn password
+import { postApiNoneToken } from "../api/Callapi";
 export default class SignInScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       active: "QR",
       showPassword:false,
+      email: "",
+      pass: "",
+      token: "",
+      fetchingToken: false,
     };
   }
+
+  getToken = async () => {
+    try {
+      this.setState({ fetchingToken: true });
+      const response = await postApiNoneToken('/login', {
+        "username": this.state.email,
+        "password": this.state.pass,
+      });
+      this.setState({ token: response.data.accessToken, fetchingToken: false });
+      
+    } catch (error) {
+      console.error("Error while fetching token:", error);
+      this.setState({ token: 'no token', fetchingToken: false });
+    }
+  };
+  
+  login = () => {
+    this.getToken();
+    // eslint-disable-next-line no-unused-vars
+    const { fetchingToken, token, email, pass} = this.state;
+    if (fetchingToken) {
+      alert('Authenticating...');
+    } else {
+      if (token === 'no token') {
+        alert('Wrong account or password');
+      } else if (token) {
+        alert(token);
+        console.log(token);
+        this.props.navigation.navigate('HomeScreen');
+      } else {
+        alert('Invalid Token');
+      }
+    }
+  };
+
   handleTab = (tab) => {
     this.setState({
       active: tab,
     });
-  };
+  }; 
+  handleTValueEm = (event) => {
+    const value = event.target.value;
+    this.setState({
+      email: value,
+    });
+  }; 
+  handleTValuePas = (event) => {
+    const value = event.target.value;
+    this.setState({
+      pass: value,
+    });
+  }; 
   togglePasswordVisibility = () => {
     this.setState((prevState) => ({
       showPassword: !prevState.showPassword,
     }));
   };
+  
   renderContentTab() {
     const { active,showPassword} = this.state;
     if (active === "QR") {
@@ -65,6 +118,7 @@ export default class SignInScreen extends React.Component {
                   outline: "0",
                 }}
                 type="text"
+                onChange={this.handleTValueEm}
                 placeholder="Số điện thoại"
               />
             </Row>
@@ -77,6 +131,8 @@ export default class SignInScreen extends React.Component {
                   fontSize: "16px",
                   outline: "0",
                 }}
+
+                onChange={this.handleTValuePas}
                 type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu"
               />
@@ -110,7 +166,6 @@ export default class SignInScreen extends React.Component {
             </Row>
             <Row>
               <a
-                href="home"
                 style={{
                   width: "100%",
                   border: "none",
@@ -123,6 +178,7 @@ export default class SignInScreen extends React.Component {
                 }}
               >
                 <button
+                  onClick={this.login}
                   style={{
                     width: "100%",
                     border: "none",

@@ -5,6 +5,8 @@ Cần làm là: chạy lần lượt các lệnh sau:
 * yarn add styled-components
 * yarn add react-icons 
 * yarn add react-router-dom
+* yarn add axios
+*  yarn add --dev @babel/plugin-proposal-private-property-in-object
 
 Để chạy chương trình:
 => cd Appchat_FE_Web
