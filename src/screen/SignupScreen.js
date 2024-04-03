@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-
+import img from "../images/image_background.webp";
 const SignupScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -63,7 +63,7 @@ const SignupScreen = () => {
         </Form>
 
         <p style={{ textAlign: "center" }}>
-          Bạn đã có tài khoản? <Link to="/signin">Đăng nhập</Link>
+          Bạn đã có tài khoản? <Link to="/">Đăng nhập</Link>
         </p>
       </div>
     </Content>
@@ -77,6 +77,7 @@ const Content = styled.div`
   width: 100%;
   display: flex;
   box-sizing: border-box;
+  background-image: url(${img});
 `;
 
 const Form = styled.form`
