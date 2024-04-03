@@ -11,7 +11,7 @@ const ModalAccountInfor = ({ closeModal }) => {
   const handleUpdate = () => {
     // Gọi API để cập nhật thông tin tài khoản(cap nhat sau).
     
-
+    
     // Đóng modal sau khi cập nhật thành công
     closeModal();
   };

@@ -7,24 +7,28 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { FaRegEye } from "react-icons/fa6";               // Icon hiển thị password
 import { FaRegEyeSlash } from "react-icons/fa6";  // Icon ẩn password
 import { postApiNoneToken } from "../api/Callapi";
+
 export default class SignInScreen extends React.Component {
+
   constructor(props) {
     super(props);
     this.state = {
       active: "QR",
       showPassword:false,
-      email: "",
+      username: "",
       pass: "",
       token: "",
       fetchingToken: false,
     };
   }
-
+  gotToHome = () => {
+    return window.location.href = "/home";
+  };
   getToken = async () => {
     try {
       this.setState({ fetchingToken: true });
       const response = await postApiNoneToken('/login', {
-        "username": this.state.email,
+        "username": this.state.username,
         "password": this.state.pass,
       });
       this.setState({ token: response.data.accessToken, fetchingToken: false });
@@ -35,24 +39,30 @@ export default class SignInScreen extends React.Component {
     }
   };
   
-  login = () => {
-    this.getToken();
-    // eslint-disable-next-line no-unused-vars
-    const { fetchingToken, token, email, pass} = this.state;
-    if (fetchingToken) {
-      alert('Authenticating...');
-    } else {
-      if (token === 'no token') {
-        alert('Wrong account or password');
-      } else if (token) {
-        alert(token);
-        console.log(token);
-        this.props.navigation.navigate('HomeScreen');
+  login = async () => {
+    this.setState({ fetchingToken: true }); // Bắt đầu fetching token
+    try {
+      const response = await postApiNoneToken('/login', {
+        "username": this.state.username,
+        "password": this.state.pass,
+      });
+      const token = response.data.accessToken;
+      if (token) {
+        this.setState({ token, fetchingToken: false });
+        // alert(token);
+        // alert("Dang nhap thanh cong")
+        this.gotToHome();
       } else {
-        alert('Invalid Token');
+        this.setState({ token: 'no token', fetchingToken: false });
+        alert('Wrong account or password');
       }
+    } catch (error) {
+      console.error("Error while fetching token:", error);
+      this.setState({ token: 'no token', fetchingToken: false });
+      alert('Error while fetching token gàds'  + error.message);
     }
   };
+  
 
   handleTab = (tab) => {
     this.setState({
@@ -60,17 +70,21 @@ export default class SignInScreen extends React.Component {
     });
   }; 
   handleTValueEm = (event) => {
-    const value = event.target.value;
+    const {value} = event.target;
     this.setState({
-      email: value,
+      username: value,
     });
+    // alert(this.state.username);
   }; 
+  
   handleTValuePas = (event) => {
-    const value = event.target.value;
+    const {value} = event.target;
     this.setState({
       pass: value,
     });
-  }; 
+    // alert(this.state.pass);
+  };
+  
   togglePasswordVisibility = () => {
     this.setState((prevState) => ({
       showPassword: !prevState.showPassword,
@@ -118,8 +132,8 @@ export default class SignInScreen extends React.Component {
                   outline: "0",
                 }}
                 type="text"
-                onChange={this.handleTValueEm}
-                placeholder="Số điện thoại"
+                onChange={ (event)=> this.handleTValueEm(event)}
+                placeholder="Nhập email"
               />
             </Row>
             <Row style={{ borderBottom: "1px solid black" }}>
@@ -132,7 +146,7 @@ export default class SignInScreen extends React.Component {
                   outline: "0",
                 }}
 
-                onChange={this.handleTValuePas}
+                onChange={ (event)=> this.handleTValuePas(event)}
                 type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu"
               />
