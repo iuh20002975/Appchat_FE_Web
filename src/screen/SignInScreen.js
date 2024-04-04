@@ -7,7 +7,7 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { FaRegEye } from "react-icons/fa6";               // Icon hiển thị password
 import { FaRegEyeSlash } from "react-icons/fa6";  // Icon ẩn password
 import { postApiNoneToken } from "../api/Callapi";
-
+import { Link } from "react-router-dom";
 export default class SignInScreen extends React.Component {
 
   constructor(props) {
@@ -21,23 +21,6 @@ export default class SignInScreen extends React.Component {
       fetchingToken: false,
     };
   }
-  gotToHome = () => {
-    return window.location.href = "/home";
-  };
-  getToken = async () => {
-    try {
-      this.setState({ fetchingToken: true });
-      const response = await postApiNoneToken('/login', {
-        "username": this.state.username,
-        "password": this.state.pass,
-      });
-      this.setState({ token: response.data.accessToken, fetchingToken: false });
-      
-    } catch (error) {
-      console.error("Error while fetching token:", error);
-      this.setState({ token: 'no token', fetchingToken: false });
-    }
-  };
   
   login = async () => {
     this.setState({ fetchingToken: true }); // Bắt đầu fetching token
@@ -51,7 +34,7 @@ export default class SignInScreen extends React.Component {
         this.setState({ token, fetchingToken: false });
         // alert(token);
         // alert("Dang nhap thanh cong")
-        this.gotToHome();
+        return window.location.href = "/home";
       } else {
         this.setState({ token: 'no token', fetchingToken: false });
         alert('Wrong account or password');
@@ -230,6 +213,7 @@ export default class SignInScreen extends React.Component {
               >
                 Quên mật khẩu?
               </a>
+              <Link to="/signup">Đăng kí</Link>
             </Row>
           </ContentPhone>
         </>
