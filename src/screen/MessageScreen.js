@@ -249,7 +249,7 @@ sendPowerPointFile = () => {
                       >
                         <AiOutlineUsergroupAdd />
                       </button>
-                      <h2></h2>
+                     
                       <span style={{ fontSize: "13px" }}>Thêm thành viên</span>
                     </AddMemberToGroup>
                     <Modal
@@ -340,7 +340,7 @@ sendPowerPointFile = () => {
                       >
                         <AiOutlineUsergroupDelete />
                       </button>
-                      <h2></h2>
+                      
                       <span style={{ fontSize: "13px" }}>Xóa thành viên</span>
                     </DeleteMember>
                     <DeleteGroup className="DeleteGroup">
@@ -357,7 +357,7 @@ sendPowerPointFile = () => {
                       >
                         <MdDeleteOutline />
                       </button>
-                      <h2></h2>
+                     
                       <span style={{ fontSize: "13px" }}>Xóa nhóm</span>
                     </DeleteGroup>
                     <Modal
@@ -666,7 +666,7 @@ const FileButton = styled.div`
   cursor:pointer;
 `;
 const ImageButton = styled.div`
-  marginLeft:10px;
+  margin-left:10px;
   height: 30px;
   width: 30px;
   cursor:pointer;
@@ -679,9 +679,6 @@ const ChatInputContainer = styled.div`
   display: flex;
   align-items: center;
 `;
-
-
-
 const SendButton = styled.div`
   position: relative;
 

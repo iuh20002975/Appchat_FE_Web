@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import img from "../images/image_background.webp";
+import { postApiNoneToken } from "../api/Callapi";
 const SignupScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -9,7 +10,9 @@ const SignupScreen = () => {
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
+  // const [day, setDay] = useState("");
+  // const [month, setMonth] = useState("");
+  // const [year, setYear] = useState("");
   const handleSubmit = (e) => {
     e.preventDefault();
 //day len github lai
@@ -17,13 +20,108 @@ const SignupScreen = () => {
       alert("Mật khẩu không khớp");
       return;
     }
-
     // Lưu thông tin đăng ký vào cơ sở dữ liệu hoặc thực hiện bất kỳ hành động nào khác.
-
-    alert("Đăng ký thành công");
   };
   //cap nhat lai
+  // const createAccount = async () => {
+  //   try {
+  //     const response = await postApiNoneToken("/signup", {
+  //       name: name,
+  //       username: email,
+  //       // gender: gender,
+  //       dateOfBirth: dateOfBirth,
+  //       phone: phoneNumber,
+  //       password: password,
+  //       confirmPassword: confirmPassword,
+  //     });
+  //     if (response.data.status === "ERR") {
+  //       alert("Đăng ký thất bại " + response.data.message);
+  //       return;
+  //     } else {
+  //       alert("Đăng ký thành công " + response.data.message);
+  //       alert("Tài khoản mới" + response.data.data.name + "đã được tạo");
+  //       <Link to="/">Đăng nhập</Link> // chuyen ve
+  //     }
+  //   } catch (error) {
+  //     console.error("error for signup", error);
+  //     alert("Đã xảy ra lỗi khi đăng ký");
+  //   }
+  // };
+  // function checkAge() {
+  //   const selectedDate = new Date(`${year}-${month}-${day}`);
+  //   setDateOfBirth(selectedDate);
+  //   const today = new Date();
+  //   let age = today.getFullYear() - selectedDate.getFullYear(); 
+  //   const monthCheck = today.getMonth() - selectedDate.getMonth();
+  //   if (
+  //     monthCheck < 0 ||
+  //     (monthCheck === 0 && today.getDate() < selectedDate.getDate())
+  //   ) {
+  //     age--;
+  //   }
+  //   return age;
+  // }
 
+  // check signup
+  const createAccount = async () => {
+     await postApiNoneToken("/signup", {
+        name: name,
+        username: email,
+        // gender: gender,
+        dateOfBirth: dateOfBirth,
+        phone: phoneNumber,
+        password: password,
+        confirmPassword: confirmPassword,
+      });
+      alert("Đăng ký thành công " );
+      return window.location.href ="/" // chuyen ve
+
+  };
+  function checkSignup() {
+    const regPhone = /^\d{10,}$/;
+    const regMail = /^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+    const regName = /^[a-zA-Z]+$/;
+    const regPass = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).{8,}$/;
+    const checkEmail = regMail.test(email);
+    const checkNamein = regName.test(name);
+    const checkPhone = regPhone.test(phoneNumber);
+    const checkPass = regPass.test(password);
+    if (
+      name === "" ||
+      email === "" ||
+      phoneNumber === "" ||
+      password === "" ||
+      confirmPassword === "" 
+      // day === "" ||
+      // month === "" ||
+      // year === ""
+    ) {
+      alert("Vui lòng nhập đầy đủ thông tin");
+    } else if (!checkNamein) {
+      alert("Tên không hợp lệ phải là chữ cái");
+    } 
+    // else if (gender === "") {
+    //   alert("Vui lòng chọn giới tính");
+    // } 
+    else if (!checkEmail) {
+      alert("Email không hợp lệ");
+    } else if (!checkPhone) {
+      alert("Số điện thoại không hợp lệ phải là số và có ít nhất 10 số");
+    } else if (!checkPass) {
+      alert(
+        "Mật khẩu không hợp lệ phải có ít nhất 8 ký tự, 1 chữ số, 1 chữ hoa, 1 ký tự đặc biệt"
+      );
+    } else if (!checkNamein && !checkEmail && !checkPhone) {
+      alert("Email hoặc tên hoặc sđt hoặc  không hợp lệ");
+    } else {
+      // const age = checkAge();
+      // if (age < 18) {
+      //   alert("Tuổi phải lớn hơn 18");
+      // } else {
+        createAccount();
+      // }
+    }
+  }
   return (
     <Content>
       <div style={{ width: "50%", height: "max-content", margin: "0 auto", position: "relative", boxShadow: "0 0 20px rgba(0, 0, 0, 0.2)" }}>
@@ -72,7 +170,10 @@ const SignupScreen = () => {
             <input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
 
-          <button type="submit">Đăng ký</button>
+          <button type="submit"
+          onClick={checkSignup}
+          >
+          Đăng ký</button>
         </Form>
 
         <p style={{ textAlign: "center" }}>
