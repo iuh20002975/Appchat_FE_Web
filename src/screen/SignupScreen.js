@@ -24,46 +24,6 @@ const SignupScreen = () => {
     // Lưu thông tin đăng ký vào cơ sở dữ liệu hoặc thực hiện bất kỳ hành động nào khác.
   };
   //cap nhat lai
-  // const createAccount = async () => {
-  //   try {
-  //     const response = await postApiNoneToken("/signup", {
-  //       name: name,
-  //       username: email,
-  //       // gender: gender,
-  //       dateOfBirth: dateOfBirth,
-  //       phone: phoneNumber,
-  //       password: password,
-  //       confirmPassword: confirmPassword,
-  //     });
-  //     if (response.data.status === "ERR") {
-  //       alert("Đăng ký thất bại " + response.data.message);
-  //       return;
-  //     } else {
-  //       alert("Đăng ký thành công " + response.data.message);
-  //       alert("Tài khoản mới" + response.data.data.name + "đã được tạo");
-  //       <Link to="/">Đăng nhập</Link> // chuyen ve
-  //     }
-  //   } catch (error) {
-  //     console.error("error for signup", error);
-  //     alert("Đã xảy ra lỗi khi đăng ký");
-  //   }
-  // };
-  // function checkAge() {
-  //   const selectedDate = new Date(`${year}-${month}-${day}`);
-  //   setDateOfBirth(selectedDate);
-  //   const today = new Date();
-  //   let age = today.getFullYear() - selectedDate.getFullYear(); 
-  //   const monthCheck = today.getMonth() - selectedDate.getMonth();
-  //   if (
-  //     monthCheck < 0 ||
-  //     (monthCheck === 0 && today.getDate() < selectedDate.getDate())
-  //   ) {
-  //     age--;
-  //   }
-  //   return age;
-  // }
-
-  // check signup
   
   function calculateAge(dateOfBirth) {
     const today = new Date();
