@@ -12,7 +12,7 @@ const SignupScreen = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+//day len github lai
     if (password !== confirmPassword) {
       alert("Mật khẩu không khớp");
       return;
