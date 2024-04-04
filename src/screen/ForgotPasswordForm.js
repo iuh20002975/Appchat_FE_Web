@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import img from "../images/image_background.webp";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
@@ -43,6 +44,7 @@ const Content = styled.div`
   display: flex;
   box-sizing: border-box;
   background-color: #f5f5f5;
+  background-image: url(${img});
 `;
 
 const Form = styled.form`
