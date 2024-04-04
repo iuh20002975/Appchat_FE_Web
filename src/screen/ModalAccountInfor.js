@@ -4,14 +4,14 @@ import { FaUserCircle } from "react-icons/fa";
 
 const ModalAccountInfor = ({ closeModal }) => {
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [gender, setGender] = useState("");
 
   const handleUpdate = () => {
     // Gọi API để cập nhật thông tin tài khoản(cap nhat sau).
-    
-    
+
     // Đóng modal sau khi cập nhật thành công
     closeModal();
   };
@@ -19,14 +19,18 @@ const ModalAccountInfor = ({ closeModal }) => {
   return (
     <ModalContainer>
       <ModalHeader>
-        <FaUserCircle style={{ marginRight: "10px", fontSize: "25px" }} />
+        <FaUserCircle style={{ marginRight: "10px", fontSize: "50px" , color:"blue"}} />
         Thông tin tài khoản
         <CloseButton onClick={closeModal}>&times;</CloseButton>
       </ModalHeader>
       <ModalBody>
         <InputContainer>
-          <label htmlFor="name">Tên:</label>
+          <label htmlFor="name">Tên người dùng:</label>
           <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} />
+        </InputContainer>
+        <InputContainer>
+          <label htmlFor="email">Email:</label>
+          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </InputContainer>
         <InputContainer>
           <label htmlFor="phone-number">Số điện thoại:</label>
@@ -57,21 +61,25 @@ const ModalContainer = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 50%;
+  width: 600px;
+  max-width: 90%;
   height: auto;
   background-color: #fff;
-  padding: 15px;
+  padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
 `;
 
 const ModalHeader = styled.div`
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #ccc;
   padding-bottom: 10px;
+  font-size: 1.2rem;
+  color: blue;
 `;
 
 const CloseButton = styled.button`
@@ -89,12 +97,39 @@ const ModalBody = styled.div`
 `;
 
 const InputContainer = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
   align-items: center;
-  justify-content: space-between;
   width: 100%;
-`;
+  
+  label {
+    width: 100px;
+    text-align: right;
+    font-size: 16px;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    text-indent: 5px;
+  }
 
+  input {
+    width: 100%;
+    padding-left: 20px;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+`;
+// style1
 const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
