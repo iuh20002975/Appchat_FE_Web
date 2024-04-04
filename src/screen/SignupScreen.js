@@ -10,6 +10,7 @@ const SignupScreen = () => {
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [gender, setGender] = useState(true); // mặc định là nam
   // const [day, setDay] = useState("");
   // const [month, setMonth] = useState("");
   // const [year, setYear] = useState("");
@@ -63,11 +64,24 @@ const SignupScreen = () => {
   // }
 
   // check signup
+  
+  function calculateAge(dateOfBirth) {
+    const today = new Date();
+    const dob = new Date(dateOfBirth);
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthCheck = today.getMonth() - dob.getMonth();
+  
+    if (monthCheck < 0 || (monthCheck === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+  
+    return age;
+  }
   const createAccount = async () => {
      await postApiNoneToken("/signup", {
         name: name,
         username: email,
-        // gender: gender,
+        gender: gender,
         dateOfBirth: dateOfBirth,
         phone: phoneNumber,
         password: password,
@@ -100,9 +114,9 @@ const SignupScreen = () => {
     } else if (!checkNamein) {
       alert("Tên không hợp lệ phải là chữ cái");
     } 
-    // else if (gender === "") {
-    //   alert("Vui lòng chọn giới tính");
-    // } 
+    else if (gender === "") {
+      alert("Vui lòng chọn giới tính");
+    } 
     else if (!checkEmail) {
       alert("Email không hợp lệ");
     } else if (!checkPhone) {
@@ -114,12 +128,12 @@ const SignupScreen = () => {
     } else if (!checkNamein && !checkEmail && !checkPhone) {
       alert("Email hoặc tên hoặc sđt hoặc  không hợp lệ");
     } else {
-      // const age = checkAge();
-      // if (age < 18) {
-      //   alert("Tuổi phải lớn hơn 18");
-      // } else {
+      const age = calculateAge(dateOfBirth);
+      if (age < 18) {
+        alert("Tuổi phải lớn hơn 18");
+      } else {
         createAccount();
-      // }
+      }
     }
   }
   return (
@@ -140,6 +154,16 @@ const SignupScreen = () => {
               <label htmlFor="email" style={{ width: "100px", textAlign: "right" }}>Email:</label>
             </div>
             <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <label htmlFor="gender" style={{ width: "100px", textAlign: "right" }}>Giới tính:</label>
+            </div>
+            <select id="gender" value={gender?"male":"female"} onChange={(e) => setGender(e.target.value === "male")}>
+              <option value="male">Nam</option>
+              <option value="female">Nữ</option>
+            </select>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
