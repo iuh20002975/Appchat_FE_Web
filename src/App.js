@@ -12,12 +12,12 @@ function App() {
     <Router>
       <div>
         <Routes>
-          <Route path="/" element={<SignupScreen />} />  
-          <Route path="/signin" element={<SignInScreen />} />
+          <Route path="/" element={<SignInScreen />} />
+          <Route path="/signup" element={<SignupScreen />} />
           <Route path="/message" element={<MessageScreen />} />
           <Route path="/contact" element={<ContactScreen />} />
           <Route path="/setting" element={<SettingScreen />} />
-          <Route path="/home" element={< HomeScreen />} />
+          <Route path="/home" element={<HomeScreen />} />
         </Routes>
       </div>
     </Router>
