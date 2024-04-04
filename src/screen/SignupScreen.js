@@ -22,6 +22,7 @@ const SignupScreen = () => {
 
     alert("Đăng ký thành công");
   };
+  //cap nhat lai
 
   return (
     <Content>
