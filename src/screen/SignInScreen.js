@@ -208,11 +208,12 @@ export default class SignInScreen extends React.Component {
               </button>
             </Row>
             <Row style={{ display: "inline-block", margin: "10px" }}>
-              <a
-                style={{ textDecoration: "none", margin: "0 0 15px 0",cursor:"pointer",}}
+            <Link
+              style={{ textDecoration: "none", margin: "0 0 15px 0", cursor: "pointer" }}
+              to="/forgot-password"
               >
-                Quên mật khẩu?
-              </a>
+              Quên mật khẩu?
+              </Link>
               <Link to="/signup">Đăng kí</Link>
             </Row>
           </ContentPhone>
