@@ -18,7 +18,7 @@ const SignupScreen = () => {
       return;
     }
 
-    // Lưu thông tin đăng ký vào cơ sở dữ liệu hoặc thực hiện bất kỳ hành động nào khác mà bạn muốn.
+    // Lưu thông tin đăng ký vào cơ sở dữ liệu hoặc thực hiện bất kỳ hành động nào khác.
 
     alert("Đăng ký thành công");
   };
@@ -30,36 +30,48 @@ const SignupScreen = () => {
 
         <Form onSubmit={handleSubmit}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
-            <label htmlFor="name">Họ và tên:</label>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <label htmlFor="name" style={{ width: "100px", textAlign: "right" }}>Họ và tên:</label>
+            </div>
             <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
-            <label htmlFor="email">Email:</label>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <label htmlFor="email" style={{ width: "100px", textAlign: "right" }}>Email:</label>
+            </div>
             <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
-            <label htmlFor="phoneNumber">Số điện thoại:</label>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <label htmlFor="phoneNumber" style={{ width: "100px", textAlign: "right" }}>Số điện thoại:</label>
+            </div>
             <input type="tel" id="phoneNumber" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
-            <label htmlFor="dateOfBirth">Ngày sinh:</label>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <label htmlFor="dateOfBirth" style={{ width: "100px", textAlign: "right" }}>Ngày sinh:</label>
+            </div>
             <input type="date" id="dateOfBirth" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
-            <label htmlFor="password">Mật khẩu:</label>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <label htmlFor="password" style={{ width: "100px", textAlign: "right" }}>Mật khẩu:</label>
+            </div>
             <input type="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "10px" }}>
-            <label htmlFor="confirmPassword">Xác nhận mật khẩu:</label>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <label htmlFor="confirmPassword" style={{ width: "100px", textAlign: "right" }}>Xác nhận mật khẩu:</label>
+            </div>
             <input type="password" id="confirmPassword" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
 
-          <button type="submit" style={{ width: "100%" }}>Đăng ký</button>
+          <button type="submit">Đăng ký</button>
         </Form>
 
         <p style={{ textAlign: "center" }}>
@@ -86,8 +98,34 @@ const Form = styled.form`
   align-items: center;
   justify-content: center;
   gap: 20px;
-  padding: 20px;
+  padding: 50px;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+  label {
+    width: 100px;
+    text-align: right;
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    background-color: blue;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
 `;
