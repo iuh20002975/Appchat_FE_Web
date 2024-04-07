@@ -16,7 +16,6 @@ import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
 import Modal from "react-modal";
 
-
 export default class MessageScreen extends React.Component {
   // eslint-disable-next-line no-useless-constructor
   constructor(props) {
@@ -30,73 +29,71 @@ export default class MessageScreen extends React.Component {
       showDeleteMemberModal: false, // Thêm trạng thái mới cho modal xóa thành viên
       selectedMembers: [],
       messageInput: "",
+      messages: [],
       users: [
         { id: "1", name: "Người dùng 1", email: "user1@example.com" },
         { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
         { id: "3", name: "Nguyễn Hoàng Thái", email: "user1@example.com" },
         { id: "4", name: "Lê Thị Ngọc Mai", email: "user2@example.com" },
         { id: "5", name: "Nguyễn Văn Việt", email: "user1@example.com" },
-        { id: "6", name: "Nguyễn Văn Long", email: "user2@example.com" },
-        { id: "1", name: "Người dùng 1", email: "user1@example.com" },
-        { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
-        { id: "3", name: "Nguyễn Hoàng Thái", email: "user1@example.com" },
-        { id: "4", name: "Lê Thị Ngọc Mai", email: "user2@example.com" },
-        { id: "5", name: "Nguyễn Văn Việt", email: "user1@example.com" },
-        { id: "6", name: "Nguyễn Văn Long", email: "user2@example.com" },
-        // Thêm thông tin người dùng khác nếu cần
       ],
     };
   }
-handleSearchInputChange = (event) => {
+  handleSearchInputChange = (event) => {
     const searchKeyword = event.target.value.toLowerCase(); // Chuyển đổi từ khóa tìm kiếm sang chữ thường để so sánh dễ dàng hơn
-    const filteredUsers = this.state.users.filter(user =>
-        user.name.toLowerCase().includes(searchKeyword) // Lọc ra các người dùng có tên chứa từ khóa tìm kiếm
+    const filteredUsers = this.state.users.filter(
+      (user) => user.name.toLowerCase().includes(searchKeyword) // Lọc ra các người dùng có tên chứa từ khóa tìm kiếm
     );
     this.setState({ users: filteredUsers }); // Cập nhật danh sách người dùng hiển thị trên giao diện
-};
+  };
 
-sendFileOfType = (acceptedFileType) => {
-    const input = document.createElement('input');
-    input.type = 'file';
+  sendFileOfType = (acceptedFileType) => {
+    const input = document.createElement("input");
+    input.type = "file";
     input.accept = acceptedFileType;
     input.onchange = (event) => {
-        const file = event.target.files[0];
-        this.sendFile(file); 
+      const file = event.target.files[0];
+      this.sendFile(file);
     };
-    input.click(); 
-};
+    input.click();
+  };
 
-sendWordFile = () => {
-    this.sendFileOfType('.doc,.docx');
-};
+  sendWordFile = () => {
+    this.sendFileOfType(".doc,.docx");
+  };
 
-sendExcelFile = () => {
-    this.sendFileOfType('.xls,.xlsx'); 
-};
+  sendExcelFile = () => {
+    this.sendFileOfType(".xls,.xlsx");
+  };
 
-sendPowerPointFile = () => {
-    this.sendFileOfType('.ppt,.pptx'); 
-};
+  sendPowerPointFile = () => {
+    this.sendFileOfType(".ppt,.pptx");
+  };
   sendImage = () => {
-  
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
     input.onchange = (event) => {
       const file = event.target.files[0];
       const formData = new FormData();
-      formData.append('image', file);
-      alert('Đã chọn ảnh: ' + file.name);
+      formData.append("image", file);
+      alert("Đã chọn ảnh: " + file.name);
     };
     input.click(); // Kích hoạt sự kiện click trên input để mở cửa sổ chọn file
   };
   sendMessage = () => {
-    const { messageInput } = this.state;
+    const { messageInput, messages } = this.state;
     if (messageInput.trim() !== "") {
-      console.log("Đã gửi tin nhắn:", messageInput);
-      this.setState({ messageInput: "" });
+      const newMessage = {
+        sender: "User", // Thay bằng tên của người gửi tin nhắn
+        content: messageInput,
+      };
+      // Cập nhật mảng tin nhắn trong state
+      this.setState({
+        messages: [...messages, newMessage],
+        messageInput: "", // Xóa nội dung tin nhắn sau khi gửi
+      });
     } else {
-    
       console.log("Không thể gửi tin nhắn trống.");
     }
   };
@@ -155,7 +152,21 @@ sendPowerPointFile = () => {
       selectedMembers: [],
     });
   };
-
+  componentDidUpdate(prevProps, prevState) {
+    // Kiểm tra xem selectedUserName có thay đổi không
+    if (prevState.selectedUserName !== this.state.selectedUserName) {
+      // Thực hiện các hành động cần thiết khi selectedUserName thay đổi
+      // Ví dụ: Load lại tin nhắn cho selectedUserName mới
+      this.loadMessagesForUser(this.state.selectedUserName);
+    }
+  }
+  
+  loadMessagesForUser = (userName) => {
+    // Thực hiện logic để load tin nhắn cho userName cụ thể
+    // Ví dụ:
+    // 1. Gọi API để lấy tin nhắn từ server
+    // 2. Cập nhật state.messages với tin nhắn tương ứng
+  };
   renderContentMessage() {
     const { selectedUserName } = this.state; // Lấy tên người dùng từ state
     return (
@@ -187,7 +198,16 @@ sendPowerPointFile = () => {
                   />
                 </IconGroupMessage>
               </HeaderContentMessage>
-              <BodyContentMessage className="BodyContentMessage"></BodyContentMessage>
+              <BodyContentMessage className="BodyContentMessage">
+              
+                {this.state.messages.map((message, index) => (
+                  <div key={index}>
+                    <ItemMessage>
+                      <strong>{message.sender}:</strong> {message.content}
+                    </ItemMessage>
+                  </div>
+                ))}
+              </BodyContentMessage>
               <FooterContenMessate>
                 <ChatButton>
                   <ImageButton onClick={this.sendImage}>
@@ -199,7 +219,7 @@ sendPowerPointFile = () => {
                     />
                   </FileButton>
                 </ChatButton>
-                <hr style={{width:"100%"}}/>
+                <hr style={{ width: "100%" }} />
                 <ChatInputContainer>
                   <input
                     style={{
@@ -218,7 +238,7 @@ sendPowerPointFile = () => {
                     }
                   />
                   <SendButton onClick={this.sendMessage}>
-                    <IoSendOutline style={{width:"23px",height:"23px"}} />
+                    <IoSendOutline style={{ width: "23px", height: "23px" }} />
                   </SendButton>
                 </ChatInputContainer>
               </FooterContenMessate>
@@ -249,7 +269,7 @@ sendPowerPointFile = () => {
                       >
                         <AiOutlineUsergroupAdd />
                       </button>
-                     
+
                       <span style={{ fontSize: "13px" }}>Thêm thành viên</span>
                     </AddMemberToGroup>
                     <Modal
@@ -340,7 +360,7 @@ sendPowerPointFile = () => {
                       >
                         <AiOutlineUsergroupDelete />
                       </button>
-                      
+
                       <span style={{ fontSize: "13px" }}>Xóa thành viên</span>
                     </DeleteMember>
                     <DeleteGroup className="DeleteGroup">
@@ -357,7 +377,7 @@ sendPowerPointFile = () => {
                       >
                         <MdDeleteOutline />
                       </button>
-                     
+
                       <span style={{ fontSize: "13px" }}>Xóa nhóm</span>
                     </DeleteGroup>
                     <Modal
@@ -610,7 +630,12 @@ sendPowerPointFile = () => {
             <HeaderList className="HeaderList">
               <Search className="Search">
                 <button
-                  style={{ fontSize: "15px", padding: "5px", border: "none",cursor:"pointer" }}
+                  style={{
+                    fontSize: "15px",
+                    padding: "5px",
+                    border: "none",
+                    cursor: "pointer",
+                  }}
                   onChange={this.handleSearchInputChange}
                 >
                   <FaSearch />
@@ -659,21 +684,29 @@ sendPowerPointFile = () => {
     );
   }
 }
-
+const ItemMessage = styled.div`
+  padding: 15px;
+  border-radius: 8px;
+  display: inline-block;
+  background-color: cyan;
+  width: max-content;
+  height: max-content;
+  margin: 5px;
+`;
 const FileButton = styled.div`
   height: 30px;
   width: 30px;
-  cursor:pointer;
+  cursor: pointer;
 `;
 const ImageButton = styled.div`
-  margin-left:10px;
+  margin-left: 10px;
   height: 30px;
   width: 30px;
-  cursor:pointer;
+  cursor: pointer;
 `;
 const ChatButton = styled.div`
   display: flex;
-  margin-left:7.5px;
+  margin-left: 7.5px;
 `;
 const ChatInputContainer = styled.div`
   display: flex;
@@ -814,15 +847,16 @@ const HeaderInforMessage = styled.div`
   height: 8%;
   padding: 10px;
   display: flex;
+
   align-items: center;
   justify-content: center;
   border-bottom: 2px solid rgb(241, 243, 245);
 `;
 
 const BodyContentMessage = styled.div`
-  background: gray;
   width: 100%;
   height: 73%;
+  background-color: red;
 `;
 const LeftMessage = styled.div`
   float: left;
