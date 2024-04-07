@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { FaUserCircle } from "react-icons/fa";
+import { useSelector } from 'react-redux';
 
-const ModalAccountInfor = ({ closeModal }) => {
-  const [name, setName] = useState("");
+
+export default function ModalAccountInfor(props) {
+  const user = useSelector((state) => state.user.currentUser);
+  const [name, setName] = useState(user.name);
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
@@ -13,15 +16,15 @@ const ModalAccountInfor = ({ closeModal }) => {
     // Gọi API để cập nhật thông tin tài khoản(cap nhat sau).
 
     // Đóng modal sau khi cập nhật thành công
-    closeModal();
+    props.closeModal();
   };
 
   return (
     <ModalContainer>
       <ModalHeader>
-        <FaUserCircle style={{ marginRight: "10px", fontSize: "50px" , color:"blue"}} />
+        <FaUserCircle style={{ marginRight: "10px", fontSize: "50px", color: "blue" }} />
         Thông tin tài khoản
-        <CloseButton onClick={closeModal}>&times;</CloseButton>
+        <CloseButton onClick={props.closeModal}>&times;</CloseButton>
       </ModalHeader>
       <ModalBody>
         <InputContainer>
@@ -54,7 +57,8 @@ const ModalAccountInfor = ({ closeModal }) => {
       </ModalFooter>
     </ModalContainer>
   );
-};
+}
+
 
 const ModalContainer = styled.div`
   position: fixed;
@@ -72,7 +76,6 @@ const ModalContainer = styled.div`
 `;
 
 const ModalHeader = styled.div`
-
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -129,7 +132,7 @@ const InputContainer = styled.div`
     font-size: 16px;
   }
 `;
-// style1
+
 const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -146,5 +149,3 @@ const Button = styled.button`
   cursor: pointer;
   font-size: 16px;
 `;
-
-export default ModalAccountInfor;

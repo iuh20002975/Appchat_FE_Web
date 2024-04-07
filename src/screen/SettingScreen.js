@@ -37,7 +37,7 @@ export default function SettingScreen() {
           <FaGlobe style={{ marginRight: "10px", fontSize: "25px" }} />
           Ngôn ngữ
         </SettingItem>
-        <SettingItem onClick={() => {}}>
+        <SettingItem onClick={() => {return window.location.href="/"}}>
           <FaSignOutAlt style={{ marginRight: "10px", fontSize: "25px" }} />
           Đăng xuất
         </SettingItem>

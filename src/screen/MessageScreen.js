@@ -100,6 +100,7 @@ export default class MessageScreen extends React.Component {
   handlerName(tabName) {
     this.setState({
       activeName: tabName,
+      messages: [],
     });
   }
   handleContentTab(tab) {
@@ -152,23 +153,10 @@ export default class MessageScreen extends React.Component {
       selectedMembers: [],
     });
   };
-  componentDidUpdate(prevProps, prevState) {
-    // Kiểm tra xem selectedUserName có thay đổi không
-    if (prevState.selectedUserName !== this.state.selectedUserName) {
-      // Thực hiện các hành động cần thiết khi selectedUserName thay đổi
-      // Ví dụ: Load lại tin nhắn cho selectedUserName mới
-      this.loadMessagesForUser(this.state.selectedUserName);
-    }
-  }
-  
-  loadMessagesForUser = (userName) => {
-    // Thực hiện logic để load tin nhắn cho userName cụ thể
-    // Ví dụ:
-    // 1. Gọi API để lấy tin nhắn từ server
-    // 2. Cập nhật state.messages với tin nhắn tương ứng
-  };
+
   renderContentMessage() {
     const { selectedUserName } = this.state; // Lấy tên người dùng từ state
+
     return (
       <ChatMessage className="ChatMessage">
         {selectedUserName === "" ? (
@@ -199,11 +187,11 @@ export default class MessageScreen extends React.Component {
                 </IconGroupMessage>
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage">
-              
                 {this.state.messages.map((message, index) => (
                   <div key={index}>
                     <ItemMessage>
-                      <strong>{message.sender}:</strong> {message.content}
+                      {message.content}
+                      {/* <strong>{message.sender}:</strong> {message.content} */}
                     </ItemMessage>
                   </div>
                 ))}
@@ -857,6 +845,7 @@ const BodyContentMessage = styled.div`
   width: 100%;
   height: 73%;
   background-color: red;
+  text-align: right;
 `;
 const LeftMessage = styled.div`
   float: left;

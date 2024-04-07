@@ -52,6 +52,7 @@ const SignupScreen = () => {
       if (re.data.message === undefined) {
         alert("Trùng số điện thoại ");
       }
+      alert(re.data.message);
       return;
     } else {
       alert("Đăng ký thành công ");

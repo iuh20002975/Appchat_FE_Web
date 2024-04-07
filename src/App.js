@@ -7,24 +7,23 @@ import MessageScreen  from "./screen/MessageScreen.js";
 import ContactScreen from "./screen/ContactScreen.js";
 import SettingScreen from "./screen/SettingScreen.js";
 import ForgotPasswordForm from "./screen/ForgotPasswordForm.js";
-
+import { Provider } from "react-redux";
+import store from "./redux/store.js";
 function App() {
   return (
-    <Router>
-      <div>
+    <Provider store={store}>
+      <Router>
         <Routes>
-          <Route path="/" element={<SignInScreen />} />
-          
+          <Route path="/home" element={<HomeScreen />} />
           <Route path="/signup" element={<SignupScreen />} />
+          <Route path="/" element={<SignInScreen />} />
           <Route path="/message" element={<MessageScreen />} />
           <Route path="/contact" element={<ContactScreen />} />
           <Route path="/setting" element={<SettingScreen />} />
-          <Route path="/home" element={<HomeScreen />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
-         
         </Routes>
-      </div>
-    </Router>
+      </Router>
+    </Provider>
   );
 }
 
