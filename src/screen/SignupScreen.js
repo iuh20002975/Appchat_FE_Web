@@ -11,9 +11,6 @@ const SignupScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [gender, setGender] = useState(true); // mặc định là nam
-  // const [day, setDay] = useState("");
-  // const [month, setMonth] = useState("");
-  // const [year, setYear] = useState("");
   const handleSubmit = (e) => {
     e.preventDefault();
     //day len github lai
@@ -41,7 +38,7 @@ const SignupScreen = () => {
     return age;
   }
   const createAccount = async () => {
-    await postApiNoneToken("/signup", {
+    const re = await postApiNoneToken("/signup", {
       name: name,
       username: email,
       gender: gender,
@@ -50,8 +47,16 @@ const SignupScreen = () => {
       password: password,
       confirmPassword: confirmPassword,
     });
-    alert("Đăng ký thành công ");
-    return (window.location.href = "/"); // chuyen ve
+
+    if (re.data.status === "ERR") {
+      if (re.data.message === undefined) {
+        alert("Trùng số điện thoại ");
+      }
+      return;
+    } else {
+      alert("Đăng ký thành công ");
+      return (window.location.href = "/"); // chuyen ve
+    }
   };
   function checkSignup() {
     const age = calculateAge(dateOfBirth);
@@ -214,6 +219,7 @@ const SignupScreen = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
             />
           </div>
 
@@ -237,6 +243,7 @@ const SignupScreen = () => {
               id="confirmPassword"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
             />
           </div>
 
