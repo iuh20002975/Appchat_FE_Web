@@ -12,6 +12,7 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { IoSendOutline } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
+import { getApiNoneToken } from "../api/Callapi";
 import Modal from "react-modal";
 
 export default function MessageScreen({ userLogin }) {
@@ -34,8 +35,14 @@ export default function MessageScreen({ userLogin }) {
   // ]);
 
     useEffect(() => {
-      
-    })
+      const loadFriends = async () => {
+        const response = await getApiNoneToken(`/getAllFriend/${userLogin}`
+        , {id: userLogin});
+        setUsers(response.data.data);
+
+      };
+      loadFriends();
+    },[userLogin]);
 
     const handleSearchInputChange = (event) => {
         const searchKeyword = event.target.value.toLowerCase();
