@@ -7,11 +7,11 @@ import MessageScreen  from "./screen/MessageScreen.js";
 import ContactScreen from "./screen/ContactScreen.js";
 import SettingScreen from "./screen/SettingScreen.js";
 import ForgotPasswordForm from "./screen/ForgotPasswordForm.js";
-import { Provider } from "react-redux";
-import store from "./redux/store.js";
+import ModalAccountInfor from "./screen/ModalAccountInfor.js";
+
 function App() {
   return (
-    <Provider store={store}>
+
       <Router>
         <Routes>
           <Route path="/home" element={<HomeScreen />} />
@@ -20,10 +20,11 @@ function App() {
           <Route path="/message" element={<MessageScreen />} />
           <Route path="/contact" element={<ContactScreen />} />
           <Route path="/setting" element={<SettingScreen />} />
+          <Route                 element={<ModalAccountInfor />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         </Routes>
       </Router>
-    </Provider>
+
   );
 }
 

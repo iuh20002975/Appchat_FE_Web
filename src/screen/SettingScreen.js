@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { FaUserCircle, FaCog, FaDatabase, FaTools, FaGlobe, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaUserCircle,
+  FaCog,
+  FaDatabase,
+  FaTools,
+  FaGlobe,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import ModalAccountInfor from "./ModalAccountInfor";
 
-export default function SettingScreen() {
+export default function SettingScreen({ userLogin }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openModalAccountInfor = () => {
+  const openModalAccountInfor = (userLogin) => {
     setIsModalOpen(true);
   };
 
@@ -17,7 +24,7 @@ export default function SettingScreen() {
   return (
     <Content>
       <SettingList>
-        <SettingItem onClick={openModalAccountInfor}>
+        <SettingItem onClick={ openModalAccountInfor}>
           <FaUserCircle style={{ marginRight: "10px", fontSize: "25px" }} />
           Thông tin tài khoản
         </SettingItem>
@@ -37,12 +44,16 @@ export default function SettingScreen() {
           <FaGlobe style={{ marginRight: "10px", fontSize: "25px" }} />
           Ngôn ngữ
         </SettingItem>
-        <SettingItem onClick={() => {return window.location.href="/"}}>
+        <SettingItem
+          onClick={() => {
+            return (window.location.href = "/");
+          }}
+        >
           <FaSignOutAlt style={{ marginRight: "10px", fontSize: "25px" }} />
           Đăng xuất
         </SettingItem>
       </SettingList>
-      {isModalOpen && <ModalAccountInfor closeModal={closeModalAccountInfor} />}
+      {isModalOpen && <ModalAccountInfor userLogin={userLogin} closeModal={closeModalAccountInfor} />}
     </Content>
   );
 }

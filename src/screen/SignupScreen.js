@@ -10,7 +10,7 @@ const SignupScreen = () => {
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [gender, setGender] = useState(true); // mặc định là nam
+  const [gender, setGender] = useState(true); // mặc định là 
   const handleSubmit = (e) => {
     e.preventDefault();
     //day len github lai
@@ -146,11 +146,11 @@ const SignupScreen = () => {
             </div>
             <select
               id="gender"
-              value={gender ? "male" : "female"}
+              value={gender ? "true" : "false"}
               onChange={(e) => setGender(e.target.value === "male")}
             >
-              <option value="male">Nam</option>
-              <option value="female">Nữ</option>
+              <option value="true">Nam</option>
+              <option value="false">Nữ</option>
             </select>
           </div>
 

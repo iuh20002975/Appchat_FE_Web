@@ -1,54 +1,103 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FaUserCircle } from "react-icons/fa";
-import { useSelector } from 'react-redux';
+import { getApiNoneToken } from "../api/Callapi";
 
-
-export default function ModalAccountInfor(props) {
-  const user = useSelector((state) => state.user.currentUser);
-  const [name, setName] = useState(user.name);
+export default function ModalAccountInfor({ userLogin, closeModal }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [gender, setGender] = useState("");
+  const formatDate = (dateString) => {
+    const date = new Date(dateString); // Tạo đối tượng Date từ chuỗi ngày tháng
+    const year = date.getFullYear(); // Lấy năm
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Lấy tháng và thêm '0' phía trước nếu cần
+    const day = date.getDate().toString().padStart(2, '0'); // Lấy ngày và thêm '0' phía trước nếu cần
+    return `${year}-${month}-${day}`; // Trả về chuỗi ngày tháng đã được định dạng
+  };
+  useEffect(() => {
+    const loadInfor = async () => {
+      try {
+        const response = await getApiNoneToken(`/getDetails/${userLogin}`, {
+          id: userLogin,
+        });
+        setName(response.data.data.name);
+        setEmail(response.data.data.username);
+        setPhoneNumber(response.data.data.phone);
+        setDateOfBirth(response.data.data.dateOfBirth);
+        setGender(response.data.data.gender);
+      } catch (error) {
+        console.error("Error while fetching user details:", error);
+        alert("Error while fetching user details: " + error.message);
+      }
+    };
+
+    loadInfor();
+  }, [userLogin]);
 
   const handleUpdate = () => {
-    // Gọi API để cập nhật thông tin tài khoản(cap nhat sau).
+    // Gọi API để cập nhật thông tin tài khoản (cập nhật sau).
 
     // Đóng modal sau khi cập nhật thành công
-    props.closeModal();
+    closeModal();
   };
 
   return (
     <ModalContainer>
       <ModalHeader>
-        <FaUserCircle style={{ marginRight: "10px", fontSize: "50px", color: "blue" }} />
+        <FaUserCircle
+          style={{ marginRight: "10px", fontSize: "50px", color: "blue" }}
+        />
         Thông tin tài khoản
-        <CloseButton onClick={props.closeModal}>&times;</CloseButton>
+        <CloseButton onClick={closeModal}>&times;</CloseButton>
       </ModalHeader>
       <ModalBody>
         <InputContainer>
           <label htmlFor="name">Tên người dùng:</label>
-          <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} />
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </InputContainer>
         <InputContainer>
           <label htmlFor="email">Email:</label>
-          <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input
+            type="email"
+            id="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
         </InputContainer>
         <InputContainer>
           <label htmlFor="phone-number">Số điện thoại:</label>
-          <input type="text" id="phone-number" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} />
+          <input
+            type="text"
+            id="phone-number"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+          />
         </InputContainer>
         <InputContainer>
           <label htmlFor="date-of-birth">Ngày sinh:</label>
-          <input type="date" id="date-of-birth" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} />
+          <input
+            type="date"
+            id="date-of-birth"
+            value={dateOfBirth ? formatDate(dateOfBirth): ""}
+            onChange={(e) => setDateOfBirth(e.target.value)}
+          />
         </InputContainer>
         <InputContainer>
           <label htmlFor="gender">Giới tính:</label>
-          <select id="gender" value={gender} onChange={(e) => setGender(e.target.value)}>
-            <option value="male">Nam</option>
-            <option value="female">Nữ</option>
-            <option value="other">Khác</option>
+          <select
+            id="gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+          >
+            <option value="true">Nam</option>
+            <option value="false">Nữ</option>
           </select>
         </InputContainer>
       </ModalBody>
@@ -58,7 +107,6 @@ export default function ModalAccountInfor(props) {
     </ModalContainer>
   );
 }
-
 
 const ModalContainer = styled.div`
   position: fixed;
@@ -105,7 +153,7 @@ const InputContainer = styled.div`
   gap: 10px;
   align-items: center;
   width: 100%;
-  
+
   label {
     width: 100px;
     text-align: right;

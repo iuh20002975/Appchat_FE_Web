@@ -6,8 +6,9 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { postApiNoneToken } from "../api/Callapi";
 import { Link } from "react-router-dom";
 import img from "../images/image_background.webp";
-import { useDispatch } from "react-redux";
-import { setCurrentUser } from "../redux/dataSlice";
+//import { useDispatch } from "react-redux";
+//import { setCurrentUser } from "../redux/dataSlice";
+import { useNavigate } from "react-router-dom";
 
 const SignInScreen = () => {
   const [active, setActive] = useState("QR");
@@ -18,8 +19,8 @@ const SignInScreen = () => {
 const [token, setToken] = useState("");
 // eslint-disable-next-line no-unused-vars
 const [fetchingToken, setFetchingToken] = useState(false);
-const dispatch = useDispatch();
-
+//  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const login = async () => {
     setFetchingToken(true);
     try {
@@ -30,10 +31,8 @@ const dispatch = useDispatch();
       const accessToken = response.data.accessToken;
       if (accessToken) {
         setToken(accessToken);
-        const userLogin = response.data.userLogin;
-        dispatch(setCurrentUser(userLogin));
-        alert(userLogin)
-        return (window.location.href = "/home");
+        const userLogin = response.data.userLogin._id;
+        navigate("/home", { state: { userLogin } });
       } else {
         setToken("no token");
         alert("Wrong account or password");

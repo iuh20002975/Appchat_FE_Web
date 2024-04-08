@@ -1,162 +1,145 @@
-/* eslint-disable no-undef */
-import React from "react";
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { CiVideoOn } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
 import img from "../images/image_background.webp";
 import { FaSearch } from "react-icons/fa";
-import { AiOutlineUsergroupAdd } from "react-icons/ai"; // Icon thêm thành viên
-import { AiOutlineUsergroupDelete } from "react-icons/ai"; // Xóa thành viên
-import { MdDeleteOutline } from "react-icons/md"; // Xóa chat
-import { IoMdArrowDropdown } from "react-icons/io"; // Icon hiển thị danh sách thành viên
-import { IoMdArrowDropup } from "react-icons/io"; // Icon ẩn danh sách thành viên
+import { AiOutlineUsergroupAdd, AiOutlineUsergroupDelete } from "react-icons/ai";
+import { MdDeleteOutline } from "react-icons/md";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { IoSendOutline } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
 import Modal from "react-modal";
 
-export default class MessageScreen extends React.Component {
-  // eslint-disable-next-line no-useless-constructor
-  constructor(props) {
-    super(props);
-    this.state = {
-      activeName: "Name",
-      activeContentTab: "Prioritize",
-      selectedUserName: "",
-      showMembers: false,
-      showModal: false,
-      showDeleteMemberModal: false, // Thêm trạng thái mới cho modal xóa thành viên
-      selectedMembers: [],
-      messageInput: "",
-      messages: [],
-      users: [
-        { id: "1", name: "Người dùng 1", email: "user1@example.com" },
-        { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
-        { id: "3", name: "Nguyễn Hoàng Thái", email: "user1@example.com" },
-        { id: "4", name: "Lê Thị Ngọc Mai", email: "user2@example.com" },
-        { id: "5", name: "Nguyễn Văn Việt", email: "user1@example.com" },
-      ],
+export default function MessageScreen({ userLogin }) {
+    const [activeName, setActiveName] = useState("");
+    const [activeContentTab, setActiveContentTab] = useState("Prioritize");
+    const [selectedUserName, setSelectedUserName] = useState("");
+    const [showMembers, setShowMembers] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
+    const [selectedMembers, setSelectedMembers] = useState([]);
+    const [messageInput, setMessageInput] = useState("");
+    const [messages, setMessages] = useState([]);
+    const [users, setUsers] = useState([]);
+  //   const [users, setUsers] = useState([
+  //     { id: "1", name: "Người dùng 1", email: "user1@example.com" },
+  //     { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
+  //     { id: "3", name: "Nguyễn Hoàng Thái", email: "user1@example.com" },
+  //     { id: "4", name: "Lê Thị Ngọc Mai", email: "user2@example.com" },
+  //     { id: "5", name: "Nguyễn Văn Việt", email: "user1@example.com" },
+  // ]);
+
+    useEffect(() => {
+      
+    })
+
+    const handleSearchInputChange = (event) => {
+        const searchKeyword = event.target.value.toLowerCase();
+        const filteredUsers = users.filter((user) =>
+            user.name.toLowerCase().includes(searchKeyword)
+        );
+        setUsers(filteredUsers);
     };
-  }
-  handleSearchInputChange = (event) => {
-    const searchKeyword = event.target.value.toLowerCase(); // Chuyển đổi từ khóa tìm kiếm sang chữ thường để so sánh dễ dàng hơn
-    const filteredUsers = this.state.users.filter(
-      (user) => user.name.toLowerCase().includes(searchKeyword) // Lọc ra các người dùng có tên chứa từ khóa tìm kiếm
-    );
-    this.setState({ users: filteredUsers }); // Cập nhật danh sách người dùng hiển thị trên giao diện
-  };
 
-  sendFileOfType = (acceptedFileType) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = acceptedFileType;
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      this.sendFile(file);
+    const sendFileOfType = (acceptedFileType) => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = acceptedFileType;
+        input.onchange = (event) => {
+            const file = event.target.files[0];
+            sendFile(file);
+        };
+        input.click();
     };
-    input.click();
-  };
 
-  sendWordFile = () => {
-    this.sendFileOfType(".doc,.docx");
-  };
-
-  sendExcelFile = () => {
-    this.sendFileOfType(".xls,.xlsx");
-  };
-
-  sendPowerPointFile = () => {
-    this.sendFileOfType(".ppt,.pptx");
-  };
-  sendImage = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      const formData = new FormData();
-      formData.append("image", file);
-      alert("Đã chọn ảnh: " + file.name);
+    const sendFile = (file) => {
+        // Thực hiện gửi file ở đây
     };
-    input.click(); // Kích hoạt sự kiện click trên input để mở cửa sổ chọn file
-  };
-  sendMessage = () => {
-    const { messageInput, messages } = this.state;
-    if (messageInput.trim() !== "") {
-      const newMessage = {
-        sender: "User", // Thay bằng tên của người gửi tin nhắn
-        content: messageInput,
-      };
-      // Cập nhật mảng tin nhắn trong state
-      this.setState({
-        messages: [...messages, newMessage],
-        messageInput: "", // Xóa nội dung tin nhắn sau khi gửi
-      });
-    } else {
-      console.log("Không thể gửi tin nhắn trống.");
-    }
-  };
-  handlerName(tabName) {
-    this.setState({
-      activeName: tabName,
-      messages: [],
-    });
-  }
-  handleContentTab(tab) {
-    this.setState({
-      activeContentTab: tab,
-    });
-  }
-  handleModalAdd = () => {
-    this.setState({ showModal: true });
-  };
-  closeModalAdd = () => {
-    this.setState({ showModal: false });
-  };
-  //------------------------------------------------------
-  handleDeleteMemberModal = () => {
-    this.setState({ showDeleteMemberModal: true });
-  };
 
-  // Thêm hàm xử lý đóng modal xóa thành viên
-  closeDeleteMemberModal = () => {
-    this.setState({ showDeleteMemberModal: false });
-  };
+    const sendWordFile = () => {
+        sendFileOfType(".doc,.docx");
+    };
 
-  // Thêm hàm xử lý chọn thành viên để xóa
-  handleSelectMember = (userId) => {
-    const { selectedMembers } = this.state;
-    const isSelected = selectedMembers.includes(userId);
+    const sendExcelFile = () => {
+        sendFileOfType(".xls,.xlsx");
+    };
 
-    if (isSelected) {
-      // Nếu đã được chọn, loại bỏ khỏi danh sách
-      this.setState({
-        selectedMembers: selectedMembers.filter((id) => id !== userId),
-      });
-    } else {
-      // Nếu chưa được chọn, thêm vào danh sách
-      this.setState({
-        selectedMembers: [...selectedMembers, userId],
-      });
-    }
-  };
+    const sendPowerPointFile = () => {
+        sendFileOfType(".ppt,.pptx");
+    };
 
-  // Thêm hàm xử lý xóa thành viên
-  handleDeleteMembers = () => {
-    // Xử lý xóa thành viên ở đây, có thể gọi API hoặc thực hiện logic xóa tùy thuộc vào yêu cầu của bạn
-    console.log("Xóa thành viên:", this.state.selectedMembers);
+    const sendImage = () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = (event) => {
+            const file = event.target.files[0];
+            const formData = new FormData();
+            formData.append("image", file);
+            alert("Đã chọn ảnh: " + file.name);
+        };
+        input.click();
+    };
 
-    // Sau khi xóa, đóng modal và làm sạch danh sách được chọn
-    this.setState({
-      showDeleteMemberModal: false,
-      selectedMembers: [],
-    });
-  };
+    const sendMessage = () => {
+        if (messageInput.trim() !== "") {
+            const newMessage = {
+                sender: "User",
+                content: messageInput,
+            };
+            setMessages([...messages, newMessage]);
+            setMessageInput("");
+        } else {
+            console.log("Không thể gửi tin nhắn trống.");
+        }
+    };
 
-  renderContentMessage() {
-    const { selectedUserName } = this.state; // Lấy tên người dùng từ state
+    const handlerName = (tabName) => {
+        setActiveName(tabName);
+        setMessages([]);
+    };
 
+    const handleContentTab = (tab) => {
+        setActiveContentTab(tab);
+    };
+
+    const handleModalAdd = () => {
+        setShowModal(true);
+    };
+
+    const closeModalAdd = () => {
+        setShowModal(false);
+    };
+
+    const handleDeleteMemberModal = () => {
+        setShowDeleteMemberModal(true);
+    };
+
+    const closeDeleteMemberModal = () => {
+        setShowDeleteMemberModal(false);
+    };
+
+    const handleSelectMember = (userId) => {
+        const isSelected = selectedMembers.includes(userId);
+        if (isSelected) {
+            setSelectedMembers(selectedMembers.filter((id) => id !== userId));
+        } else {
+            setSelectedMembers([...selectedMembers, userId]);
+        }
+    };
+
+    const handleDeleteMembers = () => {
+        console.log("Xóa thành viên:", selectedMembers);
+        setShowDeleteMemberModal(false);
+        setSelectedMembers([]);
+    };
+
+  // eslint-disable-next-line no-unused-vars
+    const renderContentMessage = ({ selectedUserName }) => { // Lấy tên người dùng từ state
     return (
       <ChatMessage className="ChatMessage">
         {selectedUserName === "" ? (
@@ -187,7 +170,7 @@ export default class MessageScreen extends React.Component {
                 </IconGroupMessage>
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage">
-                {this.state.messages.map((message, index) => (
+                { messages.map((message, index) => (
                   <div key={index}>
                     <ItemMessage>
                       {message.content}
@@ -198,10 +181,10 @@ export default class MessageScreen extends React.Component {
               </BodyContentMessage>
               <FooterContenMessate>
                 <ChatButton>
-                  <ImageButton onClick={this.sendImage}>
+                  <ImageButton onClick={  sendImage}>
                     <CiImageOn style={{ width: "100%", height: "100%" }} />
                   </ImageButton>
-                  <FileButton onClick={this.sendFileOfType}>
+                  <FileButton onClick={  sendFileOfType}>
                     <MdOutlineAttachFile
                       style={{ width: "100%", height: "100%" }}
                     />
@@ -220,12 +203,12 @@ export default class MessageScreen extends React.Component {
                     }}
                     type="text"
                     placeholder="Nhập tin nhắn..."
-                    value={this.state.messageInput}
+                    value={ messageInput}
                     onChange={(e) =>
-                      this.setState({ messageInput: e.target.value })
+                         setMessageInput( e.target.value )
                     }
                   />
-                  <SendButton onClick={this.sendMessage}>
+                  <SendButton onClick={  sendMessage}>
                     <IoSendOutline style={{ width: "23px", height: "23px" }} />
                   </SendButton>
                 </ChatInputContainer>
@@ -253,7 +236,7 @@ export default class MessageScreen extends React.Component {
                           cursor: "pointer",
                           borderColor: "gray",
                         }}
-                        onClick={this.handleModalAdd}
+                        onClick={  handleModalAdd}
                       >
                         <AiOutlineUsergroupAdd />
                       </button>
@@ -274,8 +257,8 @@ export default class MessageScreen extends React.Component {
                           justifyContent: "space-between",
                         },
                       }}
-                      isOpen={this.state.showModal}
-                      onRequestClose={this.closeModalAdd}
+                      isOpen={ showModal}
+                      onRequestClose={  closeModalAdd}
                       contentLabel="Example Modal"
                     >
                       <div>
@@ -283,7 +266,7 @@ export default class MessageScreen extends React.Component {
                       </div>
 
                       <form style={{ flex: 1, overflowY: "auto" }}>
-                        {this.state.users.map((user) => (
+                        { users.map((user) => (
                           <div
                             key={user.id}
                             style={{ display: "flex", alignItems: "center" }}
@@ -303,7 +286,7 @@ export default class MessageScreen extends React.Component {
                         }}
                       >
                         <button
-                          onClick={this.closeModalAdd}
+                          onClick={  closeModalAdd}
                           style={{
                             width: 50,
                             height: 35,
@@ -344,7 +327,7 @@ export default class MessageScreen extends React.Component {
                           cursor: "pointer",
                           borderColor: "gray",
                         }}
-                        onClick={this.handleDeleteMemberModal}
+                        onClick={  handleDeleteMemberModal}
                       >
                         <AiOutlineUsergroupDelete />
                       </button>
@@ -382,15 +365,15 @@ export default class MessageScreen extends React.Component {
                           justifyContent: "space-between",
                         },
                       }}
-                      isOpen={this.state.showDeleteMemberModal}
-                      onRequestClose={this.closeDeleteMemberModal}
+                      isOpen={ showDeleteMemberModal}
+                      onRequestClose={  closeDeleteMemberModal}
                       contentLabel="Delete Member Modal"
                     >
                       <div>
                         <h2>Xóa thành viên</h2>
                       </div>
                       <form style={{ flex: 1, overflowY: "auto" }}>
-                        {this.state.users.map((user) => (
+                        { users.map((user) => (
                           <div
                             key={user.id}
                             style={{ display: "flex", alignItems: "center" }}
@@ -398,10 +381,10 @@ export default class MessageScreen extends React.Component {
                             <input
                               type="checkbox"
                               id={user.id}
-                              checked={this.state.selectedMembers.includes(
+                              checked={ selectedMembers.includes(
                                 user.id
                               )}
-                              onChange={() => this.handleSelectMember(user.id)}
+                              onChange={() =>   handleSelectMember(user.id)}
                             />
                             <AvatarModal className="AvatarModal"></AvatarModal>
                             <label htmlFor={user.id}>{user.name}</label>
@@ -424,7 +407,7 @@ export default class MessageScreen extends React.Component {
                             outline: "none",
                             cursor: "pointer",
                           }}
-                          onClick={this.closeDeleteMemberModal}
+                          onClick={  closeDeleteMemberModal}
                         >
                           Đóng
                         </button>
@@ -439,7 +422,7 @@ export default class MessageScreen extends React.Component {
                             color: "white",
                             cursor: "pointer",
                           }}
-                          onClick={this.handleDeleteMembers}
+                          onClick={  handleDeleteMembers}
                         >
                           Xóa
                         </button>
@@ -461,7 +444,7 @@ export default class MessageScreen extends React.Component {
                       outline: "none",
                     }}
                     onClick={() =>
-                      this.setState({ showMembers: !this.state.showMembers })
+                         setShowMembers( ! showMembers )
                     }
                   >
                     <span
@@ -469,11 +452,11 @@ export default class MessageScreen extends React.Component {
                         fontSize: "20px",
                       }}
                     >
-                      {this.state.showMembers
+                      { showMembers
                         ? "Ẩn danh sách "
                         : "Thành viên nhóm"}
                     </span>
-                    {this.state.showMembers ? (
+                    { showMembers ? (
                       <IoMdArrowDropup
                         style={{
                           width: "10%",
@@ -491,16 +474,15 @@ export default class MessageScreen extends React.Component {
                     )}
                   </button>
 
-                  {this.state.showMembers && (
+                  { showMembers && (
                     <ul>
-                      {this.state.users.map((user) => (
+                      { users.map((user) => (
                         <li
                           style={{
                             listStyleType: "none",
                             paddingRight: "10px",
                             display: "flex",
-                            alignItems: "center",
-                            fontWeight: user._id === this.props.userId,
+                            alignItems: "center"
                           }}
                           key={user.id}
                         >
@@ -518,8 +500,8 @@ export default class MessageScreen extends React.Component {
       </ChatMessage>
     );
   }
-  renderContentTab() {
-    const { activeContentTab, users } = this.state;
+  // eslint-disable-next-line no-unused-vars
+  const renderContentTab = ({ activeContentTab }) => {
     if (activeContentTab === "Orther") {
       return <h1>Orther</h1>;
     } else if (activeContentTab === "Prioritize") {
@@ -527,7 +509,7 @@ export default class MessageScreen extends React.Component {
         <div style={{ overflow: "scroll", maxHeight: "90vb" }}>
           {users.map((user) => (
             <button
-              onClick={() => this.setState({ selectedUserName: user.name })} // Sử dụng arrow function ở đây
+              onClick={() =>    setSelectedUserName(user.name)  } // Sử dụng arrow function ở đây
               style={{
                 width: "100%",
                 outline: "0",
@@ -537,8 +519,8 @@ export default class MessageScreen extends React.Component {
               key={user.id}
             >
               <ItemUser
-                $activeName={this.state.activeName === "Name"}
-                onClick={() => this.handlerName("Name")}
+                $activeName={activeName === "Name"}
+                onClick={() =>   handlerName("Name")}
               >
                 <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
                 <div
@@ -584,33 +566,32 @@ export default class MessageScreen extends React.Component {
       );
     }
   }
-  renderTab() {
+  const renderTab= ( ) =>{
     return (
       <ListMessage className="ListMessage">
         <TabsList className="Tabs">
           <TabList
             className="Tab"
-            $activeContentTab={this.state.activeContentTab === "Prioritize"}
-            onClick={() => this.handleContentTab("Prioritize")}
+            $activeContentTab={ activeContentTab === "Prioritize"}
+            onClick={() =>   handleContentTab("Prioritize")}
           >
             Ưu tiên
           </TabList>
           <TabList
             className="Tab"
-            $activeContentTab={this.state.activeContentTab === "Orther"}
-            onClick={() => this.handleContentTab("Orther")}
+            $activeContentTab={ activeContentTab === "Orther"}
+            onClick={() =>   handleContentTab("Orther")}
           >
             Khác
           </TabList>
         </TabsList>
         <ContentTab className="ContentTab">
-          {this.renderContentTab()}
+          {renderContentTab({activeContentTab})}
         </ContentTab>
       </ListMessage>
     );
   }
-
-  render() {
+// eslint-disable-next-line no-unused-vars
     return (
       <>
         <Content>
@@ -624,7 +605,7 @@ export default class MessageScreen extends React.Component {
                     border: "none",
                     cursor: "pointer",
                   }}
-                  onChange={this.handleSearchInputChange}
+                  onChange={handleSearchInputChange}
                 >
                   <FaSearch />
                 </button>
@@ -637,6 +618,7 @@ export default class MessageScreen extends React.Component {
                     background: "rgb(240,240,240)",
                   }}
                   placeholder="Tìm kiếm"
+                  onChange={handleSearchInputChange}
                 ></input>
               </Search>
               <button
@@ -661,16 +643,17 @@ export default class MessageScreen extends React.Component {
               </button>
             </HeaderList>
             <ContentList className="ContentListPerson">
-              {this.renderTab()}
+              {renderTab({selectedUserName})}
             </ContentList>
           </ListPerson>
           <ContentBody className="ContentBodyMessage">
-            {this.renderContentMessage()}
+            {renderContentMessage({ selectedUserName })}
           </ContentBody>
         </Content>
       </>
     );
-  }
+
+
 }
 const ItemMessage = styled.div`
   padding: 15px;
@@ -765,8 +748,6 @@ const ItemUser = styled.div`
   display: flex;
   cursor: pointer;
 `;
-// background: ${(props) => (props.$activeName ? 'rgb(229,239,255)' : 'normal')};
-//   font-weight: ${(props) => (props.$activeName ? 'bold': 'normal')};
 const Background = styled.div`
   width: 100%;
   height: 100vh;

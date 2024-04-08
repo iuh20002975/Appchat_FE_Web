@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-expressions */
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import MessageScreen from "./MessageScreen.js";
 import ContactScreen from "./ContactScreen.js";
@@ -7,77 +6,66 @@ import SettingScreen from "./SettingScreen.js";
 import { FaRegAddressBook } from "react-icons/fa6";
 import { MdOutlineChat } from "react-icons/md";
 import { IoSettings  } from "react-icons/io5";
-export default class HomeScreen extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      active: "MessageScreen",
-      activeContentTab: "Prioritize",
-    };
+import { useLocation } from "react-router-dom";
+
+export default function HomeScreen (props) {
+  const [active, setActive] = useState("MessageScreen");  
+  const location = useLocation();
+  const userLogin = location.state?.userLogin;
+
+  const handleTab = (tab) =>{
+    setActive(tab);
   }
-  handleTab(tab) {
-    this.setState({
-      active: tab,
-    });
-  }
-  renderLoadContent() {
-    const { active } = this.state;
+
+  const renderLoadContent = () =>{
     if (active === "MessageScreen") {
-      return (
-        <>
-          <MessageScreen></MessageScreen>
-        </>
-      );
+      return <MessageScreen userLogin={userLogin} />;
     } else if (active === "ContactScreen") {
-      return (
-        <>
-          <ContactScreen></ContactScreen>
-        </>
-      );
+      return <ContactScreen />;
     } else if (active === "SettingScreen") {
-      return (
-        <>
-          <SettingScreen></SettingScreen>
-        </>
-      );
+      return <SettingScreen userLogin={userLogin} />;
     } else {
       return null;
     }
   }
-  render() {
-    return (
-      <AppContent>
-        <Tabs className="Tabs">
-          <Avatar className="Avatar"></Avatar>
-          <Tab
-            className="Tab"
-            $active={this.state.active === "MessageScreen"}
-            onClick={() => this.handleTab("MessageScreen")}
-          >
-            <MdOutlineChat style={{fontSize:'35px'}} />
-          </Tab>
-          <Tab
-            className="Tab"
-            $active={this.state.active === "ContactScreen"}
-            onClick={() => this.handleTab("ContactScreen")}
-          >
-            <FaRegAddressBook style={{fontSize:'30px'}} />
-          </Tab>
 
-          {/* Nút cài đặt */}
-          <Tab
-            className="Tab"
-            $active={this.state.active === "SettingScreen"}
-            onClick={() => this.handleTab("SettingScreen")}
-          >
-            <IoSettings  style={{fontSize:'30px'}} />
-          </Tab>
-        </Tabs>
-        <Content>{this.renderLoadContent()}</Content>
-      </AppContent>
-    );
-  }
+  return (
+
+    <AppContent>
+      <Tabs className="Tabs">
+        
+        <Avatar className="Avatar"></Avatar>
+        <Tab
+          className="Tab"
+          $active={active === "MessageScreen"}
+          onClick={() => handleTab("MessageScreen")}
+        >
+          <MdOutlineChat style={{fontSize:'35px'}} />
+        </Tab>
+        <Tab
+          className="Tab"
+          $active={active === "ContactScreen"}
+          onClick={() => handleTab("ContactScreen")}
+        >
+          <FaRegAddressBook style={{fontSize:'30px'}} />
+        </Tab>
+
+        {/* Nút cài đặt */}
+        <Tab
+          className="Tab"
+          $active={active === "SettingScreen"}
+          onClick={() => handleTab("SettingScreen")}
+        >
+          <IoSettings  style={{fontSize:'30px'}} />
+        </Tab>
+       
+      </Tabs>
+      
+      <Content>{renderLoadContent()}</Content>
+    </AppContent>
+  );
 }
+
 const Content = styled.div`
   height: 100%;
   width: 96%;

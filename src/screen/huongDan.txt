@@ -13,3 +13,4 @@ Cần làm là: chạy lần lượt các lệnh sau:
 => yarn start
 
 
+MONGO_DB=mongodb+srv://thaidp2002:chatappdb@chatappdatabase.mebfcgt.mongodb.net/?retryWrites=true&w=majority
