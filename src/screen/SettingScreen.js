@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
 import styled from "styled-components";
 import {
   FaUserCircle,
@@ -10,9 +10,11 @@ import {
 } from "react-icons/fa";
 import ModalAccountInfor from "./ModalAccountInfor";
 
+//import { postApiNoneToken  } from "../api/Callapi";
+
 export default function SettingScreen({ userLogin }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  
   const openModalAccountInfor = (userLogin) => {
     setIsModalOpen(true);
   };

@@ -21,7 +21,7 @@ export default function HomeScreen (props) {
     if (active === "MessageScreen") {
       return <MessageScreen userLogin={userLogin} />;
     } else if (active === "ContactScreen") {
-      return <ContactScreen />;
+      return <ContactScreen userLogin={userLogin}/>;
     } else if (active === "SettingScreen") {
       return <SettingScreen userLogin={userLogin} />;
     } else {

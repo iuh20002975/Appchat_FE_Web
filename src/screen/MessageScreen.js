@@ -26,20 +26,12 @@ export default function MessageScreen({ userLogin }) {
     const [messageInput, setMessageInput] = useState("");
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
-  //   const [users, setUsers] = useState([
-  //     { id: "1", name: "Người dùng 1", email: "user1@example.com" },
-  //     { id: "2", name: "Thành viên Mến", email: "user2@example.com" },
-  //     { id: "3", name: "Nguyễn Hoàng Thái", email: "user1@example.com" },
-  //     { id: "4", name: "Lê Thị Ngọc Mai", email: "user2@example.com" },
-  //     { id: "5", name: "Nguyễn Văn Việt", email: "user1@example.com" },
-  // ]);
 
     useEffect(() => {
       const loadFriends = async () => {
         const response = await getApiNoneToken(`/getAllFriend/${userLogin}`
         , {id: userLogin});
         setUsers(response.data.data);
-
       };
       loadFriends();
     },[userLogin]);
@@ -667,9 +659,11 @@ const ItemMessage = styled.div`
   border-radius: 8px;
   display: inline-block;
   background-color: cyan;
-  width: max-content;
+  max-width: 100%;
   height: max-content;
   margin: 5px;
+  word-wrap: break-word;
+  flex: 1;
 `;
 const FileButton = styled.div`
   height: 30px;
@@ -834,6 +828,8 @@ const BodyContentMessage = styled.div`
   height: 73%;
   background-color: red;
   text-align: right;
+  overflow-y: auto;
+  flex: 1;
 `;
 const LeftMessage = styled.div`
   float: left;

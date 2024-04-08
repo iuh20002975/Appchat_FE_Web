@@ -6,8 +6,6 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { postApiNoneToken } from "../api/Callapi";
 import { Link } from "react-router-dom";
 import img from "../images/image_background.webp";
-//import { useDispatch } from "react-redux";
-//import { setCurrentUser } from "../redux/dataSlice";
 import { useNavigate } from "react-router-dom";
 
 const SignInScreen = () => {
@@ -15,11 +13,11 @@ const SignInScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [pass, setPass] = useState("");
-// eslint-disable-next-line no-unused-vars
-const [token, setToken] = useState("");
-// eslint-disable-next-line no-unused-vars
-const [fetchingToken, setFetchingToken] = useState(false);
-//  const dispatch = useDispatch();
+  // eslint-disable-next-line no-unused-vars
+  const [token, setToken] = useState("");
+  // eslint-disable-next-line no-unused-vars
+  const [fetchingToken, setFetchingToken] = useState(false);
+  //  const dispatch = useDispatch();
   const navigate = useNavigate();
   const login = async () => {
     setFetchingToken(true);
@@ -98,6 +96,7 @@ const [fetchingToken, setFetchingToken] = useState(false);
                 fontSize: "16px",
                 outline: "0",
               }}
+              
               type="text"
               onChange={handleTValueEm}
               placeholder="Nhập email"
@@ -112,7 +111,7 @@ const [fetchingToken, setFetchingToken] = useState(false);
                 fontSize: "16px",
                 outline: "0",
               }}
-              onChange={handleTValuePas}
+               onChange={handleTValuePas}
               type={showPassword ? "text" : "password"}
               placeholder="Nhập mật khẩu"
             />
@@ -232,7 +231,6 @@ const [fetchingToken, setFetchingToken] = useState(false);
 };
 
 export default SignInScreen;
-
 
 const QRCode = styled.div`
   width: 60%;

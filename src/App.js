@@ -8,7 +8,7 @@ import ContactScreen from "./screen/ContactScreen.js";
 import SettingScreen from "./screen/SettingScreen.js";
 import ForgotPasswordForm from "./screen/ForgotPasswordForm.js";
 import ModalAccountInfor from "./screen/ModalAccountInfor.js";
-
+import ListFriend from "./component/listFriend.js";
 function App() {
   return (
 
@@ -21,6 +21,7 @@ function App() {
           <Route path="/contact" element={<ContactScreen />} />
           <Route path="/setting" element={<SettingScreen />} />
           <Route                 element={<ModalAccountInfor />} />
+          <Route element={<ListFriend />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         </Routes>
       </Router>
