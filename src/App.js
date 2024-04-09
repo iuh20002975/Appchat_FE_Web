@@ -9,6 +9,8 @@ import SettingScreen from "./screen/SettingScreen.js";
 import ForgotPasswordForm from "./screen/ForgotPasswordForm.js";
 import ModalAccountInfor from "./screen/ModalAccountInfor.js";
 import ListFriend from "./component/listFriend.js";
+import MessageChat from "./component/messageChat.js";
+import Friend from "./component/friend.js";
 function App() {
   return (
 
@@ -21,7 +23,9 @@ function App() {
           <Route path="/contact" element={<ContactScreen />} />
           <Route path="/setting" element={<SettingScreen />} />
           <Route                 element={<ModalAccountInfor />} />
-          <Route element={<ListFriend />} />
+          <Route                 element={<ListFriend />} />
+          <Route                 element={<MessageChat />} />
+          <Route                 element={<Friend />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         </Routes>
       </Router>

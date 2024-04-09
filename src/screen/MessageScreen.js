@@ -14,7 +14,8 @@ import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
 import { getApiNoneToken } from "../api/Callapi";
 import Modal from "react-modal";
-
+import MessageChat from "../component/messageChat";
+import {getApiNoneTokenMessage} from "../api/Callapi";
 export default function MessageScreen({ userLogin }) {
     const [activeName, setActiveName] = useState("");
     const [activeContentTab, setActiveContentTab] = useState("Prioritize");
@@ -26,26 +27,29 @@ export default function MessageScreen({ userLogin }) {
     const [messageInput, setMessageInput] = useState("");
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
-
-    const messagesEndRef = useRef(null);
-
+    const [originalUsers, setOriginalUsers] = useState([])
     useEffect(() => {
       const loadFriends = async () => {
         const response = await getApiNoneToken(`/getAllFriend/${userLogin}`
         , {id: userLogin});
         setUsers(response.data.data);
+        setOriginalUsers(response.data.data);
       };
       loadFriends();
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    },[userLogin, messages]);
+      
 
-    const handleSearchInputChange = (event) => {
-        const searchKeyword = event.target.value.toLowerCase();
-        const filteredUsers = users.filter((user) =>
-            user.name.toLowerCase().includes(searchKeyword)
-        );
-        setUsers(filteredUsers);
-    };
+    },[userLogin]);
+
+      const handleSearchInputChange = (event) => {
+          const searchKeyword = event.target.value.toLowerCase();
+          if(searchKeyword === "") {
+              setUsers(originalUsers)
+          }else{
+          const filteredUsers = users.filter((user) =>
+              user.name.toLowerCase().includes(searchKeyword)
+          );
+          setUsers(filteredUsers);}
+      };
 
     const sendFileOfType = (acceptedFileType) => {
         const input = document.createElement("input");
@@ -597,6 +601,7 @@ export default function MessageScreen({ userLogin }) {
     return (
       <>
         <Content>
+        {/* {alert(messages)} */}
           <ListPerson className="ListPersonMessage">
             <HeaderList className="HeaderList">
               <Search className="Search">
@@ -650,7 +655,6 @@ export default function MessageScreen({ userLogin }) {
           </ListPerson>
           <ContentBody className="ContentBodyMessage">
             {renderContentMessage({ selectedUserName })}
-            {messagesEndRef.current && <div ref={messagesEndRef} />}
           </ContentBody>
         </Content>
       </>

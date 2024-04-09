@@ -5,13 +5,30 @@ import { IoPerson } from "react-icons/io5";
 import { BsFillPeopleFill, BsPersonFillAdd } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 import ListFriend from "../component/listFriend.js";
+import { getApiNoneToken } from "../api/Callapi.js";
+import Friend from "../component/friend.js";
 const Contact = ({userLogin}) => {
   const [active, setActive] = useState('listFriend');
-
+  //eslint-disable-next-line
+  const [search, setSearch] = useState('');
   const handler = (tab) => {
     setActive(tab);
   };
-  
+  const handleFriendSearch =async (event) => {
+    try{
+      const searchKeyword = event.target.value.toLowerCase();
+        const response = await getApiNoneToken("/getDetailsByPhone/"+searchKeyword, {
+          phone: searchKeyword,
+        });
+        setSearch(response.data.data._id);
+    }catch (error) {
+      console.log(error);
+    }
+    if (event.target.value.trim() === "") {
+      setSearch("");
+    }
+  }
+
   return (
     <>
       <Content>
@@ -32,6 +49,7 @@ const Contact = ({userLogin}) => {
                   background: "rgb(240,240,240)",
                 }}
                 placeholder="Tìm kiếm"
+                onChange={handleFriendSearch}
               ></input>
             </Search>
             <button
@@ -80,7 +98,11 @@ const Contact = ({userLogin}) => {
           </ContentList>
         </ContentLeft>
         <ContentRight className="ContentBody">
-              {active === 'listFriend' && <ListFriend userLogin={userLogin}/>}
+        {search !== "" ?<><Friend userLogin={search} />
+              </>
+              :
+              active ==="listFriend" && <ListFriend userLogin={userLogin} /> 
+         }
         </ContentRight>
       </Content>
     </>
