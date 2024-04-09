@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getApiNoneToken } from "../api/Callapi";
 const ListFriend = ({ userLogin }) => {
-  // eslint-disable-next-line
+// eslint-disable-next-line
   const [listFriend, setListFriend] = useState([]);
   useEffect(() => {
     const loadFriends = async () => {

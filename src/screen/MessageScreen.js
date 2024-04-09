@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect , useRef} from "react";
 import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { CiVideoOn } from "react-icons/ci";
@@ -27,6 +27,8 @@ export default function MessageScreen({ userLogin }) {
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([]);
 
+    const messagesEndRef = useRef(null);
+
     useEffect(() => {
       const loadFriends = async () => {
         const response = await getApiNoneToken(`/getAllFriend/${userLogin}`
@@ -34,7 +36,8 @@ export default function MessageScreen({ userLogin }) {
         setUsers(response.data.data);
       };
       loadFriends();
-    },[userLogin]);
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    },[userLogin, messages]);
 
     const handleSearchInputChange = (event) => {
         const searchKeyword = event.target.value.toLowerCase();
@@ -647,6 +650,7 @@ export default function MessageScreen({ userLogin }) {
           </ListPerson>
           <ContentBody className="ContentBodyMessage">
             {renderContentMessage({ selectedUserName })}
+            {messagesEndRef.current && <div ref={messagesEndRef} />}
           </ContentBody>
         </Content>
       </>
@@ -664,6 +668,7 @@ const ItemMessage = styled.div`
   margin: 5px;
   word-wrap: break-word;
   flex: 1;
+  text-align: justify;
 `;
 const FileButton = styled.div`
   height: 30px;
