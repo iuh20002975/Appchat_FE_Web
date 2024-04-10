@@ -1,12 +1,15 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect , useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { CiVideoOn } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
 import img from "../images/image_background.webp";
 import { FaSearch } from "react-icons/fa";
-import { AiOutlineUsergroupAdd, AiOutlineUsergroupDelete } from "react-icons/ai";
+import {
+  AiOutlineUsergroupAdd,
+  AiOutlineUsergroupDelete,
+} from "react-icons/ai";
 import { MdDeleteOutline } from "react-icons/md";
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { IoSendOutline } from "react-icons/io5";
@@ -15,137 +18,142 @@ import { MdOutlineAttachFile } from "react-icons/md";
 import { getApiNoneToken } from "../api/Callapi";
 import Modal from "react-modal";
 import MessageChat from "../component/messageChat";
-import {getApiNoneTokenMessage} from "../api/Callapi";
+import { getApiNoneTokenMessage } from "../api/Callapi";
+
 export default function MessageScreen({ userLogin }) {
-    const [activeName, setActiveName] = useState("");
-    const [activeContentTab, setActiveContentTab] = useState("Prioritize");
-    const [selectedUserName, setSelectedUserName] = useState("");
-    const [showMembers, setShowMembers] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-    const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
-    const [selectedMembers, setSelectedMembers] = useState([]);
-    const [messageInput, setMessageInput] = useState("");
-    const [messages, setMessages] = useState([]);
-    const [users, setUsers] = useState([]);
-    const [originalUsers, setOriginalUsers] = useState([])
-    useEffect(() => {
-      const loadFriends = async () => {
-        const response = await getApiNoneToken(`/getAllFriend/${userLogin}`
-        , {id: userLogin});
-        setUsers(response.data.data);
-        setOriginalUsers(response.data.data);
+
+  const [activeName, setActiveName] = useState("");
+  const [activeContentTab, setActiveContentTab] = useState("Prioritize");
+  const [selectedUserName, setSelectedUserName] = useState("");
+  const [showMembers, setShowMembers] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  
+  const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [originalUsers, setOriginalUsers] = useState([]);
+
+  useEffect(() => {
+    const loadFriends = async () => {
+      const response = await getApiNoneToken(`/getAllFriend/${userLogin}`, {
+        id: userLogin,
+      });
+      setUsers(response.data.data);
+      setOriginalUsers(response.data.data);
+    };
+    loadFriends();
+  }, [userLogin]);
+
+  const handleSearchInputChange = (event) => {
+    const searchKeyword = event.target.value.toLowerCase();
+    if (searchKeyword === "") {
+      setUsers(originalUsers);
+    } else {
+      const filteredUsers = users.filter((user) =>
+        user.name.toLowerCase().includes(searchKeyword)
+      );
+      setUsers(filteredUsers);
+    }
+  };
+
+  const sendFileOfType = (acceptedFileType) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = acceptedFileType;
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      sendFile(file);
+    };
+    input.click();
+  };
+
+  const sendFile = (file) => {
+    // Thực hiện gửi file ở đây
+  };
+
+  const sendWordFile = () => {
+    sendFileOfType(".doc,.docx");
+  };
+
+  const sendExcelFile = () => {
+    sendFileOfType(".xls,.xlsx");
+  };
+
+  const sendPowerPointFile = () => {
+    sendFileOfType(".ppt,.pptx");
+  };
+
+  const sendImage = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      const formData = new FormData();
+      formData.append("image", file);
+      alert("Đã chọn ảnh: " + file.name);
+    };
+    input.click();
+  };
+
+  const sendMessage = () => {
+    if (messageInput.trim() !== "") {
+      const newMessage = {
+        sender: "User",
+        content: messageInput,
       };
-      loadFriends();
-      
+      setMessages([...messages, newMessage]);
+      setMessageInput("");
+    } else {
+      console.log("Không thể gửi tin nhắn trống.");
+    }
+  };
 
-    },[userLogin]);
+  const handlerName = (tabName) => {
+    setActiveName(tabName);
+    setMessages([]);
+  };
 
-      const handleSearchInputChange = (event) => {
-          const searchKeyword = event.target.value.toLowerCase();
-          if(searchKeyword === "") {
-              setUsers(originalUsers)
-          }else{
-          const filteredUsers = users.filter((user) =>
-              user.name.toLowerCase().includes(searchKeyword)
-          );
-          setUsers(filteredUsers);}
-      };
+  const handleContentTab = (tab) => {
+    setActiveContentTab(tab);
+  };
 
-    const sendFileOfType = (acceptedFileType) => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = acceptedFileType;
-        input.onchange = (event) => {
-            const file = event.target.files[0];
-            sendFile(file);
-        };
-        input.click();
-    };
+  const handleModalAdd = () => {
+    setShowModal(true);
+  };
 
-    const sendFile = (file) => {
-        // Thực hiện gửi file ở đây
-    };
+  const closeModalAdd = () => {
+    setShowModal(false);
+  };
 
-    const sendWordFile = () => {
-        sendFileOfType(".doc,.docx");
-    };
+  const handleDeleteMemberModal = () => {
+    setShowDeleteMemberModal(true);
+  };
 
-    const sendExcelFile = () => {
-        sendFileOfType(".xls,.xlsx");
-    };
+  const closeDeleteMemberModal = () => {
+    setShowDeleteMemberModal(false);
+  };
 
-    const sendPowerPointFile = () => {
-        sendFileOfType(".ppt,.pptx");
-    };
+  const handleSelectMember = (userId) => {
+    const isSelected = selectedMembers.includes(userId);
+    if (isSelected) {
+      setSelectedMembers(selectedMembers.filter((id) => id !== userId));
+    } else {
+      setSelectedMembers([...selectedMembers, userId]);
+    }
+  };
 
-    const sendImage = () => {
-        const input = document.createElement("input");
-        input.type = "file";
-        input.accept = "image/*";
-        input.onchange = (event) => {
-            const file = event.target.files[0];
-            const formData = new FormData();
-            formData.append("image", file);
-            alert("Đã chọn ảnh: " + file.name);
-        };
-        input.click();
-    };
-
-    const sendMessage = () => {
-        if (messageInput.trim() !== "") {
-            const newMessage = {
-                sender: "User",
-                content: messageInput,
-            };
-            setMessages([...messages, newMessage]);
-            setMessageInput("");
-        } else {
-            console.log("Không thể gửi tin nhắn trống.");
-        }
-    };
-
-    const handlerName = (tabName) => {
-        setActiveName(tabName);
-        setMessages([]);
-    };
-
-    const handleContentTab = (tab) => {
-        setActiveContentTab(tab);
-    };
-
-    const handleModalAdd = () => {
-        setShowModal(true);
-    };
-
-    const closeModalAdd = () => {
-        setShowModal(false);
-    };
-
-    const handleDeleteMemberModal = () => {
-        setShowDeleteMemberModal(true);
-    };
-
-    const closeDeleteMemberModal = () => {
-        setShowDeleteMemberModal(false);
-    };
-
-    const handleSelectMember = (userId) => {
-        const isSelected = selectedMembers.includes(userId);
-        if (isSelected) {
-            setSelectedMembers(selectedMembers.filter((id) => id !== userId));
-        } else {
-            setSelectedMembers([...selectedMembers, userId]);
-        }
-    };
-
-    const handleDeleteMembers = () => {
-        console.log("Xóa thành viên:", selectedMembers);
-        setShowDeleteMemberModal(false);
-        setSelectedMembers([]);
-    };
+  const handleDeleteMembers = () => {
+    console.log("Xóa thành viên:", selectedMembers);
+    setShowDeleteMemberModal(false);
+    setSelectedMembers([]);
+  };
 
   // eslint-disable-next-line no-unused-vars
-    const renderContentMessage = ({ selectedUserName }) => { // Lấy tên người dùng từ state
+  const renderContentMessage = ({ selectedUserName }) => {
+    // Lấy tên người dùng từ state
     return (
       <ChatMessage className="ChatMessage">
         {selectedUserName === "" ? (
@@ -176,7 +184,7 @@ export default function MessageScreen({ userLogin }) {
                 </IconGroupMessage>
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage">
-                { messages.map((message, index) => (
+                {messages.map((message, index) => (
                   <div key={index}>
                     <ItemMessage>
                       {message.content}
@@ -187,10 +195,10 @@ export default function MessageScreen({ userLogin }) {
               </BodyContentMessage>
               <FooterContenMessate>
                 <ChatButton>
-                  <ImageButton onClick={  sendImage}>
+                  <ImageButton onClick={sendImage}>
                     <CiImageOn style={{ width: "100%", height: "100%" }} />
                   </ImageButton>
-                  <FileButton onClick={  sendFileOfType}>
+                  <FileButton onClick={sendFileOfType}>
                     <MdOutlineAttachFile
                       style={{ width: "100%", height: "100%" }}
                     />
@@ -209,12 +217,10 @@ export default function MessageScreen({ userLogin }) {
                     }}
                     type="text"
                     placeholder="Nhập tin nhắn..."
-                    value={ messageInput}
-                    onChange={(e) =>
-                         setMessageInput( e.target.value )
-                    }
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
                   />
-                  <SendButton onClick={  sendMessage}>
+                  <SendButton onClick={sendMessage}>
                     <IoSendOutline style={{ width: "23px", height: "23px" }} />
                   </SendButton>
                 </ChatInputContainer>
@@ -242,7 +248,7 @@ export default function MessageScreen({ userLogin }) {
                           cursor: "pointer",
                           borderColor: "gray",
                         }}
-                        onClick={  handleModalAdd}
+                        onClick={handleModalAdd}
                       >
                         <AiOutlineUsergroupAdd />
                       </button>
@@ -263,8 +269,8 @@ export default function MessageScreen({ userLogin }) {
                           justifyContent: "space-between",
                         },
                       }}
-                      isOpen={ showModal}
-                      onRequestClose={  closeModalAdd}
+                      isOpen={showModal}
+                      onRequestClose={closeModalAdd}
                       contentLabel="Example Modal"
                     >
                       <div>
@@ -272,7 +278,7 @@ export default function MessageScreen({ userLogin }) {
                       </div>
 
                       <form style={{ flex: 1, overflowY: "auto" }}>
-                        { users.map((user) => (
+                        {users.map((user) => (
                           <div
                             key={user.id}
                             style={{ display: "flex", alignItems: "center" }}
@@ -292,7 +298,7 @@ export default function MessageScreen({ userLogin }) {
                         }}
                       >
                         <button
-                          onClick={  closeModalAdd}
+                          onClick={closeModalAdd}
                           style={{
                             width: 50,
                             height: 35,
@@ -333,7 +339,7 @@ export default function MessageScreen({ userLogin }) {
                           cursor: "pointer",
                           borderColor: "gray",
                         }}
-                        onClick={  handleDeleteMemberModal}
+                        onClick={handleDeleteMemberModal}
                       >
                         <AiOutlineUsergroupDelete />
                       </button>
@@ -371,15 +377,15 @@ export default function MessageScreen({ userLogin }) {
                           justifyContent: "space-between",
                         },
                       }}
-                      isOpen={ showDeleteMemberModal}
-                      onRequestClose={  closeDeleteMemberModal}
+                      isOpen={showDeleteMemberModal}
+                      onRequestClose={closeDeleteMemberModal}
                       contentLabel="Delete Member Modal"
                     >
                       <div>
                         <h2>Xóa thành viên</h2>
                       </div>
                       <form style={{ flex: 1, overflowY: "auto" }}>
-                        { users.map((user) => (
+                        {users.map((user) => (
                           <div
                             key={user.id}
                             style={{ display: "flex", alignItems: "center" }}
@@ -387,10 +393,8 @@ export default function MessageScreen({ userLogin }) {
                             <input
                               type="checkbox"
                               id={user.id}
-                              checked={ selectedMembers.includes(
-                                user.id
-                              )}
-                              onChange={() =>   handleSelectMember(user.id)}
+                              checked={selectedMembers.includes(user.id)}
+                              onChange={() => handleSelectMember(user.id)}
                             />
                             <AvatarModal className="AvatarModal"></AvatarModal>
                             <label htmlFor={user.id}>{user.name}</label>
@@ -413,7 +417,7 @@ export default function MessageScreen({ userLogin }) {
                             outline: "none",
                             cursor: "pointer",
                           }}
-                          onClick={  closeDeleteMemberModal}
+                          onClick={closeDeleteMemberModal}
                         >
                           Đóng
                         </button>
@@ -428,7 +432,7 @@ export default function MessageScreen({ userLogin }) {
                             color: "white",
                             cursor: "pointer",
                           }}
-                          onClick={  handleDeleteMembers}
+                          onClick={handleDeleteMembers}
                         >
                           Xóa
                         </button>
@@ -449,20 +453,16 @@ export default function MessageScreen({ userLogin }) {
                       border: "10px",
                       outline: "none",
                     }}
-                    onClick={() =>
-                         setShowMembers( ! showMembers )
-                    }
+                    onClick={() => setShowMembers(!showMembers)}
                   >
                     <span
                       style={{
                         fontSize: "20px",
                       }}
                     >
-                      { showMembers
-                        ? "Ẩn danh sách "
-                        : "Thành viên nhóm"}
+                      {showMembers ? "Ẩn danh sách " : "Thành viên nhóm"}
                     </span>
-                    { showMembers ? (
+                    {showMembers ? (
                       <IoMdArrowDropup
                         style={{
                           width: "10%",
@@ -480,15 +480,15 @@ export default function MessageScreen({ userLogin }) {
                     )}
                   </button>
 
-                  { showMembers && (
+                  {showMembers && (
                     <ul>
-                      { users.map((user) => (
+                      {users.map((user) => (
                         <li
                           style={{
                             listStyleType: "none",
                             paddingRight: "10px",
                             display: "flex",
-                            alignItems: "center"
+                            alignItems: "center",
                           }}
                           key={user.id}
                         >
@@ -505,7 +505,7 @@ export default function MessageScreen({ userLogin }) {
         )}
       </ChatMessage>
     );
-  }
+  };
   // eslint-disable-next-line no-unused-vars
   const renderContentTab = ({ activeContentTab }) => {
     if (activeContentTab === "Orther") {
@@ -515,7 +515,7 @@ export default function MessageScreen({ userLogin }) {
         <div style={{ overflow: "scroll", maxHeight: "90vb" }}>
           {users.map((user) => (
             <button
-              onClick={() =>    setSelectedUserName(user.name)  } // Sử dụng arrow function ở đây
+              onClick={() => setSelectedUserName(user.name)} // Sử dụng arrow function ở đây
               style={{
                 width: "100%",
                 outline: "0",
@@ -526,7 +526,7 @@ export default function MessageScreen({ userLogin }) {
             >
               <ItemUser
                 $activeName={activeName === "Name"}
-                onClick={() =>   handlerName("Name")}
+                onClick={() => handlerName("Name")}
               >
                 <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
                 <div
@@ -571,96 +571,93 @@ export default function MessageScreen({ userLogin }) {
         </div>
       );
     }
-  }
-  const renderTab= ( ) =>{
+  };
+  const renderTab = () => {
     return (
       <ListMessage className="ListMessage">
         <TabsList className="Tabs">
           <TabList
             className="Tab"
-            $activeContentTab={ activeContentTab === "Prioritize"}
-            onClick={() =>   handleContentTab("Prioritize")}
+            $activeContentTab={activeContentTab === "Prioritize"}
+            onClick={() => handleContentTab("Prioritize")}
           >
             Ưu tiên
           </TabList>
           <TabList
             className="Tab"
-            $activeContentTab={ activeContentTab === "Orther"}
-            onClick={() =>   handleContentTab("Orther")}
+            $activeContentTab={activeContentTab === "Orther"}
+            onClick={() => handleContentTab("Orther")}
           >
             Khác
           </TabList>
         </TabsList>
         <ContentTab className="ContentTab">
-          {renderContentTab({activeContentTab})}
+          {renderContentTab({ activeContentTab })}
         </ContentTab>
       </ListMessage>
     );
-  }
-// eslint-disable-next-line no-unused-vars
-    return (
-      <>
-        <Content>
-        {/* {alert(messages)} */}
-          <ListPerson className="ListPersonMessage">
-            <HeaderList className="HeaderList">
-              <Search className="Search">
-                <button
-                  style={{
-                    fontSize: "15px",
-                    padding: "5px",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                  onChange={handleSearchInputChange}
-                >
-                  <FaSearch />
-                </button>
-                <input
-                  style={{
-                    fontSize: "15px",
-                    padding: "6px",
-                    outline: "0",
-                    border: "none",
-                    background: "rgb(240,240,240)",
-                  }}
-                  placeholder="Tìm kiếm"
-                  onChange={handleSearchInputChange}
-                ></input>
-              </Search>
+  };
+  // eslint-disable-next-line no-unused-vars
+  return (
+    <>
+      <Content>
+        <ListPerson className="ListPersonMessage">
+          <HeaderList className="HeaderList">
+            <Search className="Search">
               <button
                 style={{
-                  border: "none",
                   fontSize: "15px",
-                  background: "white",
-                  padding: "0",
+                  padding: "5px",
+                  border: "none",
+                  cursor: "pointer",
                 }}
+                onChange={handleSearchInputChange}
               >
-                <MdOutlinePersonAddAlt1 style={{ fontSize: "24px" }} />
+                <FaSearch />
               </button>
-              <button
+              <input
                 style={{
-                  border: "none",
                   fontSize: "15px",
-                  background: "white",
-                  padding: "0",
+                  padding: "6px",
+                  outline: "0",
+                  border: "none",
+                  background: "rgb(240,240,240)",
                 }}
-              >
-                <MdOutlineGroupAdd style={{ fontSize: "24px" }} />
-              </button>
-            </HeaderList>
-            <ContentList className="ContentListPerson">
-              {renderTab({selectedUserName})}
-            </ContentList>
-          </ListPerson>
-          <ContentBody className="ContentBodyMessage">
-            {renderContentMessage({ selectedUserName })}
-          </ContentBody>
-        </Content>
-      </>
-    );
-
-
+                placeholder="Tìm kiếm"
+                onChange={handleSearchInputChange}
+              ></input>
+            </Search>
+            <button
+              style={{
+                border: "none",
+                fontSize: "15px",
+                background: "white",
+                padding: "0",
+              }}
+            >
+              <MdOutlinePersonAddAlt1 style={{ fontSize: "24px" }} />
+            </button>
+            <button
+              style={{
+                border: "none",
+                fontSize: "15px",
+                background: "white",
+                padding: "0",
+              }}
+            >
+              <MdOutlineGroupAdd style={{ fontSize: "24px" }} />
+            </button>
+          </HeaderList>
+          <ContentList className="ContentListPerson">
+            {renderTab({ selectedUserName })}
+          </ContentList>
+        </ListPerson>
+        <ContentBody className="ContentBodyMessage">
+          {renderContentMessage({ selectedUserName })}
+        </ContentBody>
+      </Content>
+    </>
+  );
 }
 const ItemMessage = styled.div`
   padding: 15px;
@@ -701,7 +698,6 @@ const SendButton = styled.div`
   padding: 7px 13px;
   cursor: pointer;
 `;
-
 const AvatarModal = styled.div`
   background: black;
   width: 35px;
@@ -716,21 +712,18 @@ const AvatarInGroup = styled.div`
   margin: 3px;
   border-radius: 50%;
 `;
-
 const Infor = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
 `;
-
 const MenutoGroup = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: center;
   margin-top: 25px;
 `;
-
 const DeleteMember = styled.div``;
 const DeleteGroup = styled.div``;
 const AddMemberToGroup = styled.div`
@@ -831,7 +824,6 @@ const HeaderInforMessage = styled.div`
   justify-content: center;
   border-bottom: 2px solid rgb(241, 243, 245);
 `;
-
 const BodyContentMessage = styled.div`
   width: 100%;
   height: 73%;
@@ -880,7 +872,6 @@ const HeaderContentMessage = styled.div`
   height: 8%;
   border-bottom: 1px solid rgb(241, 243, 245);
 `;
-
 const ChatMessage = styled.div`
   width: 100%;
   height: 100vb;

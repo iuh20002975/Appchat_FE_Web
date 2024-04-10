@@ -13,4 +13,10 @@ Cần làm là: chạy lần lượt các lệnh sau:
 => yarn start
 
 
+trong get messages 
+http://localhost:3001/api/messages/66168d1681186c30a9ef01c5
+đã đăng nhập thì id chính là id của người đã nhắn với tài khoản đăng nhập 
+nó chỉ hiện thông tin giữa 2 tài khoản
+
+
 MONGO_DB=mongodb+srv://thaidp2002:chatappdb@chatappdatabase.mebfcgt.mongodb.net/?retryWrites=true&w=majority

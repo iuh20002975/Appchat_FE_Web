@@ -98,7 +98,7 @@ const Contact = ({userLogin}) => {
           </ContentList>
         </ContentLeft>
         <ContentRight className="ContentBody">
-        {search !== "" ?<><Friend userLogin={search} />
+        {search !== "" ?<><Friend idSearch={search} idUser={userLogin} />
               </>
               :
               active ==="listFriend" && <ListFriend userLogin={userLogin} /> 
