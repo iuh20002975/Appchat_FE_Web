@@ -15,33 +15,49 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { IoSendOutline } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
-import { getApiNoneToken } from "../api/Callapi";
+import { getApiNoneToken, postApiNoneTokenMessage } from "../api/Callapi";
 import Modal from "react-modal";
-import MessageChat from "../component/messageChat";
-import { getApiNoneTokenMessage } from "../api/Callapi";
+import Chat from "../component/chat";
 
 export default function MessageScreen({ userLogin }) {
-
   const [activeName, setActiveName] = useState("");
   const [activeContentTab, setActiveContentTab] = useState("Prioritize");
   const [selectedUserName, setSelectedUserName] = useState("");
   const [showMembers, setShowMembers] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  
+  const [phone, setPhone] = useState("");
+  const [idSelector, setIdSelector] = useState("");
   const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
+  useEffect(() => {
+    const loadIdByPhone = async () => {
+      try {
+        const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
+          phone: phone,
+        });
+        setIdSelector(response.data.data._id);
+      } catch (error) {
+        console.error("Error loading ID by phone:", error);
+      }
+    };
+    loadIdByPhone();
+  });
 
   useEffect(() => {
     const loadFriends = async () => {
-      const response = await getApiNoneToken(`/getAllFriend/${userLogin}`, {
-        id: userLogin,
-      });
-      setUsers(response.data.data);
-      setOriginalUsers(response.data.data);
+      try {
+        const response = await getApiNoneToken(`/getAllFriend/${userLogin}`, {
+          id: userLogin,
+        });
+        setUsers(response.data.data);
+        setOriginalUsers(response.data.data);
+      } catch (error) {
+        console.error("Error loading ID by phone:", error);
+      }
     };
     loadFriends();
   }, [userLogin]);
@@ -98,15 +114,17 @@ export default function MessageScreen({ userLogin }) {
     input.click();
   };
 
-  const sendMessage = () => {
-    if (messageInput.trim() !== "") {
-      const newMessage = {
-        sender: "User",
-        content: messageInput,
-      };
-      setMessages([...messages, newMessage]);
+  const sendMessage = async () => {
+    try {
+      const response = await postApiNoneTokenMessage(
+        "/sendMessage/" + idSelector,
+        {
+          userId: userLogin,
+          message: messageInput,
+        }
+      );
       setMessageInput("");
-    } else {
+    } catch (error) {
       console.log("Không thể gửi tin nhắn trống.");
     }
   };
@@ -184,14 +202,7 @@ export default function MessageScreen({ userLogin }) {
                 </IconGroupMessage>
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage">
-                {messages.map((message, index) => (
-                  <div key={index}>
-                    <ItemMessage>
-                      {message.content}
-                      {/* <strong>{message.sender}:</strong> {message.content} */}
-                    </ItemMessage>
-                  </div>
-                ))}
+              <Chat idSelector={idSelector} idLogin={userLogin}></Chat>
               </BodyContentMessage>
               <FooterContenMessate>
                 <ChatButton>
@@ -280,10 +291,10 @@ export default function MessageScreen({ userLogin }) {
                       <form style={{ flex: 1, overflowY: "auto" }}>
                         {users.map((user) => (
                           <div
-                            key={user.id}
+                            key={user._id}
                             style={{ display: "flex", alignItems: "center" }}
                           >
-                            <input type="checkbox" id={user.id} />
+                            <input type="checkbox" id={user._id} />
                             <AvatarModal className="AvatarModal"></AvatarModal>
                             <label htmlFor={user.id}>{user.name}</label>
                           </div>
@@ -387,7 +398,7 @@ export default function MessageScreen({ userLogin }) {
                       <form style={{ flex: 1, overflowY: "auto" }}>
                         {users.map((user) => (
                           <div
-                            key={user.id}
+                            key={user._id}
                             style={{ display: "flex", alignItems: "center" }}
                           >
                             <input
@@ -490,7 +501,7 @@ export default function MessageScreen({ userLogin }) {
                             display: "flex",
                             alignItems: "center",
                           }}
-                          key={user.id}
+                          key={user._id}
                         >
                           <AvatarInGroup className="AvatarInGroup"></AvatarInGroup>
                           {user.name}
@@ -515,18 +526,23 @@ export default function MessageScreen({ userLogin }) {
         <div style={{ overflow: "scroll", maxHeight: "90vb" }}>
           {users.map((user) => (
             <button
-              onClick={() => setSelectedUserName(user.name)} // Sử dụng arrow function ở đây
+              onClick={() => {
+                setSelectedUserName(user.name);
+                setPhone(user.phone);
+              }}
               style={{
                 width: "100%",
                 outline: "0",
                 background: "white",
                 border: "none",
               }}
-              key={user.id}
+              key={user._id}
             >
               <ItemUser
                 $activeName={activeName === "Name"}
-                onClick={() => handlerName("Name")}
+                onClick={() => {
+                  handlerName("Name");
+                }}
               >
                 <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
                 <div
@@ -827,10 +843,7 @@ const HeaderInforMessage = styled.div`
 const BodyContentMessage = styled.div`
   width: 100%;
   height: 73%;
-  background-color: red;
-  text-align: right;
   overflow-y: auto;
-  flex: 1;
 `;
 const LeftMessage = styled.div`
   float: left;

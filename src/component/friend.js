@@ -1,40 +1,47 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getApiNoneToken,putApiNoneToken } from "../api/Callapi";
+import { getApiNoneToken, putApiNoneToken } from "../api/Callapi";
 import { useNavigate } from "react-router-dom";
 
 const Friend = ({ idSearch, idUser }) => {
-
   const [friend, setFriend] = useState([]);
   // eslint-disable-next-line
   const [phone, setPhone] = useState("");
-    // eslint-disable-next-line
+  // eslint-disable-next-line
   const [listPhone, setListPhone] = useState([]);
-  const [check , setCheck] = useState(false);
+  const [check, setCheck] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
     const loadFriends = async () => {
-      const response = await getApiNoneToken(`/getDetails/${idSearch}`, {
-        id: idSearch,
-      });
-      setFriend(response.data.data);
-      setPhone(response.data.data.phone);
+      try {
+        const response = await getApiNoneToken(`/getDetails/${idSearch}`, {
+          id: idSearch,
+        });
+        setFriend(response.data.data);
+        setPhone(response.data.data.phone);
+      } catch (error) {
+        console.error("Error loading ID by phone:", error);
+      }
     };
     loadFriends();
   }, [idSearch]);
-  
+
   useEffect(() => {
     const loadListPhone = async () => {
-      const response2 = await getApiNoneToken(`/getAllFriend/${idUser}`, {
-        id: idUser,
-      });
-      const phones = response2.data.data.map(item => item.phone);
-      setListPhone(phones);
+      try {
+        const response2 = await getApiNoneToken(`/getAllFriend/${idUser}`, {
+          id: idUser,
+        });
+        const phones = response2.data.data.map((item) => item.phone);
+        setListPhone(phones);
+      } catch (error) {
+        console.error("Error loading ID by phone:", error);
+      }
     };
     loadListPhone();
   }, [idUser]);
-  
-// kiểm tra xem phone có nằm trong danh sách phone của bạn bè không
+
+  // kiểm tra xem phone có nằm trong danh sách phone của bạn bè không
   useEffect(() => {
     if (listPhone.includes(phone)) {
       setCheck(true);
@@ -49,26 +56,24 @@ const Friend = ({ idSearch, idUser }) => {
       });
       alert("Thêm bạn thành công");
       // Thực hiện các hành động khác nếu cần
-      navigate("/home" , {state: {idUser}});
+      navigate("/home", { state: { idUser } });
     } catch (error) {
       console.error("Lỗi khi thêm bạn:", error);
       alert("Đã xảy ra lỗi khi thêm bạn. Vui lòng thử lại sau.");
     }
-  }
+  };
 
   return (
     <form style={{ flex: 1, overflowY: "auto" }}>
-        <ItemUser
-          key={friend.id}
-          style={{ display: "flex", alignItems: "center" }}
-        >
-          <input type="checkbox" id={friend.id} />
-          <Avatar />
-          <label htmlFor={friend.id}>{friend.name}</label>
-          {check ? <p></p> : <ButtonAdd
-            onClick={addFriend}
-          >Thêm</ButtonAdd>}
-        </ItemUser>
+      <ItemUser
+        key={friend.id}
+        style={{ display: "flex", alignItems: "center" }}
+      >
+        <input type="checkbox" id={friend.id} />
+        <Avatar />
+        <label htmlFor={friend.id}>{friend.name}</label>
+        {check ? <p></p> : <ButtonAdd onClick={addFriend}>Thêm</ButtonAdd>}
+      </ItemUser>
     </form>
   );
 };
@@ -90,7 +95,7 @@ const ItemUser = styled.div`
   cursor: pointer;
   background-color: red;
   display: flex;
-  margin: 5px 2px ;
+  margin: 5px 2px;
 `;
 const Avatar = styled.div`
   background: black;

@@ -5,7 +5,7 @@ var api = axios.create({
     baseURL:'http://localhost:3001/api/user'
 })
 var api2 = axios.create({
-    baseURL:'http://localhost:3001/api/'
+    baseURL:'http://localhost:3001/api/messages'
 })
   
 export const postApiNoneToken=(url,data)=>{
@@ -15,7 +15,9 @@ export const postApiNoneToken=(url,data)=>{
 export const getApiNoneTokenMessage=(url,data)=>{
     return api2.get(url,data)
 }
-
+export const postApiNoneTokenMessage=(url,data)=>{
+    return api2.post(url,data)
+}
 export const getApiNoneToken=(url,data)=>{
     return api.get(url,data)
 }

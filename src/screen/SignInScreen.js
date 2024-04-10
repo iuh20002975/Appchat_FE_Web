@@ -30,6 +30,7 @@ const SignInScreen = () => {
       if (accessToken) {
         setToken(accessToken);
         const userLogin = response.data.userLogin._id;
+        
         navigate("/home", { state: { userLogin } });
       } else {
         setToken("no token");

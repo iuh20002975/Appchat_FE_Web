@@ -142,7 +142,7 @@ const SignupScreen = () => {
                 style={{ width: "100px", textAlign: "right" }}
               >
                 Giới tính:
-              </label>
+              </label>  
             </div>
             <select
               id="gender"

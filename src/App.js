@@ -11,6 +11,7 @@ import ModalAccountInfor from "./screen/ModalAccountInfor.js";
 import ListFriend from "./component/listFriend.js";
 import MessageChat from "./component/messageChat.js";
 import Friend from "./component/friend.js";
+import Chat from "./component/chat.js";
 function App() {
   return (
 
@@ -26,6 +27,7 @@ function App() {
           <Route                 element={<ListFriend />} />
           <Route                 element={<MessageChat />} />
           <Route                 element={<Friend />} />
+          <Route  path="/chat"   element={<Chat />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         </Routes>
       </Router>
