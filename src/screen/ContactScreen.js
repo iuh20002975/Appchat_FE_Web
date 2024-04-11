@@ -7,10 +7,12 @@ import { FaSearch } from "react-icons/fa";
 import ListFriend from "../component/listFriend.js";
 import { getApiNoneToken } from "../api/Callapi.js";
 import Friend from "../component/friend.js";
+import ListInvite from "../component/listInvite.js";
+
 const Contact = ({userLogin}) => {
   const [active, setActive] = useState('listFriend');
   //eslint-disable-next-line
-  const [search, setSearch] = useState('');
+  const [searchPhone, setSearchPhone] = useState('');
   const handler = (tab) => {
     setActive(tab);
   };
@@ -20,12 +22,12 @@ const Contact = ({userLogin}) => {
         const response = await getApiNoneToken("/getDetailsByPhone/"+searchKeyword, {
           phone: searchKeyword,
         });
-        setSearch(response.data.data._id);
+        setSearchPhone(response.data.data._id);
     }catch (error) {
       console.log(error);
     }
     if (event.target.value.trim() === "") {
-      setSearch("");
+      setSearchPhone("");
     }
   }
 
@@ -98,11 +100,22 @@ const Contact = ({userLogin}) => {
           </ContentList>
         </ContentLeft>
         <ContentRight className="ContentBody">
-        {search !== "" ?<><Friend idSearch={search} idUser={userLogin} />
-              </>
-              :
-              active ==="listFriend" && <ListFriend userLogin={userLogin} /> 
-         }
+        {searchPhone !== "" ? (
+  <Friend searchPhone={searchPhone} idUser={userLogin} />
+) : (
+  <>
+    {active === "listFriend" ? (
+      <ListFriend userLogin={userLogin} />
+    ) : active === "listGroup" ? (
+      <div>listGroup</div>
+    ) : active === "listAdd" ? (
+      <ListInvite userLogin={userLogin} />
+    ) : (
+      <div>listAdd</div>
+    )}
+  </>
+)}
+
         </ContentRight>
       </Content>
     </>

@@ -3,8 +3,8 @@ import styled from "styled-components";
 import { getApiNoneToken, postApiNoneToken } from "../api/Callapi";
 
 const ListFriend = ({ userLogin }) => {
-// eslint-disable-next-line
   const [listFriend, setListFriend] = useState([]);
+
   useEffect(() => {
     const loadFriends = async () => {
       const response = await getApiNoneToken(`/getAllFriend/${userLogin}`, {
@@ -15,21 +15,25 @@ const ListFriend = ({ userLogin }) => {
     loadFriends();
   }, [userLogin]);
 
-  const deleteFriend = async (phone) => {
+  const deleteFriend = async (index, phone) => {
     try {
       await postApiNoneToken(`/deleteFriend/${userLogin}`, {
         phone: phone,
       });
       alert("Xóa bạn thành công");
+      // Tạo một bản sao của mảng listFriend và thay đổi style của nút delete của item được xóa
+      const updatedList = [...listFriend];
+      updatedList[index].style = "Not friend";
+      setListFriend(updatedList);
     } catch (error) {
       console.error("Lỗi khi xóa bạn:", error);
       alert("Đã xảy ra lỗi khi xóa bạn. Vui lòng thử lại sau.");
     }
-  }
+  };
 
   return (
     <form style={{ flex: 1, overflowY: "auto" }}>
-      {listFriend.map((user) => (
+      {listFriend.map((user, index) => (
         <ItemUser
           key={user.id}
           style={{ display: "flex", alignItems: "center" }}
@@ -37,16 +41,19 @@ const ListFriend = ({ userLogin }) => {
           <input type="checkbox" id={user.id} />
           <Avatar />
           <label htmlFor={user.id}>{user.name}</label>
-          <ButtonDelete 
-            onClick={() => deleteFriend(user.phone)}
-          >Xóa</ButtonDelete>
+          <ButtonDelete
+            type="button"
+            onClick={() => deleteFriend(index, user.phone)}
+            style={{ backgroundColor: user.style === "Not friend" ? "#ccc" : "#4caf50" }} // Thay đổi style dựa trên trạng thái của mỗi item
+          >
+            {user.style || "Delete friend"} {/* Sử dụng style đã lưu hoặc mặc định */}
+          </ButtonDelete>
         </ItemUser>
       ))}
     </form>
   );
 };
 const ButtonDelete = styled.button`
-  background-color: #4caf50;
   color: white;
   padding: 10px 10px;
   margin: 8px 0;
@@ -63,7 +70,7 @@ const ItemUser = styled.div`
   cursor: pointer;
   background-color: red;
   display: flex;
-  margin: 5px 2px ;
+  margin: 5px 2px;
 `;
 const Avatar = styled.div`
   background: black;

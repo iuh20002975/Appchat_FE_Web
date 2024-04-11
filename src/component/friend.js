@@ -1,30 +1,31 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getApiNoneToken, putApiNoneToken } from "../api/Callapi";
-import { useNavigate } from "react-router-dom";
 
-const Friend = ({ idSearch, idUser }) => {
+const Friend = ({ searchPhone, idUser }) => {
   const [friend, setFriend] = useState([]);
   // eslint-disable-next-line
   const [phone, setPhone] = useState("");
+
   // eslint-disable-next-line
   const [listPhone, setListPhone] = useState([]);
   const [check, setCheck] = useState(false);
-  const navigate = useNavigate();
+
+  const [style, setStyle] = useState("AddFriend");
+
   useEffect(() => {
     const loadFriends = async () => {
       try {
-        const response = await getApiNoneToken(`/getDetails/${idSearch}`, {
-          id: idSearch,
+        const response = await getApiNoneToken(`/getDetails/${searchPhone}`, {
+          id: searchPhone,
         });
         setFriend(response.data.data);
-        setPhone(response.data.data.phone);
       } catch (error) {
         console.error("Error loading ID by phone:", error);
       }
     };
     loadFriends();
-  }, [idSearch]);
+  }, [searchPhone]);
 
   useEffect(() => {
     const loadListPhone = async () => {
@@ -48,21 +49,32 @@ const Friend = ({ idSearch, idUser }) => {
     }
   }, [phone, listPhone]);
 
-  const addFriend = async () => {
+  const addFriend = async (idReceiver) => {
     try {
-      await putApiNoneToken(`/addFriend/${idUser}`, {
+      const response1 = await getApiNoneToken("/getDetails/" + idUser, {
+        id: idUser,
+      });
+      // eslint-disable-next-line
+      const response2 = await putApiNoneToken("/addInvite/" + idReceiver, {
+        id: idUser,
+        name: response1.data.data.name,
+        phone: response1.data.data.phone,
+      });
+      // eslint-disable-next-line
+      const response3 = await putApiNoneToken("/addListFriend/" + idUser, {
+        id: idReceiver,
         name: friend.name,
         phone: friend.phone,
       });
+
       alert("Thêm bạn thành công");
-      // Thực hiện các hành động khác nếu cần
-      navigate("/home", { state: { idUser } });
+      setStyle("SendInvite Success");
+
     } catch (error) {
       console.error("Lỗi khi thêm bạn:", error);
       alert("Đã xảy ra lỗi khi thêm bạn. Vui lòng thử lại sau.");
     }
   };
-
   return (
     <form style={{ flex: 1, overflowY: "auto" }}>
       <ItemUser
@@ -72,7 +84,13 @@ const Friend = ({ idSearch, idUser }) => {
         <input type="checkbox" id={friend.id} />
         <Avatar />
         <label htmlFor={friend.id}>{friend.name}</label>
-        {check ? <p></p> : <ButtonAdd onClick={addFriend}>Thêm</ButtonAdd>}
+        {check ? (
+          <p></p>
+        ) : (
+          <ButtonAdd type="button" onClick={() => addFriend(friend._id)}>
+            {style}
+          </ButtonAdd>
+        )}
       </ItemUser>
     </form>
   );
