@@ -1,12 +1,20 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getApiNoneTokenMessage } from "../api/Callapi";
 import styled from "styled-components";
+import io from "socket.io-client";
 
 const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    const socket = io("ws://localhost:3000");
+
+    // Lắng nghe tin nhắn mới từ máy chủ WebSocket
+    socket.on("newMessage", (newMessage) => {
+      // Tải lại tin nhắn
+      loadMessage();
+    });
     const loadMessage = async () => {
       try {
         const response = await getApiNoneTokenMessage(

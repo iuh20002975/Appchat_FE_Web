@@ -19,6 +19,7 @@ import { getApiNoneToken, postApiNoneTokenMessage } from "../api/Callapi";
 import Modal from "react-modal";
 import Chat from "../component/chat";
 import { useCallback } from "react";
+import io from "socket.io-client";
 
 export default function MessageScreen({ userLogin }) {
   const [activeName, setActiveName] = useState("");
@@ -32,10 +33,29 @@ export default function MessageScreen({ userLogin }) {
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
+
   const [users, setUsers] = useState([]);
+
   const [originalUsers, setOriginalUsers] = useState([]);
 
   const [chatKey, setChatKey] = useState(0);
+
+  const socket = io("ws://localhost:3000");
+
+  // Trong useEffect của component Chat
+  useEffect(() => { 
+    // Lắng nghe sự kiện mới tin nhắn từ máy chủ WebSocket
+    socket.on("newMessage", (newMessage) => {
+      // Xử lý tin nhắn mới và cập nhật trạng thái của component Chat
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    // Cleanup: Ngắt kết nối khi component unmount
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
   useEffect(() => {
     const loadIdByPhone = async () => {
       try {
@@ -126,7 +146,7 @@ export default function MessageScreen({ userLogin }) {
           message: messageInput,
         }
       );
-  
+
       setMessageInput("");
       setChatKey((prevKey) => prevKey + 1);
     } catch (error) {
@@ -183,7 +203,7 @@ export default function MessageScreen({ userLogin }) {
           <Background></Background>
         ) : (
           <>
-            <ContentMessage className="ContentMessage" >
+            <ContentMessage className="ContentMessage">
               <HeaderContentMessage className="HeaderContentMessage">
                 <LeftMessage>
                   <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
@@ -207,7 +227,11 @@ export default function MessageScreen({ userLogin }) {
                 </IconGroupMessage>
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage">
-                <Chat key={chatKey} idSelector={idSelector} idLogin={userLogin}></Chat>
+                <Chat
+                  key={chatKey}
+                  idSelector={idSelector}
+                  idLogin={userLogin}
+                ></Chat>
               </BodyContentMessage>
               <FooterContenMessate>
                 <ChatButton>
@@ -765,6 +789,7 @@ const FooterContenMessate = styled.div`
   display: block;
   flex-direction: column;
   background: white;
+  background-image: url(${img});
 `;
 const ItemUser = styled.div`
   padding: 10px;
@@ -801,6 +826,7 @@ const ContentBody = styled.div`
   height: 100vb;
   width: 85%;
   display: inline-block;
+  background-image: url(${img});
 `;
 const Content = styled.div`
   height: 100vb;
@@ -871,7 +897,7 @@ const InputName = styled.div`
 const ContentMessage = styled.div`
   height: 100vb;
   width: 70%;
-  
+
   border-right: 1px solid rgb(219, 223, 229);
 `;
 const InforMessage = styled.div`
