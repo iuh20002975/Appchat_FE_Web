@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { CiVideoOn } from "react-icons/ci";
@@ -18,6 +18,7 @@ import { MdOutlineAttachFile } from "react-icons/md";
 import { getApiNoneToken, postApiNoneTokenMessage } from "../api/Callapi";
 import Modal from "react-modal";
 import Chat from "../component/chat";
+import { useCallback } from "react";
 
 export default function MessageScreen({ userLogin }) {
   const [activeName, setActiveName] = useState("");
@@ -33,6 +34,8 @@ export default function MessageScreen({ userLogin }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
+
+  const [chatKey, setChatKey] = useState(0);
   useEffect(() => {
     const loadIdByPhone = async () => {
       try {
@@ -114,7 +117,7 @@ export default function MessageScreen({ userLogin }) {
     input.click();
   };
 
-  const sendMessage = async () => {
+  const sendMessage = useCallback(async () => {
     try {
       const response = await postApiNoneTokenMessage(
         "/sendMessage/" + idSelector,
@@ -123,11 +126,13 @@ export default function MessageScreen({ userLogin }) {
           message: messageInput,
         }
       );
+  
       setMessageInput("");
+      setChatKey((prevKey) => prevKey + 1);
     } catch (error) {
       console.log("Không thể gửi tin nhắn trống.");
     }
-  };
+  }, [idSelector, messageInput, userLogin]); // Truyền một mảng rỗng làm đối số thứ hai
 
   const handlerName = (tabName) => {
     setActiveName(tabName);
@@ -178,7 +183,7 @@ export default function MessageScreen({ userLogin }) {
           <Background></Background>
         ) : (
           <>
-            <ContentMessage className="ContentMessage">
+            <ContentMessage className="ContentMessage" >
               <HeaderContentMessage className="HeaderContentMessage">
                 <LeftMessage>
                   <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
@@ -202,7 +207,7 @@ export default function MessageScreen({ userLogin }) {
                 </IconGroupMessage>
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage">
-              <Chat idSelector={idSelector} idLogin={userLogin}></Chat>
+                <Chat key={chatKey} idSelector={idSelector} idLogin={userLogin}></Chat>
               </BodyContentMessage>
               <FooterContenMessate>
                 <ChatButton>
@@ -756,9 +761,8 @@ const BodyInforMessage = styled.div`
   max-height: 600px;
 `;
 const FooterContenMessate = styled.div`
-  height: 27%;
   width: 100%;
-  display: flex;
+  display: block;
   flex-direction: column;
   background: white;
 `;
@@ -796,7 +800,7 @@ const ContentTab = styled.div`
 const ContentBody = styled.div`
   height: 100vb;
   width: 85%;
-  display: flex;
+  display: inline-block;
 `;
 const Content = styled.div`
   height: 100vb;
@@ -844,6 +848,7 @@ const BodyContentMessage = styled.div`
   width: 100%;
   height: 73%;
   overflow-y: auto;
+  box-sizing: border-box;
 `;
 const LeftMessage = styled.div`
   float: left;
@@ -866,6 +871,7 @@ const InputName = styled.div`
 const ContentMessage = styled.div`
   height: 100vb;
   width: 70%;
+  
   border-right: 1px solid rgb(219, 223, 229);
 `;
 const InforMessage = styled.div`
@@ -888,6 +894,5 @@ const HeaderContentMessage = styled.div`
 const ChatMessage = styled.div`
   width: 100%;
   height: 100vb;
-  display: flex;
-  overflow: hidden;
+  display: inline-flex;
 `;

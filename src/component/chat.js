@@ -1,36 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { getApiNoneTokenMessage } from "../api/Callapi";
 import styled from "styled-components";
 
 const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     const loadMessage = async () => {
       try {
-        const response = await getApiNoneTokenMessage("/getMessages/" + idLogin + "?senderId=" + idSelector);
-        setMessages(response.data); // Tránh lỗi nếu response.data.message là undefined
+        const response = await getApiNoneTokenMessage(
+          "/getMessages/" + idLogin + "?senderId=" + idSelector
+        );
+        setMessages(response.data);
       } catch (error) {
         console.error("Error loading messages:", error);
-        setMessages([]); // Đảm bảo rằng messages không bị undefined khi xảy ra lỗi
+        setMessages([]);
       }
     };
     loadMessage();
   }, [idLogin, idSelector]);
 
-  return (  
-    <div style={{boxSizing:"border-box", padding:"5px"}}>
-      {messages && messages.length > 0 ? (
-        messages.map((message, index) => (
-          <div key={index}>
-            <ItemMessage senderId={message.senderId} idLogin={idLogin}>
-              <span style={{padding:"10px", fontSize:"20px"}}>{message.message}</span>
-            </ItemMessage>
-          </div>
-        ))
-      ) : (
-        <div>Hãy chat ngây, để hiểu hơn về nhau</div>
-      )}
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <div style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}>
+      <div style={{ boxSizing: "border-box", height: "100%" }}>
+        {messages && messages.length > 0 ? (
+          messages.map((message, index) => (
+            <div key={index}>
+              <div >
+                <ItemMessage ref={messagesEndRef} senderId={message.senderId} idLogin={idLogin} >
+                  <span  style={{ padding: "10px", fontSize: "20px", textAlign: "justify", margin:"5px" }}>{message.message}</span>
+                </ItemMessage><br />
+                <div />
+              </div>
+            </div>
+          ))
+        ) : (
+          <div>Hãy chat ngây, để hiểu hơn về nhau</div>
+        )}
+      </div>
     </div>
   );
 };
@@ -39,13 +55,12 @@ export default Chat;
 
 const ItemMessage = styled.div`
   border-radius: 8px;
-  display: inline-block;
-  background-color: cyan;
+  display: flow;
   width: 100%;
+  background-color: cyan;
   height: max-content;
-
   margin: 5px 0;
   word-wrap: break-word;
   flex: 1;
-  text-align: ${({ senderId, idLogin }) => senderId === idLogin ? "right" : "left"};
+  text-align: ${({ senderId, idLogin }) => (senderId === idLogin ? "right" : "left")};
 `;
