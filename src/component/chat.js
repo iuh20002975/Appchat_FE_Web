@@ -3,7 +3,7 @@ import { getApiNoneTokenMessage } from "../api/Callapi";
 import styled from "styled-components";
 import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
-
+// Thái đẹp trai
 const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
