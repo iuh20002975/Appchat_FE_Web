@@ -37,6 +37,25 @@ const Chat = ({ idSelector, idLogin }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  const isFileExtensionAllowed = (filename) => {
+    const allowedExtensions = [
+      ".pdf",
+      ".doc",
+      ".docx",
+      ".xls",
+      ".xlsx",
+      ".ppt",
+      ".pptx",
+    ];
+    const fileExtension = filename.slice(filename.lastIndexOf(".")); // Lấy phần từ dấu . cuối cùng đến hết chuỗi
+    return allowedExtensions.includes(fileExtension.toLowerCase()); // Chuyển đuôi file về chữ thường để so sánh
+  };
+  const fileName = (filename) => {
+    const part = filename.split("/");
+    const name = part[part.length - 1];
+    return name;
+  };
+
   return (
     <div
       style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}
@@ -49,30 +68,32 @@ const Chat = ({ idSelector, idLogin }) => {
               senderId={message.senderId}
               idLogin={idLogin}
             >
-              {message.message.startsWith("https://") ?(
-              // Nếu tin nhắn là một đường dẫn URL, hiển thị ảnh từ URL đó
-              <>
-              
-                <img
-                  src={message.message}
-                  alt="ảnh"
-                  style={{
-                    borderRadius: ".7em",
-                    width:"150px",
-                    height:"150px",
-                    margin: "1.5px",
-                  }}
-                />
-              </>
-            ) : (
-                // Nếu không, hiển thị tin nhắn thông thường
+              {message.message.startsWith("https://") ? (
+                isFileExtensionAllowed(message.message) ? (
+                  <a href={message.message} target="_blank" rel="noreferrer">
+                    {fileName(message.message)}
+                  </a>
+                ) : (
+                  <img
+                    src={message.message}
+                    alt="ảnh"
+                    style={{
+                      borderRadius: ".7em",
+                      width: "150px",
+                      height: "150px",
+                      margin: "1.5px",
+                    }}
+                  />
+                )
+              ) : (
+                // Nếu không phải là đường dẫn URL, hiển thị tin nhắn thông thường
                 <>
                   <span
                     style={{
                       borderRadius: ".7em",
                       padding: "7px",
                       boxShadow: `rgba(0, 0, 0, 0.1) 0px 1px 2px`,
-                      maxWidth: `${message.length * 10}px`,
+                      maxWidth: `${message.message.length * 10}px`,
                       margin: "1.5px",
                     }}
                   >
@@ -80,6 +101,7 @@ const Chat = ({ idSelector, idLogin }) => {
                   </span>
                 </>
               )}
+
               <p style={{ fontStyle: "italic", margin: "1px" }}>
                 {extractTime(message.createdAt)}
               </p>
@@ -93,7 +115,6 @@ const Chat = ({ idSelector, idLogin }) => {
       )}
     </div>
   );
-  
 };
 
 export default Chat;
