@@ -15,7 +15,7 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { IoSendOutline } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
-import { getApiNoneToken, postApiNoneTokenMessage } from "../api/Callapi";
+import {postApiNoneTokenMessage, getApiNoneToken } from "../api/Callapi";
 import Modal from "react-modal";
 import Chat from "../component/chat";
 import { useCallback } from "react";
@@ -97,6 +97,104 @@ export default function MessageScreen({ userLogin }) {
     }
   };
 
+  // const sendFileOfType = (acceptedFileType) => {
+  //   const input = document.createElement("input");
+  //   input.type = "file";
+  //   input.accept = acceptedFileType;
+  //   input.onchange = (event) => {
+  //     const file = event.target.files[0];
+  //     sendFile(file);
+  //   };
+  //   input.click();
+  // };
+
+  // const sendFile = (file) => {
+  //   // Thực hiện gửi file ở đây
+  // };
+
+  // const sendWordFile = () => {
+  //   sendFileOfType(".doc,.docx");
+  // };
+
+  // const sendExcelFile = () => {
+  //   sendFileOfType(".xls,.xlsx");
+  // };
+
+  // const sendPowerPointFile = () => {
+  //   sendFileOfType(".ppt,.pptx");
+  // };
+
+  // const sendImage = () => {
+  //   const input = document.createElement("input");
+  //   input.type = "file";
+  //   input.accept = "image/*";
+  //   input.onchange = (event) => {
+  //     const file = event.target.files[0];
+  //     const formData = new FormData();
+  //     formData.append("image", file);
+  //     alert("Đã chọn ảnh: " + file.name);
+  //   };
+  //   input.click();
+  // };
+  const sendFile = (file) => {
+    if (file !== null && file !== undefined) {
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      // Đọc dữ liệu của file bằng FileReader
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        console.log("Dữ liệu của file:", event.target.result);
+      };
+      reader.readAsDataURL(file);
+      console.log("XIN chào cậu"+ reader)
+      // Tiếp tục gửi formData lên server bằng fetch hoặc các phương thức khác
+      fetch("/uploadFile", {
+        method: "POST",
+        body: formData,
+      })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Upload file thành công:", data);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi upload file:", error);
+      });
+    } else {
+      console.error("File không tồn tại.");
+    }
+  };
+  const uploadImageToS3 = (file) => {
+    if (!file) {
+      alert("Không có ảnh");
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append("file", file);
+  
+    // Gửi yêu cầu POST đến endpoint '/uploadOnApp/:idSelector' với formData là body
+    postApiNoneTokenMessage('/uploadOnApp/' + idSelector + '?senderId=' + userLogin, formData)
+      .then((response) => {
+        console.log("Upload ảnh lên S3 thành công:", response);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi upload ảnh lên S3:", error);
+      });
+  };
+  
+  const sendImage = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      uploadImageToS3(file);
+    };
+    input.click();
+  };
+  
+  
   const sendFileOfType = (acceptedFileType) => {
     const input = document.createElement("input");
     input.type = "file";
@@ -107,36 +205,18 @@ export default function MessageScreen({ userLogin }) {
     };
     input.click();
   };
-
-  const sendFile = (file) => {
-    // Thực hiện gửi file ở đây
-  };
-
+  
   const sendWordFile = () => {
     sendFileOfType(".doc,.docx");
   };
-
+  
   const sendExcelFile = () => {
     sendFileOfType(".xls,.xlsx");
   };
-
+  
   const sendPowerPointFile = () => {
     sendFileOfType(".ppt,.pptx");
   };
-
-  const sendImage = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = (event) => {
-      const file = event.target.files[0];
-      const formData = new FormData();
-      formData.append("image", file);
-      alert("Đã chọn ảnh: " + file.name);
-    };
-    input.click();
-  };
-
   const sendMessage = useCallback(async () => {
     try {
       const response = await postApiNoneTokenMessage(

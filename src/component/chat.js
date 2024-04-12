@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { getApiNoneTokenMessage } from "../api/Callapi";
 import styled from "styled-components";
 import io from "socket.io-client";
+import { extractTime } from "../extractTime/extractTime";
 
 const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
@@ -36,27 +37,63 @@ const Chat = ({ idSelector, idLogin }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
   return (
-    <div style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}>
-      <div style={{ boxSizing: "border-box", height: "100%" }}>
-        {messages && messages.length > 0 ? (
-          messages.map((message, index) => (
-            <div key={index}>
-              <div >
-                <ItemMessage ref={messagesEndRef} senderId={message.senderId} idLogin={idLogin} >
-                  <span  style={{ padding: "10px", fontSize: "20px", textAlign: "justify", margin:"5px" }}>{message.message}</span>
-                </ItemMessage><br />
-                <div />
-              </div>
-            </div>
-          ))
-        ) : (
-          <div>Hãy chat ngây, để hiểu hơn về nhau</div>
-        )}
-      </div>
+    <div
+      style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}
+    >
+      {messages && messages.length > 0 ? (
+        messages.map((message, index) => (
+          <div style={{ flex: 1 }} key={index}>
+            <ItemMessage
+              ref={messagesEndRef}
+              senderId={message.senderId}
+              idLogin={idLogin}
+            >
+              {message.message.startsWith("https://") ?(
+              // Nếu tin nhắn là một đường dẫn URL, hiển thị ảnh từ URL đó
+              <>
+              
+                <img
+                  src={message.message}
+                  alt="ảnh"
+                  style={{
+                    borderRadius: ".7em",
+                    width:"150px",
+                    height:"150px",
+                    margin: "1.5px",
+                  }}
+                />
+              </>
+            ) : (
+                // Nếu không, hiển thị tin nhắn thông thường
+                <>
+                  <span
+                    style={{
+                      borderRadius: ".7em",
+                      padding: "7px",
+                      boxShadow: `rgba(0, 0, 0, 0.1) 0px 1px 2px`,
+                      maxWidth: `${message.length * 10}px`,
+                      margin: "1.5px",
+                    }}
+                  >
+                    {message.message}
+                  </span>
+                </>
+              )}
+              <p style={{ fontStyle: "italic", margin: "1px" }}>
+                {extractTime(message.createdAt)}
+              </p>
+            </ItemMessage>
+            <br />
+            <div />
+          </div>
+        ))
+      ) : (
+        <div>Hãy chat ngây, để hiểu hơn về nhau</div>
+      )}
     </div>
   );
+  
 };
 
 export default Chat;
@@ -65,10 +102,11 @@ const ItemMessage = styled.div`
   border-radius: 8px;
   display: flow;
   width: 100%;
-  background-color: cyan;
+  color: black;
   height: max-content;
   margin: 5px 0;
   word-wrap: break-word;
   flex: 1;
-  text-align: ${({ senderId, idLogin }) => (senderId === idLogin ? "right" : "left")};
+  text-align: ${({ senderId, idLogin }) =>
+    senderId === idLogin ? "right" : "left"};
 `;
