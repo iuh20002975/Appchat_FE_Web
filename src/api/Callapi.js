@@ -8,6 +8,16 @@ var api2 = axios.create({
     baseURL:'http://localhost:3001/api/messages'
 })
   
+var api3 = axios.create({
+    baseURL:'http://localhost:3001/api/conversations'
+})
+
+export const getApiNoneTokenConversation=(url,data)=>{
+    return api3.get(url,data)
+}
+export const postApiNoneTokenConversation=(url,data)=>{
+    return api3.post(url,data)
+}
 export const postApiNoneToken=(url,data)=>{
     return api.post(url,data)
 }

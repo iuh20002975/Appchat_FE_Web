@@ -15,11 +15,12 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { IoSendOutline } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
-import { postApiNoneTokenMessage, getApiNoneToken } from "../api/Callapi";
+import { postApiNoneTokenMessage, getApiNoneToken , postApiNoneTokenConversation} from "../api/Callapi";
 import Modal from "react-modal";
 import Chat from "../component/chat";
 import { useCallback } from "react";
 import io from "socket.io-client";
+import ListGroup from "../component/listGroup";
 
 export default function MessageScreen({ userLogin }) {
   const [activeName, setActiveName] = useState("");
@@ -30,14 +31,12 @@ export default function MessageScreen({ userLogin }) {
   const [phone, setPhone] = useState("");
   const [idSelector, setIdSelector] = useState("");
   const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
-  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [selectedMembers, setSelectedMembers] = useState([userLogin]);
   const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([]);
-
+  const [nameGroup, setNameGroup] = useState("");
   const [users, setUsers] = useState([]);
-
   const [originalUsers, setOriginalUsers] = useState([]);
-
   const [chatKey, setChatKey] = useState(0);
 
   const socket = io("ws://localhost:3000");
@@ -138,7 +137,7 @@ export default function MessageScreen({ userLogin }) {
     };
     input.click();
   };
- 
+
   const sendMessage = useCallback(async () => {
     try {
       const response = await postApiNoneTokenMessage(
@@ -181,15 +180,37 @@ export default function MessageScreen({ userLogin }) {
     setShowDeleteMemberModal(false);
   };
 
-  const handleSelectMember = (userId) => {
-    const isSelected = selectedMembers.includes(userId);
-    if (isSelected) {
-      setSelectedMembers(selectedMembers.filter((id) => id !== userId));
+  const handleFindUserIdByPhone = async (phone) => {
+    const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
+      phone: phone,
+    });
+    if (selectedMembers.includes(response.data.data._id)) {
+      setSelectedMembers((prevMembers) =>
+        prevMembers.filter((member) => member !== response.data.data._id)
+      );
     } else {
-      setSelectedMembers([...selectedMembers, userId]);
+      setSelectedMembers((prevMembers) => [
+        ...prevMembers,
+        response.data.data._id,
+      ]);
     }
   };
-
+  const handleCreateGroup = async () => {
+    if (nameGroup === "") {
+      alert("Tên nhóm không được để trống");
+      return;
+    } else if (selectedMembers.length < 2) {
+      alert("Chọn ít nhất 2 thành viên");
+      console.log(selectedMembers);
+      return;
+    }
+    const response = await postApiNoneTokenConversation("/createGroup", {
+      groupName: nameGroup,
+      participants: selectedMembers,
+    });
+    alert("Tạo nhóm " + response.data.name + " thành công");
+    setShowModal(false);
+  };
   const handleDeleteMembers = () => {
     console.log("Xóa thành viên:", selectedMembers);
     setShowDeleteMemberModal(false);
@@ -278,7 +299,7 @@ export default function MessageScreen({ userLogin }) {
                     <Avatar className="Avatar"></Avatar>
                     <InputName>{selectedUserName}</InputName>
                   </Infor>
-                  <MenutoGroup className="MenuToGroup">
+                  {/* <MenutoGroup className="MenuToGroup">
                     <AddMemberToGroup className="AddMemberToGroup">
                       <button
                         style={{
@@ -295,7 +316,7 @@ export default function MessageScreen({ userLogin }) {
                         <AiOutlineUsergroupAdd />
                       </button>
 
-                      <span style={{ fontSize: "13px" }}>Thêm thành viên</span>
+                      <span style={{ fontSize: "13px" }}>Thêm thành viê</span>
                     </AddMemberToGroup>
                     <Modal
                       style={{
@@ -315,23 +336,41 @@ export default function MessageScreen({ userLogin }) {
                       onRequestClose={closeModalAdd}
                       contentLabel="Example Modal"
                     >
-                      <div>
-                        <h2>Thêm thành viên</h2>
+                      <div style={{ margin: 0 }}>
+                        <h2 style={{ margin: 0 }}>Tạo nhóm chat</h2>
                       </div>
-
-                      <form style={{ flex: 1, overflowY: "auto" }}>
+                      <div>
+                        <h4>Đặt tên nhóm</h4>
+                      </div>
+                      <input
+                        style={{ marginBottom: "15px", padding: "8px" }}
+                        placeholder="Nhập tên group"
+                        onChange={(e) => setNameGroup(e.target.value)}
+                      ></input>
+                      <div>
+                        <h4 style={{ margin: 0 }}>Chọn thành viên tham gia</h4>
+                      </div>
+                      <form
+                        style={{ flex: 1, overflowY: "auto", padding: "3px" }}
+                      >
                         {users.map((user) => (
                           <div
                             key={user._id}
                             style={{ display: "flex", alignItems: "center" }}
                           >
-                            <input type="checkbox" id={user._id} />
-                            <AvatarModal className="AvatarModal"></AvatarModal>
-                            <label htmlFor={user.id}>{user.name}</label>
+                            <input
+                              type="checkbox"
+                              id={user._id}
+                              onChange={() =>
+                                handleFindUserIdByPhone(user.phone)
+                              }
+                            />
+                            <AvatarModal className="AvatarModal" />
+                            <label htmlFor={user._id}>{user.name}</label>
                           </div>
                         ))}
                       </form>
-
+                      <br></br>
                       <div
                         style={{
                           display: "flex",
@@ -365,8 +404,9 @@ export default function MessageScreen({ userLogin }) {
                             color: "white",
                             cursor: "pointer",
                           }}
+                          onClick={handleCreateGroup}
                         >
-                          Thêm
+                          Tạo nhóm
                         </button>
                       </div>
                     </Modal>
@@ -434,12 +474,14 @@ export default function MessageScreen({ userLogin }) {
                           >
                             <input
                               type="checkbox"
-                              id={user.id}
-                              checked={selectedMembers.includes(user.id)}
-                              onChange={() => handleSelectMember(user.id)}
+                              id={user._id}
+                              checked={selectedMembers.includes(user.phone)}
+                              onChange={() =>
+                                handleFindUserIdByPhone(user.phone)
+                              }
                             />
                             <AvatarModal className="AvatarModal"></AvatarModal>
-                            <label htmlFor={user.id}>{user.name}</label>
+                            <label htmlFor={user._id}>{user.name}</label>
                           </div>
                         ))}
                       </form>
@@ -480,7 +522,7 @@ export default function MessageScreen({ userLogin }) {
                         </button>
                       </div>
                     </Modal>
-                  </MenutoGroup>
+                  </MenutoGroup> */}
                 </BodyInforTop>
 
                 <BodyInforBottom className="BodyInforBottom">
@@ -552,7 +594,9 @@ export default function MessageScreen({ userLogin }) {
   const renderContentTab = ({ activeContentTab }) => {
     if (activeContentTab === "Orther") {
       return <h1>Orther</h1>;
-    } else if (activeContentTab === "Prioritize") {
+    } else if (activeContentTab === "Group") {
+      return <ListGroup userLogin={userLogin} />;
+    } else {
       return (
         <div style={{ overflow: "scroll", maxHeight: "90vb" }}>
           {users.map((user) => (
@@ -632,6 +676,13 @@ export default function MessageScreen({ userLogin }) {
           </TabList>
           <TabList
             className="Tab"
+            $activeContentTab={activeContentTab === "Group"}
+            onClick={() => handleContentTab("Group")}
+          >
+            Nhóm
+          </TabList>
+          <TabList
+            className="Tab"
             $activeContentTab={activeContentTab === "Orther"}
             onClick={() => handleContentTab("Orther")}
           >
@@ -691,6 +742,7 @@ export default function MessageScreen({ userLogin }) {
                 background: "white",
                 padding: "0",
               }}
+              onClick={handleModalAdd}
             >
               <MdOutlineGroupAdd style={{ fontSize: "24px" }} />
             </button>
