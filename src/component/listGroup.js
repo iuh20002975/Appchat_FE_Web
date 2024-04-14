@@ -1,28 +1,42 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getApiNoneToken } from "../api/Callapi";
+import { getApiNoneTokenConversation } from "../api/Callapi";
 
 const ListGroup = ({ userLogin }) => {
   const [listFriend, setListFriend] = useState([]);
 
   useEffect(() => {
     const loadFriends = async () => {
-      const response = await getApiNoneToken(`/getAllFriend/${userLogin}`, {
-        id: userLogin,
-      });
-      setListFriend(response.data.data);
+      try {
+        const response = await getApiNoneTokenConversation(`/${userLogin}`, {
+          id: userLogin,
+        });
+  
+        // Lọc ra những object có ít nhất 3 người tham gia
+        const friendsWithAtLeastThreeParticipants = response.data.filter(
+          friend => friend.participants.length >= 3
+        );
+  
+        // Set state cho listFriend với những object đã lọc
+        setListFriend(friendsWithAtLeastThreeParticipants);
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách bạn:", error);
+      }
     };
     loadFriends();
   }, [userLogin]);
+  
+
   return (
+    console.log(listFriend),
     <form style={{ flex: 1, overflowY: "auto" }}>
-      {listFriend.map((user, index) => (
+      {listFriend && listFriend.map((user, index) => (
         <ItemUser
-          key={user.id}
+          key={user._id}
           style={{ display: "flex", alignItems: "center" }}
         >
           <Avatar />
-          <label htmlFor={user.id}>{user.name}</label>
+          <label htmlFor={user._id}>{user.groupName}</label>
         </ItemUser>
       ))}
     </form>
