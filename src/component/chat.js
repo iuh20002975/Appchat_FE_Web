@@ -3,23 +3,24 @@ import { getApiNoneTokenMessage } from "../api/Callapi";
 import styled from "styled-components";
 import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
-// Thái đẹp trai
+import ModalImg from "./modalViewImage";
+
 const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const socket = io("ws://localhost:3000");
 
-    // Lắng nghe tin nhắn mới từ máy chủ WebSocket
     socket.on("newMessage", (newMessage) => {
-      // Tải lại tin nhắn
       loadMessage();
     });
+
     const loadMessage = async () => {
       try {
         const response = await getApiNoneTokenMessage(
-          "/getMessages/" + idLogin + "?senderId=" + idSelector
+          `/getMessages/${idLogin}?senderId=${idSelector}`
         );
         setMessages(response.data);
       } catch (error) {
@@ -37,6 +38,7 @@ const Chat = ({ idSelector, idLogin }) => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   const isFileExtensionAllowed = (filename) => {
     const allowedExtensions = [
       ".pdf",
@@ -47,46 +49,90 @@ const Chat = ({ idSelector, idLogin }) => {
       ".ppt",
       ".pptx",
     ];
-    const fileExtension = filename.slice(filename.lastIndexOf(".")); // Lấy phần từ dấu . cuối cùng đến hết chuỗi
-    return allowedExtensions.includes(fileExtension.toLowerCase()); // Chuyển đuôi file về chữ thường để so sánh
+    const fileExtension = filename.slice(filename.lastIndexOf("."));
+    return allowedExtensions.includes(fileExtension.toLowerCase());
   };
+
   const fileName = (filename) => {
     const part = filename.split("/");
-    const name = part[part.length - 1];
-    return name;
+    return part[part.length - 1];
+  };
+
+  const allowedVideoExtensions = [".mp4", ".avi", ".mov", ".mkv", ".wmv"];
+  const isVideoExtensionAllowed = (filename) => {
+    const fileExtension = filename.slice(filename.lastIndexOf("."));
+    return allowedVideoExtensions.includes(fileExtension.toLowerCase());
+  };
+
+  const [isZoomed, setIsZoomed] = useState(false);
+
+  const handleImageClick = (imgUrl) => {
+    setSelectedImage(imgUrl);
+    setIsZoomed(true);
+  };
+
+  const handleSaveImage = () => {
+    const fileName = selectedImage.split('/').pop();
+    const link = document.createElement('a');
+    link.href = selectedImage;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const closeModal = () => {
+    setIsZoomed(false);
+    setSelectedImage(null);
   };
 
   return (
-    <div
-      style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}
-    >
+    <div style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}>
       {messages && messages.length > 0 ? (
         messages.map((message, index) => (
           <div style={{ flex: 1 }} key={index}>
-            <ItemMessage
-              ref={messagesEndRef}
-              senderId={message.senderId}
-              idLogin={idLogin}
-            >
+            <ItemMessage ref={messagesEndRef} senderId={message.senderId} idLogin={idLogin}>
               {message.message.startsWith("https://") ? (
-                isFileExtensionAllowed(message.message) ? (
+                isVideoExtensionAllowed(message.message) ? (
+                  <video
+                    controls
+                    style={{
+                      borderRadius: ".7em",
+                      width: "60%",
+                      height: 200,
+                      margin: "1.5px",
+                    }}
+                  >
+                    <source src={message.message} type="video/mp4" />
+                    Your browser does not support the video tag.
+                  </video>
+                ) : isFileExtensionAllowed(message.message) ? (
                   <a href={message.message} target="_blank" rel="noreferrer">
                     {fileName(message.message)}
                   </a>
                 ) : (
-                  <img
-                    src={message.message}
-                    alt="ảnh"
-                    style={{
-                      borderRadius: ".7em",
-                      width: "150px",
-                      height: "150px",
-                      margin: "1.5px",
-                    }}
-                  />
+                  <div>
+                    <img
+                      src={message.message}
+                      alt="ảnh"
+                      style={{
+                        borderRadius: ".7em",
+                        width: "150px",
+                        height: "150px",
+                        margin: "1.5px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleImageClick(message.message)}
+                    />
+                    <ModalImg
+                      isZoomed={isZoomed}
+                      imageUrl={selectedImage}
+                      handleSaveImage={handleSaveImage}
+                      closeModal={closeModal}
+                    />
+                  </div>
                 )
               ) : (
-                // Nếu không phải là đường dẫn URL, hiển thị tin nhắn thông thường
                 <>
                   <span
                     style={{
@@ -101,7 +147,6 @@ const Chat = ({ idSelector, idLogin }) => {
                   </span>
                 </>
               )}
-
               <p style={{ fontStyle: "italic", margin: "1px" }}>
                 {extractTime(message.createdAt)}
               </p>

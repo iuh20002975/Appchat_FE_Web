@@ -14,6 +14,7 @@ import Friend from "./component/friend.js";
 import Chat from "./component/chat.js";
 import ListInvite from "./component/listInvite.js";
 function App() {
+   
   return (
 
       <Router>

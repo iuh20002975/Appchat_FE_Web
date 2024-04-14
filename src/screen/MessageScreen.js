@@ -20,6 +20,7 @@ import Modal from "react-modal";
 import Chat from "../component/chat";
 import { useCallback } from "react";
 import io from "socket.io-client";
+import { EmojiKeyboard } from "reactjs-emoji-keyboard";
 
 export default function MessageScreen({ userLogin }) {
   const [activeName, setActiveName] = useState("");
@@ -41,6 +42,15 @@ export default function MessageScreen({ userLogin }) {
   const [chatKey, setChatKey] = useState(0);
 
   const socket = io("ws://localhost:3000");
+
+  // emoji
+  const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
+  const toggleEmojiKeyboard = () => {
+    setShowEmojiKeyboard(!showEmojiKeyboard);
+  };
+  const handleEmojiSelect = (emoji) => {
+    setMessageInput((prevMessage) => prevMessage + emoji.character);
+  };
 
   // Trong useEffect của component Chat
   useEffect(() => {
@@ -120,7 +130,7 @@ export default function MessageScreen({ userLogin }) {
   const sendFileOfType = () => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx";
+    input.accept = "application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,video/*";
     input.onchange = (event) => {
       const file = event.target.files[0];
       uploadToS3(file);
@@ -245,6 +255,22 @@ export default function MessageScreen({ userLogin }) {
                       style={{ width: "100%", height: "100%" }}
                     />
                   </FileButton>
+                  {/* // thêm emoji */}
+                  {showEmojiKeyboard && (
+                      <EmojiKeyboard 
+                        style={{  bottom: "100%",left: 0}}
+                        height={320}
+                        width={350}
+                        theme="dark"
+                        searchLabel="Procurar emoji"
+                        searchDisabled={false}
+                        // onEmojiSelect={(emoji) => setMessageInput((emoji.character))}         
+                        onEmojiSelect={handleEmojiSelect} 
+                        categoryDisabled={false}
+                      />
+                    )}
+                    <button onClick={toggleEmojiKeyboard} >💔</button>
+
                 </ChatButton>
                 <hr style={{ width: "100%" }} />
                 <ChatInputContainer>
