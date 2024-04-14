@@ -15,16 +15,19 @@ import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 import { IoSendOutline } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { MdOutlineAttachFile } from "react-icons/md";
-import { postApiNoneTokenMessage, getApiNoneToken , postApiNoneTokenConversation} from "../api/Callapi";
+import {
+  postApiNoneTokenMessage,
+  getApiNoneToken,
+  postApiNoneTokenConversation,
+} from "../api/Callapi";
 import Modal from "react-modal";
 import Chat from "../component/chat";
 import { useCallback } from "react";
 import io from "socket.io-client";
-<<<<<<< HEAD
+
 import ListGroup from "../component/listGroup";
-=======
+
 import { EmojiKeyboard } from "reactjs-emoji-keyboard";
->>>>>>> 6372e7281d9dae7a7f0af7f861d799c569151cd8
 
 export default function MessageScreen({ userLogin }) {
   const [activeName, setActiveName] = useState("");
@@ -281,20 +284,19 @@ export default function MessageScreen({ userLogin }) {
                   </FileButton>
                   {/* // thêm emoji */}
                   {showEmojiKeyboard && (
-                      <EmojiKeyboard 
-                        style={{  bottom: "100%",left: 0}}
-                        height={320}
-                        width={350}
-                        theme="dark"
-                        searchLabel="Procurar emoji"
-                        searchDisabled={false}
-                        // onEmojiSelect={(emoji) => setMessageInput((emoji.character))}         
-                        onEmojiSelect={handleEmojiSelect} 
-                        categoryDisabled={false}
-                      />
-                    )}
-                    <button onClick={toggleEmojiKeyboard} >💔</button>
-
+                    <EmojiKeyboard
+                      style={{ bottom: "100%", left: 0 }}
+                      height={320}
+                      width={350}
+                      theme="dark"
+                      searchLabel="Procurar emoji"
+                      searchDisabled={false}
+                      // onEmojiSelect={(emoji) => setMessageInput((emoji.character))}
+                      onEmojiSelect={handleEmojiSelect}
+                      categoryDisabled={false}
+                    />
+                  )}
+                  <button onClick={toggleEmojiKeyboard}>💔</button>
                 </ChatButton>
                 <hr style={{ width: "100%" }} />
                 <ChatInputContainer>
@@ -328,230 +330,173 @@ export default function MessageScreen({ userLogin }) {
                     <Avatar className="Avatar"></Avatar>
                     <InputName>{selectedUserName}</InputName>
                   </Infor>
-                  {/* <MenutoGroup className="MenuToGroup">
-                    <AddMemberToGroup className="AddMemberToGroup">
-                      <button
-                        style={{
-                          marginLeft: 30,
-                          width: "30px",
-                          height: "30px",
-                          background: "#f0f0f0",
-                          borderRadius: "50%",
-                          cursor: "pointer",
-                          borderColor: "gray",
-                        }}
-                        onClick={handleModalAdd}
-                      >
-                        <AiOutlineUsergroupAdd />
-                      </button>
-
-                      <span style={{ fontSize: "13px" }}>Thêm thành viê</span>
-                    </AddMemberToGroup>
-                    <Modal
-                      style={{
-                        overlay: {
-                          backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        content: {
-                          width: "50%",
-                          margin: "auto",
-                          maxHeight: "50%",
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "space-between",
-                        },
-                      }}
-                      isOpen={showModal}
-                      onRequestClose={closeModalAdd}
-                      contentLabel="Example Modal"
+                  {/* =============== Modal thêm ===================== */}
+                  <Modal
+                    style={{
+                      overlay: {
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      },
+                      content: {
+                        width: "50%",
+                        margin: "auto",
+                        maxHeight: "50%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      },
+                    }}
+                    isOpen={showModal}
+                    onRequestClose={closeModalAdd}
+                    contentLabel="Example Modal"
+                  >
+                    <div style={{ margin: 0 }}>
+                      <h2 style={{ margin: 0 }}>Tạo nhóm chat</h2>
+                    </div>
+                    <div>
+                      <h4>Đặt tên nhóm</h4>
+                    </div>
+                    <input
+                      style={{ marginBottom: "15px", padding: "8px" }}
+                      placeholder="Nhập tên group"
+                      onChange={(e) => setNameGroup(e.target.value)}
+                    ></input>
+                    <div>
+                      <h4 style={{ margin: 0 }}>Chọn thành viên tham gia</h4>
+                    </div>
+                    <form
+                      style={{ flex: 1, overflowY: "auto", padding: "3px" }}
                     >
-                      <div style={{ margin: 0 }}>
-                        <h2 style={{ margin: 0 }}>Tạo nhóm chat</h2>
-                      </div>
-                      <div>
-                        <h4>Đặt tên nhóm</h4>
-                      </div>
-                      <input
-                        style={{ marginBottom: "15px", padding: "8px" }}
-                        placeholder="Nhập tên group"
-                        onChange={(e) => setNameGroup(e.target.value)}
-                      ></input>
-                      <div>
-                        <h4 style={{ margin: 0 }}>Chọn thành viên tham gia</h4>
-                      </div>
-                      <form
-                        style={{ flex: 1, overflowY: "auto", padding: "3px" }}
-                      >
-                        {users.map((user) => (
-                          <div
-                            key={user._id}
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <input
-                              type="checkbox"
-                              id={user._id}
-                              onChange={() =>
-                                handleFindUserIdByPhone(user.phone)
-                              }
-                            />
-                            <AvatarModal className="AvatarModal" />
-                            <label htmlFor={user._id}>{user.name}</label>
-                          </div>
-                        ))}
-                      </form>
-                      <br></br>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        <button
-                          onClick={closeModalAdd}
-                          style={{
-                            width: 50,
-                            height: 35,
-                            borderRadius: 15,
-                            borderWidth: 1,
-                            outline: "none",
-                            cursor: "pointer",
-                          }}
+                      {users.map((user) => (
+                        <div
+                          key={user._id}
+                          style={{ display: "flex", alignItems: "center" }}
                         >
-                          Đóng
-                        </button>
-                        <button
-                          type="submit"
-                          form="modalForm"
-                          style={{
-                            width: 50,
-                            height: 35,
-                            borderRadius: 15,
-                            borderWidth: 1,
-                            outline: "none",
-                            backgroundColor: "#2ADFEA",
-                            color: "white",
-                            cursor: "pointer",
-                          }}
-                          onClick={handleCreateGroup}
-                        >
-                          Tạo nhóm
-                        </button>
-                      </div>
-                    </Modal>
-                    <DeleteMember className="DeleteMember">
-                      <button
-                        style={{
-                          marginLeft: 20,
-                          width: "30px",
-                          height: "30px",
-                          background: "#f0f0f0",
-                          borderRadius: "50%",
-                          cursor: "pointer",
-                          borderColor: "gray",
-                        }}
-                        onClick={handleDeleteMemberModal}
-                      >
-                        <AiOutlineUsergroupDelete />
-                      </button>
-
-                      <span style={{ fontSize: "13px" }}>Xóa thành viên</span>
-                    </DeleteMember>
-                    <DeleteGroup className="DeleteGroup">
-                      <button
-                        style={{
-                          marginLeft: 10,
-                          width: "30px",
-                          height: "30px",
-                          background: "#f0f0f0",
-                          borderRadius: "50%",
-                          cursor: "pointer",
-                          borderColor: "gray",
-                        }}
-                      >
-                        <MdDeleteOutline />
-                      </button>
-
-                      <span style={{ fontSize: "13px" }}>Xóa nhóm</span>
-                    </DeleteGroup>
-                    <Modal
+                          <input
+                            type="checkbox"
+                            id={user._id}
+                            onChange={() => handleFindUserIdByPhone(user.phone)}
+                          />
+                          <AvatarModal className="AvatarModal" />
+                          <label htmlFor={user._id}>{user.name}</label>
+                        </div>
+                      ))}
+                    </form>
+                    <br></br>
+                    <div
                       style={{
-                        overlay: {
-                          backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        content: {
-                          width: "50%",
-                          margin: "auto",
-                          maxHeight: "50%",
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "space-between",
-                        },
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "10px",
                       }}
-                      isOpen={showDeleteMemberModal}
-                      onRequestClose={closeDeleteMemberModal}
-                      contentLabel="Delete Member Modal"
                     >
-                      <div>
-                        <h2>Xóa thành viên</h2>
-                      </div>
-                      <form style={{ flex: 1, overflowY: "auto" }}>
-                        {users.map((user) => (
-                          <div
-                            key={user._id}
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <input
-                              type="checkbox"
-                              id={user._id}
-                              checked={selectedMembers.includes(user.phone)}
-                              onChange={() =>
-                                handleFindUserIdByPhone(user.phone)
-                              }
-                            />
-                            <AvatarModal className="AvatarModal"></AvatarModal>
-                            <label htmlFor={user._id}>{user.name}</label>
-                          </div>
-                        ))}
-                      </form>
-                      <div
+                      <button
+                        onClick={closeModalAdd}
                         style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: "10px",
+                          width: 50,
+                          height: 35,
+                          borderRadius: 15,
+                          borderWidth: 1,
+                          outline: "none",
+                          cursor: "pointer",
                         }}
                       >
-                        <button
-                          style={{
-                            width: 50,
-                            height: 35,
-                            borderRadius: 15,
-                            borderWidth: 1,
-                            outline: "none",
-                            cursor: "pointer",
-                          }}
-                          onClick={closeDeleteMemberModal}
+                        Đóng
+                      </button>
+                      <button
+                        type="submit"
+                        form="modalForm"
+                        style={{
+                          width: 50,
+                          height: 35,
+                          borderRadius: 15,
+                          borderWidth: 1,
+                          outline: "none",
+                          backgroundColor: "#2ADFEA",
+                          color: "white",
+                          cursor: "pointer",
+                        }}
+                        onClick={handleCreateGroup}
+                      >
+                        Tạo nhóm
+                      </button>
+                    </div>
+                  </Modal>
+                  {/* =============== Modal xoá ===================== */}
+                  <Modal
+                    style={{
+                      overlay: {
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                      },
+                      content: {
+                        width: "50%",
+                        margin: "auto",
+                        maxHeight: "50%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                      },
+                    }}
+                    isOpen={showDeleteMemberModal}
+                    onRequestClose={closeDeleteMemberModal}
+                    contentLabel="Delete Member Modal"
+                  >
+                    <div>
+                      <h2>Xóa thành viên</h2>
+                    </div>
+                    <form style={{ flex: 1, overflowY: "auto" }}>
+                      {users.map((user) => (
+                        <div
+                          key={user._id}
+                          style={{ display: "flex", alignItems: "center" }}
                         >
-                          Đóng
-                        </button>
-                        <button
-                          style={{
-                            width: 50,
-                            height: 35,
-                            borderRadius: 15,
-                            borderWidth: 1,
-                            outline: "none",
-                            backgroundColor: "#D22424",
-                            color: "white",
-                            cursor: "pointer",
-                          }}
-                          onClick={handleDeleteMembers}
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    </Modal>
-                  </MenutoGroup> */}
+                          <input
+                            type="checkbox"
+                            id={user._id}
+                            checked={selectedMembers.includes(user.phone)}
+                            onChange={() => handleFindUserIdByPhone(user.phone)}
+                          />
+                          <AvatarModal className="AvatarModal"></AvatarModal>
+                          <label htmlFor={user._id}>{user.name}</label>
+                        </div>
+                      ))}
+                    </form>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <button
+                        style={{
+                          width: 50,
+                          height: 35,
+                          borderRadius: 15,
+                          borderWidth: 1,
+                          outline: "none",
+                          cursor: "pointer",
+                        }}
+                        onClick={closeDeleteMemberModal}
+                      >
+                        Đóng
+                      </button>
+                      <button
+                        style={{
+                          width: 50,
+                          height: 35,
+                          borderRadius: 15,
+                          borderWidth: 1,
+                          outline: "none",
+                          backgroundColor: "#D22424",
+                          color: "white",
+                          cursor: "pointer",
+                        }}
+                        onClick={handleDeleteMembers}
+                      >
+                        Xóa
+                      </button>
+                    </div>
+                  </Modal>
                 </BodyInforTop>
 
                 <BodyInforBottom className="BodyInforBottom">
