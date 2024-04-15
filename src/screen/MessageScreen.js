@@ -51,6 +51,8 @@ export default function MessageScreen({ userLogin }) {
   const [groupKey, setGroupKey] = useState(0);
   const socket = io("ws://localhost:3000");
   const [nameSender, setNameSender] = useState("");
+  const [loadGroups,setLoadGroups] = useState(false);
+  
   // emoji
   const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
   const toggleEmojiKeyboard = () => {
@@ -94,7 +96,23 @@ export default function MessageScreen({ userLogin }) {
       }
     };
     loadGroups();
-  }, [userLogin]);
+    // thêm để render
+    setLoadGroups(false)
+  }, [userLogin,loadGroups]);
+
+
+// xóa nhóm
+const deleteGroup = async()=>{
+  try {
+    const respone = await postApiNoneTokenConversation("/deleteConversation/"+idGroup)
+    alert("Giải tán nhốn lòm")
+    setLoadGroups(true)
+
+    
+  } catch (error) {
+     console.error("xóa nhón lồm thất bại", error);
+  }
+}
 
   // Trong useEffect của component Chat
   useEffect(() => {
@@ -837,6 +855,7 @@ export default function MessageScreen({ userLogin }) {
                           cursor: "pointer",
                           borderColor: "gray",
                         }}
+                        onClick={deleteGroup}
                       >
                         <MdDeleteOutline />
                       </button>
