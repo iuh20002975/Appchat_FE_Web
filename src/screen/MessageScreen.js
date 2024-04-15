@@ -321,17 +321,43 @@ export default function MessageScreen({ userLogin }) {
                   </FileButton>
                   {/* // thêm emoji */}
                   {showEmojiKeyboard && (
+                    <Modal
+                    style={{
+                      overlay: {
+                        backgroundColor: "none",
+                        backgroundBlendMode: "darken",
+                        marginLeft:"25%",
+                        marginTop:"15%",
+                      },
+                      content: {
+                        width: "30.2%",
+                        margin: "0",
+                        maxHeight: "64.6%",
+                        padding: "10",
+                        flexDirection: "column",
+                        justifyContent: "left",
+                        alignContent: "left",
+                        overflow:"hidden",
+                      },
+                      
+                    }}
+                    isOpen={showEmojiKeyboard}
+                    onRequestClose={toggleEmojiKeyboard}
+                    contentLabel="Emoji Keyboard Modal"
+                    shouldCloseOnOverlayClick={true}
+                  >
                     <EmojiKeyboard
-                      style={{ bottom: "100%", left: 0 }}
+                      style={{ bottom: "10%", left: 0 }}
                       height={320}
                       width={350}
-                      theme="dark"
+                      theme="light"
                       searchLabel="Procurar emoji"
                       searchDisabled={false}
                       // onEmojiSelect={(emoji) => setMessageInput((emoji.character))}
                       onEmojiSelect={handleEmojiSelect}
                       categoryDisabled={false}
                     />
+                  </Modal>
                   )}
                   <button onClick={toggleEmojiKeyboard}>💔</button>
                 </ChatButton>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaCamera } from "react-icons/fa";
 import { getApiNoneToken } from "../api/Callapi";
 
 export default function ModalAccountInfor({ userLogin, closeModal }) {
@@ -12,8 +12,8 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString); // Tạo đối tượng Date từ chuỗi ngày tháng
     const year = date.getFullYear(); // Lấy năm
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Lấy tháng và thêm '0' phía trước nếu cần
-    const day = date.getDate().toString().padStart(2, '0'); // Lấy ngày và thêm '0' phía trước nếu cần
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Lấy tháng và thêm '0' phía trước nếu cần
+    const day = date.getDate().toString().padStart(2, "0"); // Lấy ngày và thêm '0' phía trước nếu cần
     return `${year}-${month}-${day}`; // Trả về chuỗi ngày tháng đã được định dạng
   };
   useEffect(() => {
@@ -53,6 +53,14 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
         <CloseButton onClick={closeModal}>&times;</CloseButton>
       </ModalHeader>
       <ModalBody>
+        <ModalAvatar>
+          <Avatar
+            src="https://s3ongk.s3.ap-southeast-2.amazonaws.com/anhdep.jpg"
+            alt="Avatar"
+          />
+          <CameraIcon><FaCamera color="black" size={25}/></CameraIcon>
+        </ModalAvatar>
+
         <InputContainer>
           <label htmlFor="name">Tên người dùng:</label>
           <input
@@ -85,7 +93,7 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
           <input
             type="date"
             id="date-of-birth"
-            value={dateOfBirth ? formatDate(dateOfBirth): ""}
+            value={dateOfBirth ? formatDate(dateOfBirth) : ""}
             onChange={(e) => setDateOfBirth(e.target.value)}
           />
         </InputContainer>
@@ -132,7 +140,27 @@ const ModalHeader = styled.div`
   font-size: 1.2rem;
   color: blue;
 `;
+const ModalAvatar = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Đảm bảo avatar được căn giữa cả theo chiều dọc và ngang */
+  font-size: 1.2rem;
+  color: blue;
+`;
 
+const Avatar = styled.img`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+`;
+const CameraIcon = styled.span`
+  position: absolute;
+  top: 32%;
+  left: 53%;
+  background-color: none;
+  border-radius: 50%;
+`;
 const CloseButton = styled.button`
   background-color: transparent;
   border: none;
