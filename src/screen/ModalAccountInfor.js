@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FaUserCircle, FaCamera } from "react-icons/fa";
-import { getApiNoneToken } from "../api/Callapi";
+import { getApiNoneToken, postApiNoneToken, putApiNoneToken} from "../api/Callapi";
 
 export default function ModalAccountInfor({ userLogin, closeModal }) {
   const [name, setName] = useState("");
@@ -9,6 +9,8 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [gender, setGender] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [file, setFile] = useState(null);
   const formatDate = (dateString) => {
     const date = new Date(dateString); // Tạo đối tượng Date từ chuỗi ngày tháng
     const year = date.getFullYear(); // Lấy năm
@@ -27,6 +29,7 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
         setPhoneNumber(response.data.data.phone);
         setDateOfBirth(response.data.data.dateOfBirth);
         setGender(response.data.data.gender);
+        setAvatar(response.data.data.avatar);
       } catch (error) {
         console.error("Error while fetching user details:", error);
         alert("Error while fetching user details: " + error.message);
@@ -36,11 +39,68 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
     loadInfor();
   }, [userLogin]);
 
-  const handleUpdate = () => {
-    // Gọi API để cập nhật thông tin tài khoản (cập nhật sau).
+  const handleUpdate = async () => {
+    try {
+      if (!file) {
+        alert("Vui lòng chọn ảnh đại diện.");
+        return;
+      }
+  
+      const url = await uploadToS3(file);
+      console.log("Avatar:", url);
+      setAvatar(url);
+  
+      const response = await putApiNoneToken(`/updateUser/${userLogin}`, {
+        avatar: url,
+      });
+  
+      console.log("Response:", response);
+      alert("Cập nhật thông tin tài khoản thành công");
+      closeModal();
+    } catch (error) {
+      console.error("Lỗi khi cập nhật thông tin tài khoản:", error);
+      alert("Đã xảy ra lỗi khi cập nhật thông tin tài khoản.");
+    }
+  };
+  
+  
 
-    // Đóng modal sau khi cập nhật thành công
-    closeModal();
+  // ============================== Phần upload file ==============================
+  const uploadToS3 = async (file) => {
+    if (!file) {
+      alert("Không có file/ảnh");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const response = await postApiNoneToken("/uploadAvatar", formData);
+      console.log("Upload lên S3 thành công:", response);
+      return response.data.data.url;
+    } catch (error) {
+      console.error("Lỗi khi upload lên S3:", error);
+      throw error;
+    }
+  };
+  
+  const chooseAvatar = () => {
+    // Chọn ảnh đại diện mới
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      // Hiển thị ảnh đã chọn lên Modal
+      const reader = new FileReader();
+      reader.onload = () => {
+        setAvatar(reader.result);
+        setFile(file);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
   };
 
   return (
@@ -54,11 +114,10 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
       </ModalHeader>
       <ModalBody>
         <ModalAvatar>
-          <Avatar
-            src="https://s3ongk.s3.ap-southeast-2.amazonaws.com/anhdep.jpg"
-            alt="Avatar"
-          />
-          <CameraIcon><FaCamera color="black" size={25}/></CameraIcon>
+          <Avatar src={avatar} alt="Avatar" />
+          <CameraIcon>
+            <FaCamera color="black" size={25} onClick={chooseAvatar} />
+          </CameraIcon>
         </ModalAvatar>
 
         <InputContainer>
