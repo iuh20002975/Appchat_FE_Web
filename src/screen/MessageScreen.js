@@ -19,24 +19,27 @@ import {
   postApiNoneTokenMessage,
   getApiNoneToken,
   postApiNoneTokenConversation,
+  getApiNoneTokenConversation
 } from "../api/Callapi";
 import Modal from "react-modal";
 import Chat from "../component/chat";
 import { useCallback } from "react";
 import io from "socket.io-client";
 
-import ListGroup from "../component/listGroup";
-
+// import ListGroup from "../component/listGroup";
 import { EmojiKeyboard } from "reactjs-emoji-keyboard";
+import ChatListGroup from "../component/listChat.js";
 
 export default function MessageScreen({ userLogin }) {
   const [activeName, setActiveName] = useState("");
   const [activeContentTab, setActiveContentTab] = useState("Prioritize");
   const [selectedUserName, setSelectedUserName] = useState("");
+  const [selectedGroupName, setSelectedGroupName] = useState("");
   const [showMembers, setShowMembers] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [phone, setPhone] = useState("");
   const [idSelector, setIdSelector] = useState("");
+  const [idGroup, setIdGroup] = useState("");
   const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([userLogin]);
   const [messageInput, setMessageInput] = useState("");
@@ -45,7 +48,6 @@ export default function MessageScreen({ userLogin }) {
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
   const [chatKey, setChatKey] = useState(0);
-
   const socket = io("ws://localhost:3000");
 
   // emoji
@@ -56,6 +58,29 @@ export default function MessageScreen({ userLogin }) {
   const handleEmojiSelect = (emoji) => {
     setMessageInput((prevMessage) => prevMessage + emoji.character);
   };
+  const [listGroup, setListGroup] = useState([]);
+
+  useEffect(() => {
+    const loadGroups = async () => {
+      try {
+        const response = await getApiNoneTokenConversation(`/${userLogin}`, {
+          id: userLogin,
+        });
+  
+        // Lọc ra những object có ít nhất 3 người tham gia
+        const friendsWithAtLeastThreeParticipants = response.data.filter(
+          friend => friend.participants.length >= 3
+        );
+  
+        // Set state cho listFriend với những object đã lọc
+        setListGroup(friendsWithAtLeastThreeParticipants);
+
+      } catch (error) {
+        console.error("Lỗi khi tải danh sách bạn:", error);
+      }
+    };
+    loadGroups();
+  }, [userLogin]);
 
   // Trong useEffect của component Chat
   useEffect(() => {
@@ -100,6 +125,7 @@ export default function MessageScreen({ userLogin }) {
     loadFriends();
   }, [userLogin]);
 
+  // Xử lý sự kiện thay đổi input tìm kiếm bạn bè trong danh sách ============
   const handleSearchInputChange = (event) => {
     const searchKeyword = event.target.value.toLowerCase();
     if (searchKeyword === "") {
@@ -111,6 +137,8 @@ export default function MessageScreen({ userLogin }) {
       setUsers(filteredUsers);
     }
   };
+
+// ============================== Phần upload file ==============================
   const uploadToS3 = (file) => {
     if (!file) {
       alert("Không có file/ảnh");
@@ -142,7 +170,6 @@ export default function MessageScreen({ userLogin }) {
     };
     input.click();
   };
-
   const sendImage = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -195,7 +222,7 @@ export default function MessageScreen({ userLogin }) {
   const closeDeleteMemberModal = () => {
     setShowDeleteMemberModal(false);
   };
-
+// ============================== Phần create group ==============================
   const handleFindUserIdByPhone = async (phone) => {
     const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
       phone: phone,
@@ -224,13 +251,23 @@ export default function MessageScreen({ userLogin }) {
       groupName: nameGroup,
       participants: selectedMembers,
     });
-    alert("Tạo nhóm " + response.data.name + " thành công");
+    alert("Tạo nhóm " + response.data.groupName + " thành công");
     setShowModal(false);
   };
+
+  // Xử lý xóa thành viên và thêm thành viên trong nhóm ========================
   const handleDeleteMembers = () => {
     console.log("Xóa thành viên:", selectedMembers);
     setShowDeleteMemberModal(false);
     setSelectedMembers([]);
+  };
+  const handleSelectMember = (userId) => {
+    const isSelected = selectedMembers.includes(userId);
+    if (isSelected) {
+      setSelectedMembers(selectedMembers.filter((id) => id !== userId));
+    } else {
+      setSelectedMembers([...selectedMembers, userId]);
+    }
   };
 
   // eslint-disable-next-line no-unused-vars
@@ -238,10 +275,10 @@ export default function MessageScreen({ userLogin }) {
     // Lấy tên người dùng từ state
     return (
       <ChatMessage className="ChatMessage">
-        {selectedUserName === "" ? (
+        {selectedUserName === "" && selectedGroupName ==="" ? (
           <Background></Background>
         ) : (
-          <>
+          activeContentTab === "Prioritize" ? (<>
             <ContentMessage className="ContentMessage">
               <HeaderContentMessage className="HeaderContentMessage">
                 <LeftMessage>
@@ -500,6 +537,306 @@ export default function MessageScreen({ userLogin }) {
                 </BodyInforTop>
 
                 <BodyInforBottom className="BodyInforBottom">
+
+                </BodyInforBottom>
+              </BodyInforMessage>
+            </InforMessage>
+          </>) : 
+ //         {/* (<ChatListGroup /> ) */}
+          ( <>
+            <ContentMessage className="ContentMessage">
+              <HeaderContentMessage className="HeaderContentMessage">
+                <LeftMessage>
+                  <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                  <InputName style={{ marginLeft: "10px" }}>
+                    {selectedGroupName}
+                  </InputName>
+                </LeftMessage>
+                <IconGroupMessage className="HeaderContentMessage">
+                  <MdOutlineGroupAdd
+                    style={{ fontSize: "24px" }}
+                    className="AddPersonGroup"
+                  />
+                  <IoIosSearch
+                    style={{ fontSize: "24px" }}
+                    className="FindMessage"
+                  />
+                  <CiVideoOn
+                    style={{ fontSize: "24px" }}
+                    className="VideoCall"
+                  />
+                </IconGroupMessage>
+              </HeaderContentMessage>
+              <BodyContentMessage className="BodyContentMessage">
+                <ChatListGroup
+                  groupId={idGroup}
+                  idLogin={userLogin}
+                ></ChatListGroup>
+              </BodyContentMessage>
+              <FooterContenMessate>
+                <ChatButton>
+                  <ImageButton onClick={sendImage}>
+                    <CiImageOn style={{ width: "100%", height: "100%" }} />
+                  </ImageButton>
+                  <FileButton onClick={sendFileOfType}>
+                    <MdOutlineAttachFile
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </FileButton>
+                  {/* // thêm emoji */}
+                  {showEmojiKeyboard && (
+                    <EmojiKeyboard
+                      style={{ bottom: "100%", left: 0 }}
+                      height={320}
+                      width={350}
+                      theme="dark"
+                      searchLabel="Procurar emoji"
+                      searchDisabled={false}
+                      // onEmojiSelect={(emoji) => setMessageInput((emoji.character))}
+                      onEmojiSelect={handleEmojiSelect}
+                      categoryDisabled={false}
+                    />
+                  )}
+                  <button onClick={toggleEmojiKeyboard}>💔</button>
+                </ChatButton>
+                <hr style={{ width: "100%" }} />
+                <ChatInputContainer>
+                  <input
+                    style={{
+                      width: "100%",
+                      padding: "10px",
+                      border: "0",
+                      borderRadius: "5px",
+                      marginRight: "10px",
+                      outline: "none",
+                    }}
+                    type="text"
+                    placeholder="Nhập tin nhắn..."
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
+                  />
+                  <SendButton onClick={sendMessage}>
+                    <IoSendOutline style={{ width: "23px", height: "23px" }} />
+                  </SendButton>
+                </ChatInputContainer>
+              </FooterContenMessate>
+            </ContentMessage>
+            <InforMessage className="InforMessage">
+              <HeaderInforMessage className="HeaderInforMessage">
+                <InputInfor>Thông tin </InputInfor>
+              </HeaderInforMessage>
+              <BodyInforMessage className="BodyInforMessage">
+                <BodyInforTop className="BodyInforTop">
+                  <Infor className="Infor">
+                    <Avatar className="Avatar"></Avatar>
+                    <InputName>{selectedGroupName}</InputName>
+                  </Infor>
+                  <MenutoGroup className="MenuToGroup">
+                    <AddMemberToGroup className="AddMemberToGroup">
+                      <button
+                        style={{
+                          marginLeft: 30,
+                          width: "30px",
+                          height: "30px",
+                          background: "#f0f0f0",
+                          borderRadius: "50%",
+                          cursor: "pointer",
+                          borderColor: "gray",
+                        }}
+                        onClick={handleModalAdd}
+                      >
+                        <AiOutlineUsergroupAdd />
+                      </button>
+
+                      <span style={{ fontSize: "13px" }}>Thêm thành viên</span>
+                    </AddMemberToGroup>
+                    <Modal
+                      style={{
+                        overlay: {
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                        content: {
+                          width: "50%",
+                          margin: "auto",
+                          maxHeight: "50%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                        },
+                      }}
+                      isOpen={showModal}
+                      onRequestClose={closeModalAdd}
+                      contentLabel="Example Modal"
+                    >
+                      <div>
+                        <h2>Thêm thành viên</h2>
+                      </div>
+
+                      <form style={{ flex: 1, overflowY: "auto" }}>
+                        {users.map((user) => (
+                          <div
+                            key={user.id}
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <input type="checkbox" id={user.id} />
+                            <AvatarModal className="AvatarModal"></AvatarModal>
+                            <label htmlFor={user.id}>{user.name}</label>
+                          </div>
+                        ))}
+                      </form>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <button
+                          onClick={closeModalAdd}
+                          style={{
+                            width: 50,
+                            height: 35,
+                            borderRadius: 15,
+                            borderWidth: 1,
+                            outline: "none",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Đóng
+                        </button>
+                        <button
+                          type="submit"
+                          form="modalForm"
+                          style={{
+                            width: 50,
+                            height: 35,
+                            borderRadius: 15,
+                            borderWidth: 1,
+                            outline: "none",
+                            backgroundColor: "#2ADFEA",
+                            color: "white",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Thêm
+                        </button>
+                      </div>
+                    </Modal>
+                    <DeleteMember className="DeleteMember">
+                      <button
+                        style={{
+                          marginLeft: 20,
+                          width: "30px",
+                          height: "30px",
+                          background: "#f0f0f0",
+                          borderRadius: "50%",
+                          cursor: "pointer",
+                          borderColor: "gray",
+                        }}
+                        onClick={handleDeleteMemberModal}
+                      >
+                        <AiOutlineUsergroupDelete />
+                      </button>
+
+                      <span style={{ fontSize: "13px" }}>Xóa thành viên</span>
+                    </DeleteMember>
+                    <DeleteGroup className="DeleteGroup">
+                      <button
+                        style={{
+                          marginLeft: 10,
+                          width: "30px",
+                          height: "30px",
+                          background: "#f0f0f0",
+                          borderRadius: "50%",
+                          cursor: "pointer",
+                          borderColor: "gray",
+                        }}
+                      >
+                        <MdDeleteOutline />
+                      </button>
+
+                      <span style={{ fontSize: "13px" }}>Xóa nhóm</span>
+                    </DeleteGroup>
+                    <Modal
+                      style={{
+                        overlay: {
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                        content: {
+                          width: "50%",
+                          margin: "auto",
+                          maxHeight: "50%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                        },
+                      }}
+                      isOpen={showDeleteMemberModal}
+                      onRequestClose={closeDeleteMemberModal}
+                      contentLabel="Delete Member Modal"
+                    >
+                      <div>
+                        <h2>Xóa thành viên</h2>
+                      </div>
+                      <form style={{ flex: 1, overflowY: "auto" }}>
+                        {users.map((user) => (
+                          <div
+                            key={user.id}
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <input
+                              type="checkbox"
+                              id={user.id}
+                              checked={selectedMembers.includes(user.id)}
+                              onChange={() => handleSelectMember(user.id)}
+                            />
+                            <AvatarModal className="AvatarModal"></AvatarModal>
+                            <label htmlFor={user.id}>{user.name}</label>
+                          </div>
+                        ))}
+                      </form>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          marginBottom: "10px",
+                        }}
+                      >
+                        <button
+                          style={{
+                            width: 50,
+                            height: 35,
+                            borderRadius: 15,
+                            borderWidth: 1,
+                            outline: "none",
+                            cursor: "pointer",
+                          }}
+                          onClick={closeDeleteMemberModal}
+                        >
+                          Đóng
+                        </button>
+                        <button
+                          style={{
+                            width: 50,
+                            height: 35,
+                            borderRadius: 15,
+                            borderWidth: 1,
+                            outline: "none",
+                            backgroundColor: "#D22424",
+                            color: "white",
+                            cursor: "pointer",
+                          }}
+                          onClick={handleDeleteMembers}
+                        >
+                          Xóa
+                        </button>
+                      </div>
+                    </Modal>
+                  </MenutoGroup>
+                </BodyInforTop>
+
+                <BodyInforBottom className="BodyInforBottom">
                   <button
                     style={{
                       width: "100%",
@@ -559,7 +896,7 @@ export default function MessageScreen({ userLogin }) {
                 </BodyInforBottom>
               </BodyInforMessage>
             </InforMessage>
-          </>
+          </> ) 
         )}
       </ChatMessage>
     );
@@ -569,10 +906,61 @@ export default function MessageScreen({ userLogin }) {
     if (activeContentTab === "Orther") {
       return <h1>Orther</h1>;
     } else if (activeContentTab === "Group") {
-      return <ListGroup userLogin={userLogin} />;
+      // return <ListGroup userLogin={userLogin} />;
+      return (
+        <div style={{ overflow: "scroll", flex:1 }}>
+          {listGroup.map((group) => (
+            <button
+              onClick={() => {
+                setSelectedGroupName(group.groupName);
+                setIdGroup(group._id);
+              }}
+              style={{
+                width: "100%",
+                outline: "0",
+                background: "white",
+                border: "none",
+              }}
+              key={group._id}
+            >
+              <ItemUser
+                $activeName={activeName === "Name"}
+                onClick={() => {
+                  handlerName("Name");
+                }}
+              >
+                <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                <div
+                  style={{
+                    display: "block",
+                    width: "80%",
+                    padding: "5px 0 0 0",
+                  }}
+                >
+                  <h3
+                    style={{
+                      fontWeight: "530",
+                      fontSize: 18,
+                      margin: "0 0 0 5px",
+                      padding: "0",
+                      textAlign: "left",
+                      position: "relative",
+                      height: "50%",
+                      top: "5%",
+                    }}
+                  >
+                    {group.groupName}
+                  </h3>
+                </div>
+              </ItemUser>
+            </button>
+          ))}
+        </div>
+      );
     } else {
       return (
-        <div style={{ overflow: "scroll", maxHeight: "90vb" }}>
+        // <div style={{ overflow: "scroll", maxHeight: "90vb" }}>
+        <div style={{ overflow: "scroll", flex:1 }}>
           {users.map((user) => (
             <button
               onClick={() => {

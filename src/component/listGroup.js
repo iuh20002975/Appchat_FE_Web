@@ -3,10 +3,10 @@ import styled from "styled-components";
 import { getApiNoneTokenConversation } from "../api/Callapi";
 
 const ListGroup = ({ userLogin }) => {
-  const [listFriend, setListFriend] = useState([]);
+  const [listGroup, setListGroup] = useState([]);
 
   useEffect(() => {
-    const loadFriends = async () => {
+    const loadGroups = async () => {
       try {
         const response = await getApiNoneTokenConversation(`/${userLogin}`, {
           id: userLogin,
@@ -18,19 +18,18 @@ const ListGroup = ({ userLogin }) => {
         );
   
         // Set state cho listFriend với những object đã lọc
-        setListFriend(friendsWithAtLeastThreeParticipants);
+        setListGroup(friendsWithAtLeastThreeParticipants);
       } catch (error) {
         console.error("Lỗi khi tải danh sách bạn:", error);
       }
     };
-    loadFriends();
+    loadGroups();
   }, [userLogin]);
   
 
   return (
-    console.log(listFriend),
     <form style={{ flex: 1, overflowY: "auto" }}>
-      {listFriend && listFriend.map((user, index) => (
+      {listGroup && listGroup.map((user, index) => (
         <ItemUser
           key={user._id}
           style={{ display: "flex", alignItems: "center" }}
@@ -44,7 +43,7 @@ const ListGroup = ({ userLogin }) => {
 };
 
 const ItemUser = styled.div`
-  padding: 10px;
+  padding: 5px;
   display: flex;
   cursor: pointer;
   display: flex;

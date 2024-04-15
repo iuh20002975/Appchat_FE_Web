@@ -14,6 +14,7 @@ import Friend from "./component/friend.js";
 import Chat from "./component/chat.js";
 import ListInvite from "./component/listInvite.js";
 import ListGroup from "./component/listGroup.js";
+import ChatListGroup from "./component/listChat.js";
 function App() {
    
   return (
@@ -32,6 +33,8 @@ function App() {
           <Route                 element={<Friend />} />
           <Route                 element={<ListInvite />} />
           <Route                 element={<ListGroup />}/>
+          <Route                  element={<ChatListGroup />} />
+          <Route                 element={<ChatListGroup />} />
           <Route  path="/chat"   element={<Chat />} />
           <Route path="/forgot-password" element={<ForgotPasswordForm />} />
         </Routes>
