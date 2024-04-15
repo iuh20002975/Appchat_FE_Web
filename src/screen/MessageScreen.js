@@ -541,8 +541,7 @@ export default function MessageScreen({ userLogin }) {
                 </BodyInforBottom>
               </BodyInforMessage>
             </InforMessage>
-          </>) : 
- //         {/* (<ChatListGroup /> ) */}
+          </>) :     
           ( <>
             <ContentMessage className="ContentMessage">
               <HeaderContentMessage className="HeaderContentMessage">
@@ -1032,14 +1031,16 @@ export default function MessageScreen({ userLogin }) {
           <TabList
             className="Tab"
             $activeContentTab={activeContentTab === "Prioritize"}
-            onClick={() => handleContentTab("Prioritize")}
+            onClick={() => (handleContentTab("Prioritize") &&
+            setSelectedUserName(""))}
           >
             Ưu tiên
           </TabList>
           <TabList
             className="Tab"
             $activeContentTab={activeContentTab === "Group"}
-            onClick={() => handleContentTab("Group")}
+            onClick={() =>( handleContentTab("Group")
+            && setSelectedGroupName(""))}
           >
             Nhóm
           </TabList>
