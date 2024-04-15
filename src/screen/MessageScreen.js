@@ -48,8 +48,9 @@ export default function MessageScreen({ userLogin }) {
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
   const [chatKey, setChatKey] = useState(0);
+  const [groupKey, setGroupKey] = useState(0);
   const socket = io("ws://localhost:3000");
-
+  const [nameSender, setNameSender] = useState("");
   // emoji
   const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
   const toggleEmojiKeyboard = () => {
@@ -59,7 +60,20 @@ export default function MessageScreen({ userLogin }) {
     setMessageInput((prevMessage) => prevMessage + emoji.character);
   };
   const [listGroup, setListGroup] = useState([]);
-
+  useEffect(() => {
+    const loadInfor = async () => {
+      try {
+        const response = await getApiNoneToken(`/getDetails/${userLogin}`, {
+          id: userLogin,
+        });
+        setNameSender(response.data.data.name);
+      } catch (error) {
+        console.error("Error while fetching user details:", error);
+        alert("Error while fetching user details: " + error.message);
+      }
+    };
+    loadInfor();
+  },[userLogin])
   useEffect(() => {
     const loadGroups = async () => {
       try {
@@ -197,6 +211,25 @@ export default function MessageScreen({ userLogin }) {
       console.log("Không thể gửi tin nhắn trống.");
     }
   }, [idSelector, messageInput, userLogin]); // Truyền một mảng rỗng làm đối số thứ hai
+
+  const sendMessageToGroupAt = useCallback(async () => {
+    try{
+      await postApiNoneTokenConversation(
+        "/sendMessageToGroup", 
+        {
+          groupId: idGroup,
+          senderId: userLogin,
+          message: nameSender + " : " + messageInput,
+        }
+      );
+
+      setMessageInput("");
+      setGroupKey((prevKey) => prevKey + 1);
+
+    }catch(error){
+      console.log("Không thể gửi tin nhắn trống.");
+    }
+  }, [idGroup, messageInput, userLogin]);
 
   const handlerName = (tabName) => {
     setActiveName(tabName);
@@ -594,6 +627,7 @@ export default function MessageScreen({ userLogin }) {
               </HeaderContentMessage>
               <BodyContentMessage className="BodyContentMessage">
                 <ChatListGroup
+                  key={groupKey}
                   groupId={idGroup}
                   idLogin={userLogin}
                 ></ChatListGroup>
@@ -638,9 +672,9 @@ export default function MessageScreen({ userLogin }) {
                     type="text"
                     placeholder="Nhập tin nhắn..."
                     value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
+                    onChange={(e) => setMessageInput( e.target.value)}
                   />
-                  <SendButton onClick={sendMessage}>
+                  <SendButton onClick={sendMessageToGroupAt}>
                     <IoSendOutline style={{ width: "23px", height: "23px" }} />
                   </SendButton>
                 </ChatInputContainer>
@@ -1180,7 +1214,6 @@ const ChatInputContainer = styled.div`
 `;
 const SendButton = styled.div`
   position: relative;
-
   border: none;
   border-radius: 5px;
   padding: 7px 13px;

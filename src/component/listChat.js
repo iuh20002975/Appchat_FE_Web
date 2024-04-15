@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getApiNoneTokenConversation } from "../api/Callapi"; // Thay đổi hàm gọi API để lấy tin nhắn nhóm
+import { getApiNoneTokenConversation, getApiNoneToken } from "../api/Callapi"; // Thay đổi hàm gọi API để lấy tin nhắn nhóm
 import styled from "styled-components";
 import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
@@ -9,7 +9,7 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
-
+  
   useEffect(() => {
     const socket = io("ws://localhost:3000");
 
@@ -145,7 +145,7 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
                   </span>
                 </>
               )}
-              <p style={{ fontStyle: "italic", margin: "1px" }}>
+              <p style={{ fontStyle: "italic", margin: "5px" }}>
                 {extractTime(message.createdAt)}
               </p>
             </ItemMessage>
