@@ -4,6 +4,8 @@ import styled from "styled-components";
 import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
+// hình ảnh của file
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint,FaFile } from 'react-icons/fa';
 
 const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
@@ -86,6 +88,29 @@ const Chat = ({ idSelector, idLogin }) => {
     setSelectedImage(null);
   };
 
+  
+  //load hình ảnh file
+  const getFileIcon = (filename) => {
+    const fileExtension = filename.slice(filename.lastIndexOf(".")).toLowerCase();
+    switch (fileExtension) {
+      case ".pdf":
+        return <FaFilePdf style={{height:50,width:70}} />;
+      case ".doc":
+      case ".docx":
+        return <FaFileWord style={{height:50,width:70}} />;
+      case ".xls":
+      case ".xlsx":
+        return <FaFileExcel style={{height:50,width:70}} />;
+      case ".ppt":
+      case ".pptx":
+        return <FaFilePowerpoint style={{height:50,width:70}}/>;
+      default:
+        // Trả về một biểu tượng mặc định cho các loại tệp khác
+        return <FaFile style={{height:50,width:70}}/>;
+    }
+  };
+
+
   return (
     <div style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}>
       {messages && messages.length > 0 ? (
@@ -108,7 +133,7 @@ const Chat = ({ idSelector, idLogin }) => {
                   </video>
                 ) : isFileExtensionAllowed(message.message) ? (
                   <a href={message.message} target="_blank" rel="noreferrer">
-                    {fileName(message.message)}
+                    {getFileIcon(fileName(message.message))} {fileName(message.message)}
                   </a>
                 ) : (
                   <div>
