@@ -213,6 +213,7 @@ export default function MessageScreen({ userLogin }) {
   }, [idSelector, messageInput, userLogin]); // Truyền một mảng rỗng làm đối số thứ hai
 
   const sendMessageToGroupAt = useCallback(async () => {
+    
     try{
       await postApiNoneTokenConversation(
         "/sendMessageToGroup", 
@@ -229,7 +230,7 @@ export default function MessageScreen({ userLogin }) {
     }catch(error){
       console.log("Không thể gửi tin nhắn trống.");
     }
-  }, [idGroup, messageInput, userLogin]);
+  }, [idGroup, messageInput, userLogin, nameSender]);
 
   const handlerName = (tabName) => {
     setActiveName(tabName);
