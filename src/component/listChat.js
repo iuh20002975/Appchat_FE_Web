@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getApiNoneTokenConversation, getApiNoneToken } from "../api/Callapi"; // Thay đổi hàm gọi API để lấy tin nhắn nhóm
+import { getApiNoneTokenConversation } from "../api/Callapi"; // Thay đổi hàm gọi API để lấy tin nhắn nhóm
 import styled from "styled-components";
 import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
+// hình ảnh của file
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint,FaFile } from 'react-icons/fa';
 
 const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thành groupId
   const [messages, setMessages] = useState([]);
@@ -78,6 +80,26 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
     link.click();
     link.remove();
   };
+  //load hình ảnh file
+  const getFileIcon = (filename) => {
+    const fileExtension = filename.slice(filename.lastIndexOf(".")).toLowerCase();
+    switch (fileExtension) {
+      case ".pdf":
+        return <FaFilePdf style={{height:50,width:70}} />;
+      case ".doc":
+      case ".docx":
+        return <FaFileWord style={{height:50,width:70}} />;
+      case ".xls":
+      case ".xlsx":
+        return <FaFileExcel style={{height:50,width:70}} />;
+      case ".ppt":
+      case ".pptx":
+        return <FaFilePowerpoint style={{height:50,width:70}}/>;
+      default:
+        // Trả về một biểu tượng mặc định cho các loại tệp khác
+        return <FaFile style={{height:50,width:70}}/>;
+    }
+  };
 
   const closeModal = () => {
     setIsZoomed(false);
@@ -89,66 +111,76 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
       {messages && messages.length > 0 ? (
         messages.map((message, index) => (
           <div style={{ flex: 1 }} key={index}>
-            <ItemMessage ref={messagesEndRef} senderId={message.senderId} idLogin={idLogin}>
-              {message.message.startsWith("https://") ? (
-                isVideoExtensionAllowed(message.message) ? (
-                  <video
-                    controls
-                    style={{
-                      borderRadius: ".7em",
-                      width: "60%",
-                      height: 200,
-                      margin: "1.5px",
-                    }}
-                  >
-                    <source src={message.message} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
-                ) : isFileExtensionAllowed(message.message) ? (
-                  <a href={message.message} target="_blank" rel="noreferrer">
-                    {fileName(message.message)}
-                  </a>
-                ) : (
-                  <div>
-                    <img
-                      src={message.message}
-                      alt="ảnh"
+            <ItemMessageContainer
+              ref={messagesEndRef}
+              senderId={message.senderId}
+              idLogin={idLogin}
+            >
+              {message.senderId !== idLogin ? ( // Hiển thị avatar phía trái nếu tin nhắn là của người nhận
+                <Avatar src={message.senderAvatar} alt="Avatar" />
+              ) : null}
+              <ItemMessageContent>
+                {message.message.startsWith("https://") ? (
+                  isVideoExtensionAllowed(message.message) ? (
+                    <video
+                      controls
                       style={{
                         borderRadius: ".7em",
-                        width: "150px",
-                        height: "150px",
-                        margin: "1.5px",
-                        cursor: "pointer",
+                        height: 200,
+                        marginRight: "1px",
                       }}
-                      onClick={() => handleImageClick(message.message)}
-                    />
-                    <ModalImg
-                      isZoomed={isZoomed}
-                      imageUrl={selectedImage}
-                      handleSaveImage={handleSaveImage}
-                      closeModal={closeModal}
-                    />
-                  </div>
-                )
-              ) : (
-                <>
-                  <span
-                    style={{
-                      borderRadius: ".7em",
-                      padding: "7px",
-                      boxShadow: `rgba(0, 0, 0, 0.1) 0px 1px 2px`,
-                      maxWidth: `${message.message.length * 10}px`,
-                      margin: "1.5px",
-                    }}
-                  >
-                    {message.message}
-                  </span>
-                </>
-              )}
-              <p style={{ fontStyle: "italic", margin: "5px" }}>
-                {extractTime(message.createdAt)}
-              </p>
-            </ItemMessage>
+                    >
+                      <source src={message.message} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : isFileExtensionAllowed(message.message) ? (
+                    <a href={message.message} target="_blank" rel="noreferrer">
+                      {getFileIcon(fileName(message.message))}{" "}
+                      {fileName(message.message)}
+                    </a>
+                  ) : (
+                    <div>
+                      <img
+                        src={message.message}
+                        alt="ảnh"
+                        style={{
+                          borderRadius: ".7em",
+                          width: "150px",
+                          height: "150px",
+                          margin: "1.5px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleImageClick(message.message)}
+                      />
+                      <ModalImg
+                        isZoomed={isZoomed}
+                        imageUrl={selectedImage}
+                        handleSaveImage={handleSaveImage}
+                        closeModal={closeModal}
+                      />
+                    </div>
+                  )
+                ) : (
+                  <>
+                    <span
+                      style={{
+                        borderRadius: ".7em",
+                        padding: "7px",
+                        boxShadow: `rgba(0, 0, 0, 0.1) 0px 1px 2px`,
+                        maxWidth: `${message.message.length * 10}px`,
+                        margin: "1.5px",
+                      }}
+                    >
+                      {message.message}
+                    </span>
+                  </>
+                )}
+                <MessageTime>{extractTime(message.createdAt)}</MessageTime>
+              </ItemMessageContent>
+              {message.senderId === idLogin ? ( // Hiển thị avatar phía phải nếu tin nhắn là của người gửi
+                <Avatar src={message.senderAvatar} alt="Avatar" />
+              ) : null}
+            </ItemMessageContainer>
             <br />
             <div />
           </div>
@@ -162,15 +194,28 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
 
 export default ChatListGroup;
 
-const ItemMessage = styled.div`
-  border-radius: 8px;
-  display: flow;
-  width: 100%;
-  color: black;
-  height: max-content;
-  margin: 5px 0;
-  word-wrap: break-word;
-  flex: 1;
-  text-align: ${({ senderId, idLogin }) =>
-    senderId === idLogin ? "right" : "left"};
+
+const ItemMessageContainer = styled.div`
+  display: flex;
+  justify-content: ${({ senderId, idLogin }) =>
+    senderId === idLogin ? "flex-end" : "flex-start"};
+  margin-bottom: 10px;
 `;
+
+const ItemMessageContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const Avatar = styled.img`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin: 0 5px;
+`;
+
+const MessageTime = styled.p`
+  font-style: italic;
+  margin: 1px;
+`;
+
