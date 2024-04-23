@@ -186,7 +186,7 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
           </div>
         ))
       ) : (
-        <div>Hãy chat ngây, để hiểu hơn về nhau </div>
+        <div>Hãy chat ngay, để hiểu hơn về nhau </div>
       )}
     </div>
   );

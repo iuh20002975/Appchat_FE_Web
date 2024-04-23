@@ -1,16 +1,16 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getApiNoneTokenMessage , getApiNoneToken} from "../api/Callapi";
+import { getApiNoneTokenMessage, getApiNoneToken } from "../api/Callapi";
 import styled from "styled-components";
 import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
-// hình ảnh của file
-import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint,FaFile } from 'react-icons/fa';
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaFile } from 'react-icons/fa';
 
 const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [hoveredMessage, setHoveredMessage] = useState(null);
 
   useEffect(() => {
     const socket = io("ws://localhost:3000");
@@ -100,28 +100,36 @@ const Chat = ({ idSelector, idLogin }) => {
     setSelectedImage(null);
   };
 
-  
-  //load hình ảnh file
   const getFileIcon = (filename) => {
     const fileExtension = filename.slice(filename.lastIndexOf(".")).toLowerCase();
     switch (fileExtension) {
       case ".pdf":
-        return <FaFilePdf style={{height:50,width:70}} />;
+        return <FaFilePdf style={{ height: 50, width: 70 }} />;
       case ".doc":
       case ".docx":
-        return <FaFileWord style={{height:50,width:70}} />;
+        return <FaFileWord style={{ height: 50, width: 70 }} />;
       case ".xls":
       case ".xlsx":
-        return <FaFileExcel style={{height:50,width:70}} />;
+        return <FaFileExcel style={{ height: 50, width: 70 }} />;
       case ".ppt":
       case ".pptx":
-        return <FaFilePowerpoint style={{height:50,width:70}}/>;
+        return <FaFilePowerpoint style={{ height: 50, width: 70 }} />;
       default:
-        // Trả về một biểu tượng mặc định cho các loại tệp khác
-        return <FaFile style={{height:50,width:70}}/>;
+        return <FaFile style={{ height: 50, width: 70 }} />;
     }
   };
 
+  const handleDeleteMessage = (message) => {
+    // Gọi API xóa tin nhắn và cập nhật state messages
+  };
+
+  const handleRecallMessage = (message) => {
+    // Gọi API thu hồi tin nhắn và cập nhật state messages
+  };
+
+  const handleForwardMessage = (message) => {
+    // Hiển thị giao diện chọn người nhận để chuyển tiếp tin nhắn
+  };
 
   return (
     <div style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}>
@@ -133,10 +141,13 @@ const Chat = ({ idSelector, idLogin }) => {
               senderId={message.senderId}
               idLogin={idLogin}
             >
-              {message.senderId !== idLogin ? ( // Hiển thị avatar phía trái nếu tin nhắn là của người nhận
+              {message.senderId !== idLogin ? (
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
-              <ItemMessageContent>
+              <ItemMessageContent
+                onMouseEnter={() => setHoveredMessage(message)}
+                onMouseLeave={() => setHoveredMessage(null)}
+              >
                 {message.message.startsWith("https://") ? (
                   isVideoExtensionAllowed(message.message) ? (
                     <video
@@ -193,8 +204,22 @@ const Chat = ({ idSelector, idLogin }) => {
                   </>
                 )}
                 <MessageTime>{extractTime(message.createdAt)}</MessageTime>
+                {hoveredMessage === message && (
+                  <MessageOptions>
+                    <MessageOption onClick={() => handleDeleteMessage(message)}>
+                      Xóa
+                    </MessageOption>
+                    <MessageOption onClick={() => handleRecallMessage(
+                      message)}>
+                      Thu hồi
+                    </MessageOption>
+                    <MessageOption onClick={() => handleForwardMessage(message)}>
+                      Chuyển tiếp
+                    </MessageOption>
+                  </MessageOptions>
+                )}
               </ItemMessageContent>
-              {message.senderId === idLogin ? ( // Hiển thị avatar phía phải nếu tin nhắn là của người gửi
+              {message.senderId === idLogin ? (
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
             </ItemMessageContainer>
@@ -203,7 +228,7 @@ const Chat = ({ idSelector, idLogin }) => {
           </div>
         ))
       ) : (
-        <div>Hãy chat ngây, để hiểu hơn về nhau</div>
+        <div>Hãy chat ngay, để hiểu hơn về nhau</div>
       )}
     </div>
   );
@@ -216,11 +241,13 @@ const ItemMessageContainer = styled.div`
   justify-content: ${({ senderId, idLogin }) =>
     senderId === idLogin ? "flex-end" : "flex-start"};
   margin-bottom: 10px;
+  position: relative;
 `;
 
 const ItemMessageContent = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 const Avatar = styled.img`
@@ -233,4 +260,25 @@ const Avatar = styled.img`
 const MessageTime = styled.p`
   font-style: italic;
   margin: 1px;
+`;
+
+const MessageOptions = styled.div`
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+  top: -120px;
+  right: -10px;
+`;
+
+const MessageOption = styled.div`
+  cursor: pointer;
+  padding: 4px 8px;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
 `;
