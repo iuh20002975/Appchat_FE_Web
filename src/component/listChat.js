@@ -1,37 +1,36 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getApiNoneTokenConversation } from "../api/Callapi"; // Thay đổi hàm gọi API để lấy tin nhắn nhóm
+import { getApiNoneTokenConversation } from "../api/Callapi"; // Thay Ä‘á»•i hÃ m gá»i API Ä‘á»ƒ láº¥y tin nháº¯n nhÃ³m
 import styled from "styled-components";
-// import io from "socket.io-client";
+import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
-// hình ảnh của file
-import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint,FaFile } from 'react-icons/fa';
+// hÃ¬nh áº£nh cá»§a file
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaFile, FaEllipsisV } from 'react-icons/fa';
 
-const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thành groupId
+const ChatListGroup = ({ groupId, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
-  
+  const [hoveredMessage, setHoveredMessage] = useState(null);
 
-    // const socket = io("ws://localhost:3000");
+  useEffect(() => {
+    const socket = io("ws://localhost:3000");
 
-    // socket.on("newGroupMessage", (newMessage) => { // Thay đổi sự kiện mới tin nhắn nhóm
-    //   loadGroupMessages();
-    // });
-
-    useEffect(() => {
-      const loadGroupMessages = async () => {
-        try {
-          const response = await getApiNoneTokenConversation(`/getGroupMessages/${groupId}`);
-          setMessages(response.data.messages);
-        } catch (error) {
-          console.error("Error loading group messages: asdgf ádg", error);
-          setMessages([]);
-        }
-      };
+    socket.on("newGroupMessage", (newMessage) => {
       loadGroupMessages();
-    }, [groupId]);
+    });
 
+    const loadGroupMessages = async () => {
+      try {
+        const response = await getApiNoneTokenConversation(`/getGroupMessages/${groupId}`);
+        setMessages(response.data.messages);
+      } catch (error) {
+        console.error("Error loading group messages:", error);
+        setMessages([]);
+      }
+    };
+    loadGroupMessages();
+  }, [groupId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -82,24 +81,23 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
     link.click();
     link.remove();
   };
-  //load hình ảnh file
+
   const getFileIcon = (filename) => {
     const fileExtension = filename.slice(filename.lastIndexOf(".")).toLowerCase();
     switch (fileExtension) {
       case ".pdf":
-        return <FaFilePdf style={{height:50,width:70}} />;
+        return <FaFilePdf style={{ height: 50, width: 70 }} />;
       case ".doc":
       case ".docx":
-        return <FaFileWord style={{height:50,width:70}} />;
+        return <FaFileWord style={{ height: 50, width: 70 }} />;
       case ".xls":
       case ".xlsx":
-        return <FaFileExcel style={{height:50,width:70}} />;
+        return <FaFileExcel style={{ height: 50, width: 70 }} />;
       case ".ppt":
       case ".pptx":
-        return <FaFilePowerpoint style={{height:50,width:70}}/>;
+        return <FaFilePowerpoint style={{ height: 50, width: 70 }} />;
       default:
-        // Trả về một biểu tượng mặc định cho các loại tệp khác
-        return <FaFile style={{height:50,width:70}}/>;
+        return <FaFile style={{ height: 50, width: 70 }} />;
     }
   };
 
@@ -108,8 +106,27 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
     setSelectedImage(null);
   };
 
+  const handleDeleteMessage = (message) => {
+    console.log("XÃ³a tin nháº¯n:", message);
+  };
+
+  const handleRecallMessage = (message) => {
+    console.log("Thu há»“i tin nháº¯n:", message);
+  };
+
+  const handleForwardMessage = (message) => {
+    console.log("Chuyá»ƒn tiáº¿p tin nháº¯n:", message);
+  };
+
+  const handleShowMenu = (message) => {
+    setHoveredMessage(message);
+  };
+
+  const handleHideMenu = () => {
+    setHoveredMessage(null);
+  };
+
   return (
-    
     <div style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}>
       {messages && messages.length > 0 ? (
         messages.map((message, index) => (
@@ -118,8 +135,10 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
               ref={messagesEndRef}
               senderId={message.senderId}
               idLogin={idLogin}
+              onMouseEnter={() => handleShowMenu(message)}
+              onMouseLeave={handleHideMenu}
             >
-              {message.senderId !== idLogin ? ( // Hiển thị avatar phía trái nếu tin nhắn là của người nhận
+              {message.senderId !== idLogin ? (
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
               <ItemMessageContent>
@@ -145,7 +164,7 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
                     <div>
                       <img
                         src={message.message}
-                        alt="ảnh"
+                        alt="áº£nh"
                         style={{
                           borderRadius: ".7em",
                           width: "150px",
@@ -180,16 +199,26 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
                 )}
                 <MessageTime>{extractTime(message.createdAt)}</MessageTime>
               </ItemMessageContent>
-              {message.senderId === idLogin ? ( // Hiển thị avatar phía phải nếu tin nhắn là của người gửi
+              {message.senderId === idLogin ? (
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
+              {hoveredMessage === message && (
+                <MessageMenu>
+                  <FaEllipsisV />
+                  <MenuOptions>
+                    <MenuItem onClick={() => handleDeleteMessage(message)}>XÃ³a</MenuItem>
+                    <MenuItem onClick={() => handleRecallMessage(message)}>Thu há»“i</MenuItem>
+                    <MenuItem onClick={() => handleForwardMessage(message)}>Chuyá»ƒn tiáº¿p</MenuItem>
+                  </MenuOptions>
+                </MessageMenu>
+              )}
             </ItemMessageContainer>
             <br />
             <div />
           </div>
         ))
       ) : (
-        <div>Hãy chat ngay, để hiểu hơn về nhau </div>
+        <div>HÃ£y chat ngay, Ä‘á»ƒ hiá»ƒu hÆ¡n vá» nhau </div>
       )}
     </div>
   );
@@ -197,12 +226,12 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
 
 export default ChatListGroup;
 
-
 const ItemMessageContainer = styled.div`
   display: flex;
   justify-content: ${({ senderId, idLogin }) =>
     senderId === idLogin ? "flex-end" : "flex-start"};
   margin-bottom: 10px;
+  position: relative;
 `;
 
 const ItemMessageContent = styled.div`
@@ -222,3 +251,36 @@ const MessageTime = styled.p`
   margin: 1px;
 `;
 
+const MessageMenu = styled.div`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 280px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+`;
+
+const MenuOptions = styled.div`
+position: absolute;
+background-color: #fff;
+border: 1px solid #ccc;
+border-radius: 4px;
+padding: 8px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+z-index: 1;
+top: -40px;
+right: 0;
+`;
+
+const MenuItem = styled.div`
+  padding: 4px 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;

@@ -37,10 +37,10 @@ const SignupScreen = () => {
 
   const confirmUser = async (e) => {
     try {
-      console.log(user)
-      user.confirm(code);
+      await user.confirm(code);
       setIsVerSignup(true);
     } catch (error) {
+      console.log(user.confirm(code));  
       console.error("Lỗi này nè: "+error);
     }
   }

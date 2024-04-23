@@ -414,7 +414,7 @@ const deleteGroup = async()=>{
                 <Chat
                   key={chatKey}
                   idSelector={idSelector}
-                  userLogin={userLogin}
+                  idLogin={userLogin}
                 ></Chat>
               </BodyContentMessage>
               <FooterContenMessate>

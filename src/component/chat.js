@@ -1,23 +1,28 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getApiNoneTokenMessage, getApiNoneToken } from "../api/Callapi";
 import styled from "styled-components";
-// import io from "socket.io-client";
+import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
 import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaFile } from 'react-icons/fa';
 
-const Chat = ({ idSelector, userLogin }) => {
+const Chat = ({ idSelector, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [hoveredMessage, setHoveredMessage] = useState(null);
 
   useEffect(() => {
-    // alert("idSelector: " + idSelector + " userLogin: " + userLogin)
+    const socket = io("ws://localhost:3000");
+
+    socket.on("newMessage", (newMessage) => {
+      loadMessage();
+    });
+
     const loadMessage = async () => {
       try {
         const response = await getApiNoneTokenMessage(
-          `/getMessages/${idSelector}?senderId=${userLogin}`
+          `/getMessages/${idLogin}?senderId=${idSelector}`
         );
         const messagesWithAvatar = await Promise.all(
           response.data.map(async (message) => {
@@ -38,7 +43,7 @@ const Chat = ({ idSelector, userLogin }) => {
       }
     };
     loadMessage();
-  }, [userLogin, idSelector]);
+  }, [idLogin, idSelector]);
 
   useEffect(() => {
     scrollToBottom();
@@ -115,15 +120,15 @@ const Chat = ({ idSelector, userLogin }) => {
   };
 
   const handleDeleteMessage = (message) => {
-    // Gọi API xóa tin nhắn và cập nhật state messages
+    // Gá»i API xÃ³a tin nháº¯n vÃ  cáº­p nháº­t state messages
   };
 
   const handleRecallMessage = (message) => {
-    // Gọi API thu hồi tin nhắn và cập nhật state messages
+    // Gá»i API thu há»“i tin nháº¯n vÃ  cáº­p nháº­t state messages
   };
 
   const handleForwardMessage = (message) => {
-    // Hiển thị giao diện chọn người nhận để chuyển tiếp tin nhắn
+    // Hiá»ƒn thá»‹ giao diá»‡n chá»n ngÆ°á»i nháº­n Ä‘á»ƒ chuyá»ƒn tiáº¿p tin nháº¯n
   };
 
   return (
@@ -133,14 +138,10 @@ const Chat = ({ idSelector, userLogin }) => {
           <div style={{ flex: 1 }} key={index}>
             <ItemMessageContainer
               ref={messagesEndRef}
-              idSelector={message.senderId}
-              userLogin={userLogin}
+              senderId={message.senderId}
+              idLogin={idLogin}
             >
-<<<<<<< HEAD
-              {message.senderId !== userLogin ? ( // Hiển thị avatar phía trái nếu tin nhắn là của người nhận
-=======
               {message.senderId !== idLogin ? (
->>>>>>> 192864c6261a1a438f4e2ec89145c33b18042d7f
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
               <ItemMessageContent
@@ -169,7 +170,7 @@ const Chat = ({ idSelector, userLogin }) => {
                     <div>
                       <img
                         src={message.message}
-                        alt="ảnh"
+                        alt="áº£nh"
                         style={{
                           borderRadius: ".7em",
                           width: "150px",
@@ -206,23 +207,19 @@ const Chat = ({ idSelector, userLogin }) => {
                 {hoveredMessage === message && (
                   <MessageOptions>
                     <MessageOption onClick={() => handleDeleteMessage(message)}>
-                      Xóa
+                      XÃ³a
                     </MessageOption>
                     <MessageOption onClick={() => handleRecallMessage(
                       message)}>
-                      Thu hồi
+                      Thu há»“i
                     </MessageOption>
                     <MessageOption onClick={() => handleForwardMessage(message)}>
-                      Chuyển tiếp
+                      Chuyá»ƒn tiáº¿p
                     </MessageOption>
                   </MessageOptions>
                 )}
               </ItemMessageContent>
-<<<<<<< HEAD
-              {message.senderId === userLogin ? ( // Hiển thị avatar phía phải nếu tin nhắn là của người gửi
-=======
               {message.senderId === idLogin ? (
->>>>>>> 192864c6261a1a438f4e2ec89145c33b18042d7f
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
             </ItemMessageContainer>
@@ -231,7 +228,7 @@ const Chat = ({ idSelector, userLogin }) => {
           </div>
         ))
       ) : (
-        <div>Hãy chat ngay, để hiểu hơn về nhau</div>
+        <div>HÃ£y chat ngay, Ä‘á»ƒ hiá»ƒu hÆ¡n vá» nhau</div>
       )}
     </div>
   );
