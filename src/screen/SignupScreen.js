@@ -2,27 +2,79 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import img from "../images/image_background.webp";
+
 import { postApiNoneToken } from "../api/Callapi";
+
+import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+
+import { auth } from "./config";
+
 const SignupScreen = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phone, setPhoneNumber] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [gender, setGender] = useState(true); // mặc định là 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    //day len github lai
-    if (password !== confirmPassword) {
-      alert("Mật khẩu không khớp");
-      return;
-    }
-    // Lưu thông tin đăng ký vào cơ sở dữ liệu hoặc thực hiện bất kỳ hành động nào khác.
-  };
-  //cap nhat lai
+  const [gender, setGender] = useState(true); // mặc định là nam
 
-  function calculateAge(dateOfBirth) {
+  //  xác thực
+  const [code, setCode] = useState("");
+
+  // eslint-disable-next-line no-unused-vars
+  const [user, setUser] = useState(null);
+  const [isVerSignup, setIsVerSignup] = useState(false);
+
+  const handleSubmit = async (e) => {
+    try {
+      const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
+      const confirmation = signInWithPhoneNumber(auth, phone, recaptcha);
+      setUser(confirmation);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const confirmUser = async (e) => {
+    try {
+      console.log(user)
+      user.confirm(code);
+      setIsVerSignup(true);
+    } catch (error) {
+      console.error("Lỗi này nè: "+error);
+    }
+  }
+
+  //cap nhat lai
+  const createAccount = async () => {
+    try {
+      const response = await postApiNoneToken("/signup", {
+        name: name,
+        username: email,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+        phone: phone,
+        password: password,
+        confirmPassword: confirmPassword,
+      });
+      if (response.data.status === "ERR") {
+        if (response.data.message === undefined) {
+          alert("Trùng số điện thoại ");
+          return;
+        }
+        alert(response.data.message);
+        return;
+      } else {
+        alert("Đăng ký thành công ");
+        return (window.location.href = "/"); // chuyen ve
+      }
+    } catch (error) {
+      console.error("error for signup", error);
+      alert("Error while fetching token" + error.message);
+    }
+  };
+
+  function checkAge(dateOfBirth) {
     const today = new Date();
     const dob = new Date(dateOfBirth);
     let age = today.getFullYear() - dob.getFullYear();
@@ -37,34 +89,16 @@ const SignupScreen = () => {
 
     return age;
   }
-  const createAccount = async () => {
-    const re = await postApiNoneToken("/signup", {
-      name: name,
-      username: email,
-      gender: gender,
-      dateOfBirth: dateOfBirth,
-      phone: phoneNumber,
-      password: password,
-      confirmPassword: confirmPassword,
-    });
-
-    if (re.data.status === "ERR") {
-      if (re.data.message === undefined) {
-        alert("Trùng số điện thoại ");
-      }
-      alert(re.data.message);
-      return;
-    } else {
-      alert("Đăng ký thành công ");
-      return (window.location.href = "/"); // chuyen ve
-    }
-  };
   function checkSignup() {
-    const age = calculateAge(dateOfBirth);
-    if (age < 18) {
-      alert("Tuổi phải lớn hơn 18");
+    if (dateOfBirth === "") {
+      alert("Vui lòng nhập ngày sinh");
     } else {
-      createAccount();
+      const age = checkAge(dateOfBirth);
+      if (age < 0) {
+        alert("Tuổi phải lớn hơn 18");
+      } else {
+        createAccount();
+      }
     }
   }
   return (
@@ -81,181 +115,206 @@ const SignupScreen = () => {
         <h1 style={{ textAlign: "center", margin: "0", color: "blue" }}>
           Đăng ký tài khoản
         </h1>
-
-        <Form onSubmit={handleSubmit}>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                htmlFor="name"
-                style={{ width: "100px", textAlign: "right" }}
+        <Form>
+          {isVerSignup === false ? (
+            <>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: "10px",
+                }}
               >
-                Họ và tên:
-              </label>
-            </div>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                htmlFor="email"
-                style={{ width: "100px", textAlign: "right" }}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <label
+                    htmlFor="phone"
+                    style={{ width: "100px", textAlign: "right" }}
+                  >
+                    Số điện thoại:
+                  </label>
+                </div>
+                <input
+                  type="tel"
+                  id="phone"
+                  value={phone}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </div>
+              <button type="button" onClick={handleSubmit}>
+                Request OTP
+              </button>
+              <div style={{ display: "block" }} id="recaptcha"></div>
+              <>
+                <div style={{ textAlign: "center" }}>
+                  <input
+                    style={{
+                      width: "40%",
+                      textAlign: "center",
+                      marginBottom: "5px",
+                    }}
+                    type="number"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                  />
+                </div>
+                <button onClick={confirmUser} type="button">
+                  Xác nhận
+                </button>
+              </>
+            </>
+          ) : null}
+          {isVerSignup === true ? (
+            <>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: "10px",
+                }}
               >
-                Email:
-              </label>
-            </div>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <label
+                    htmlFor="name"
+                    style={{ width: "100px", textAlign: "right" }}
+                  >
+                    Họ và tên:
+                  </label>
+                </div>
+                <input
+                  type="text"
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                htmlFor="gender"
-                style={{ width: "100px", textAlign: "right" }}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: "10px",
+                }}
               >
-                Giới tính:
-              </label>  
-            </div>
-            <select
-              id="gender"
-              value={gender ? "true" : "false"}
-              onChange={(e) => setGender(e.target.value === "male")}
-            >
-              <option value="true">Nam</option>
-              <option value="false">Nữ</option>
-            </select>
-          </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <label
+                    htmlFor="email"
+                    style={{ width: "100px", textAlign: "right" }}
+                  >
+                    Email:
+                  </label>
+                </div>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                htmlFor="phoneNumber"
-                style={{ width: "100px", textAlign: "right" }}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: "10px",
+                }}
               >
-                Số điện thoại:
-              </label>
-            </div>
-            <input
-              type="tel"
-              id="phoneNumber"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
-          </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <label
+                    htmlFor="gender"
+                    style={{ width: "100px", textAlign: "right" }}
+                  >
+                    Giới tính:
+                  </label>
+                </div>
+                <select
+                  id="gender"
+                  value={gender ? "male" : "female"}
+                  onChange={(e) => setGender(e.target.value === "male")}
+                >
+                  <option value="male">Nam</option>
+                  <option value="female">Nữ</option>
+                </select>
+              </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                htmlFor="dateOfBirth"
-                style={{ width: "100px", textAlign: "right" }}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: "10px",
+                }}
               >
-                Ngày sinh:
-              </label>
-            </div>
-            <input
-              type="date"
-              id="dateOfBirth"
-              value={dateOfBirth}
-              onChange={(e) => setDateOfBirth(e.target.value)}
-            />
-          </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <label
+                    htmlFor="dateOfBirth"
+                    style={{ width: "100px", textAlign: "right" }}
+                  >
+                    Ngày sinh:
+                  </label>
+                </div>
+                <input
+                  type="date"
+                  id="dateOfBirth"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                />
+              </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                htmlFor="password"
-                style={{ width: "100px", textAlign: "right" }}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: "10px",
+                }}
               >
-                Mật khẩu:
-              </label>
-            </div>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-          </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <label
+                    htmlFor="password"
+                    style={{ width: "100px", textAlign: "right" }}
+                  >
+                    Mật khẩu:
+                  </label>
+                </div>
+                <input
+                  type="password"
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
 
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr auto",
-              gap: "10px",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <label
-                htmlFor="confirmPassword"
-                style={{ width: "100px", textAlign: "right" }}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr auto",
+                  gap: "10px",
+                }}
               >
-                Xác nhận mật khẩu:
-              </label>
-            </div>
-            <input
-              type="password"
-              id="confirmPassword"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              autoComplete="new-password"
-            />
-          </div>
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <label
+                    htmlFor="confirmPassword"
+                    style={{ width: "100px", textAlign: "right" }}
+                  >
+                    Xác nhận mật khẩu:
+                  </label>
+                </div>
+                <input
+                  type="password"
+                  id="confirmPassword"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
 
-          <button type="submit" onClick={checkSignup}>
-            Đăng ký
-          </button>
+              <button type="submit" onClick={checkSignup}>
+                Đăng ký
+              </button>
+            </>
+          ) : null}
+
+          <p style={{ textAlign: "center" }}>
+            Bạn đã có tài khoản? <Link to="/">Đăng nhập</Link>
+          </p>
         </Form>
-
-        <p style={{ textAlign: "center" }}>
-          Bạn đã có tài khoản? <Link to="/">Đăng nhập</Link>
-        </p>
       </div>
     </Content>
   );

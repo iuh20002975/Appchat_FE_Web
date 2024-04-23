@@ -1,28 +1,23 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getApiNoneTokenMessage , getApiNoneToken} from "../api/Callapi";
 import styled from "styled-components";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
 // hình ảnh của file
 import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint,FaFile } from 'react-icons/fa';
 
-const Chat = ({ idSelector, idLogin }) => {
+const Chat = ({ idSelector, userLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    const socket = io("ws://localhost:3000");
-
-    socket.on("newMessage", (newMessage) => {
-      loadMessage();
-    });
-
+    // alert("idSelector: " + idSelector + " userLogin: " + userLogin)
     const loadMessage = async () => {
       try {
         const response = await getApiNoneTokenMessage(
-          `/getMessages/${idLogin}?senderId=${idSelector}`
+          `/getMessages/${idSelector}?senderId=${userLogin}`
         );
         const messagesWithAvatar = await Promise.all(
           response.data.map(async (message) => {
@@ -43,7 +38,7 @@ const Chat = ({ idSelector, idLogin }) => {
       }
     };
     loadMessage();
-  }, [idLogin, idSelector]);
+  }, [userLogin, idSelector]);
 
   useEffect(() => {
     scrollToBottom();
@@ -130,10 +125,10 @@ const Chat = ({ idSelector, idLogin }) => {
           <div style={{ flex: 1 }} key={index}>
             <ItemMessageContainer
               ref={messagesEndRef}
-              senderId={message.senderId}
-              idLogin={idLogin}
+              idSelector={message.senderId}
+              userLogin={userLogin}
             >
-              {message.senderId !== idLogin ? ( // Hiển thị avatar phía trái nếu tin nhắn là của người nhận
+              {message.senderId !== userLogin ? ( // Hiển thị avatar phía trái nếu tin nhắn là của người nhận
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
               <ItemMessageContent>
@@ -194,7 +189,7 @@ const Chat = ({ idSelector, idLogin }) => {
                 )}
                 <MessageTime>{extractTime(message.createdAt)}</MessageTime>
               </ItemMessageContent>
-              {message.senderId === idLogin ? ( // Hiển thị avatar phía phải nếu tin nhắn là của người gửi
+              {message.senderId === userLogin ? ( // Hiển thị avatar phía phải nếu tin nhắn là của người gửi
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
             </ItemMessageContainer>

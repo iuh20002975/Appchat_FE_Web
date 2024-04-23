@@ -4,6 +4,7 @@ import axios from 'axios'
 var api = axios.create({
     baseURL:'http://localhost:3001/api/user'
 })
+
 var api2 = axios.create({
     baseURL:'http://localhost:3001/api/messages'
 })

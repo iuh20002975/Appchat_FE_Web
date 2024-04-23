@@ -37,7 +37,7 @@ export default function MessageScreen({ userLogin }) {
   const [selectedGroupName, setSelectedGroupName] = useState("");
   const [showMembers, setShowMembers] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [phone, setPhone] = useState("");
+  // const [phone, setPhone] = useState("");
   const [idSelector, setIdSelector] = useState("");
   const [idGroup, setIdGroup] = useState("");
   const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
@@ -52,6 +52,7 @@ export default function MessageScreen({ userLogin }) {
   const socket = io("ws://localhost:3000");
   const [nameSender, setNameSender] = useState("");
   const [loadGroups,setLoadGroups] = useState(false);
+  const [loadMembers,setLoadMembers] = useState([]);
   
   // emoji
   const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
@@ -105,31 +106,31 @@ export default function MessageScreen({ userLogin }) {
 const deleteGroup = async()=>{
   try {
     const respone = await postApiNoneTokenConversation("/deleteConversation/"+idGroup)
-    alert("Giải tán nhốn lòm")
+    alert("Giải tán thành công")
     setLoadGroups(true)
 
     
   } catch (error) {
-     console.error("xóa nhón lồm thất bại", error);
+     console.error("xóa nhóm thất bại", error);
   }
 }
 
-  // Trong useEffect của component Chat
-  useEffect(() => {
-    // Lắng nghe sự kiện mới tin nhắn từ máy chủ WebSocket
-    socket.on("newMessage", (newMessage) => {
-      // Xử lý tin nhắn mới và cập nhật trạng thái của component Chat
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
-    });
+  // // Trong useEffect của component Chat
+  // useEffect(() => {
+  //   // Lắng nghe sự kiện mới tin nhắn từ máy chủ WebSocket
+  //   socket.on("newMessage", (newMessage) => {
+  //     // Xử lý tin nhắn mới và cập nhật trạng thái của component Chat
+  //     setMessages((prevMessages) => [...prevMessages, newMessage]);
+  //   });
 
-    // Cleanup: Ngắt kết nối khi component unmount
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket]);
+  //   // Cleanup: Ngắt kết nối khi component unmount
+  //   return () => {
+  //     socket.disconnect();
+  //   };
+  // }, [socket]);
 
-  useEffect(() => {
-    const loadIdByPhone = async () => {
+  // useEffect(() => {
+    const loadIdByPhone = async (phone) => {
       try {
         const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
           phone: phone,
@@ -139,8 +140,8 @@ const deleteGroup = async()=>{
         console.error("Error loading ID by phone:", error);
       }
     };
-    loadIdByPhone();
-  });
+  //   loadIdByPhone();
+  // });
 
   useEffect(() => {
     const loadFriends = async () => {
@@ -156,7 +157,19 @@ const deleteGroup = async()=>{
     };
     loadFriends();
   }, [userLogin]);
-
+  // useEffect(() => {
+  //   const loadMembersGroup = async () => {
+  //     try {
+  //       const response = await getApiNoneTokenConversation(`/getConversationById/${idGroup}`, {
+  //         id: idGroup,
+  //       });
+  //       setLoadMembers(response.data.data);
+  //     } catch (error) {
+  //       console.error("Error loading ID by phone:", error);
+  //     }
+  //   };
+  //   loadMembersGroup();
+  // }, [idGroup]);
   // Xử lý sự kiện thay đổi input tìm kiếm bạn bè trong danh sách ============
   const handleSearchInputChange = (event) => {
     const searchKeyword = event.target.value.toLowerCase();
@@ -180,6 +193,7 @@ const deleteGroup = async()=>{
     const formData = new FormData();
     formData.append("file", file);
     console.log("formData:", formData);
+
     // Gửi yêu cầu POST đến endpoint '/uploadOnApp/:idSelector' với formData là body
     postApiNoneTokenMessage(
       "/uploadOnApp/" + idSelector + "?senderId=" + userLogin,
@@ -192,6 +206,7 @@ const deleteGroup = async()=>{
         console.error("Lỗi khi upload lên S3:", error);
       });
   };
+
   const sendFileOfType = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -212,7 +227,48 @@ const deleteGroup = async()=>{
     };
     input.click();
   };
-
+  const uploadToS3Group = (file) => {
+    if (!file) {
+      alert("Không có file/ảnh group nào được chọn");
+      return;
+    }
+    console.log("File:", file);
+    const formData = new FormData();
+    formData.append("file", file);
+    console.log("formData:", formData);
+    // Gửi yêu cầu POST đến endpoint '/uploadOnApp/:idSelector' với formData là body
+    postApiNoneTokenConversation(
+      "/uploadOnApp/" + idGroup + "?senderId=" + userLogin,
+      formData
+    )
+      .then((response) => {
+        console.log("Upload lên S3 thành công:", response);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi upload lên S3:", error);
+      });
+  };
+  
+  const sendFileOfTypeGroup = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,video/*";
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      uploadToS3Group(file);
+    };
+    input.click();
+  };
+  const sendImageGroup = () => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      uploadToS3Group(file);
+    };
+    input.click();
+  };
   const sendMessage = useCallback(async () => {
     try {
       const response = await postApiNoneTokenMessage(
@@ -358,7 +414,7 @@ const deleteGroup = async()=>{
                 <Chat
                   key={chatKey}
                   idSelector={idSelector}
-                  idLogin={userLogin}
+                  userLogin={userLogin}
                 ></Chat>
               </BodyContentMessage>
               <FooterContenMessate>
@@ -653,10 +709,10 @@ const deleteGroup = async()=>{
               </BodyContentMessage>
               <FooterContenMessate>
                 <ChatButton>
-                  <ImageButton onClick={sendImage}>
+                  <ImageButton onClick={sendImageGroup}>
                     <CiImageOn style={{ width: "100%", height: "100%" }} />
                   </ImageButton>
-                  <FileButton onClick={sendFileOfType}>
+                  <FileButton onClick={sendFileOfTypeGroup}>
                     <MdOutlineAttachFile
                       style={{ width: "100%", height: "100%" }}
                     />
@@ -717,7 +773,7 @@ const deleteGroup = async()=>{
                     type="text"
                     placeholder="Nhập tin nhắn..."
                     value={messageInput}
-                    onChange={(e) => setMessageInput( e.target.value)}
+                    onChange={(e) => setMessageInput(e.target.value)}
                   />
                   <SendButton onClick={sendMessageToGroupAt}>
                     <IoSendOutline style={{ width: "23px", height: "23px" }} />
@@ -1009,7 +1065,9 @@ const deleteGroup = async()=>{
   // eslint-disable-next-line no-unused-vars
   const renderContentTab = ({ activeContentTab }) => {
     if (activeContentTab === "Orther") {
-      return <h1>Orther</h1>;
+      return <>
+        <h1>Orther</h1>
+      </>;
     } else if (activeContentTab === "Group") {
       // return <ListGroup userLogin={userLogin} />;
       return (
@@ -1018,7 +1076,7 @@ const deleteGroup = async()=>{
             <button
               onClick={() => {
                 setSelectedGroupName(group.groupName);
-                setIdGroup(group._id);
+                setIdGroup(group._id);              
               }}
               style={{
                 width: "100%",
@@ -1070,7 +1128,7 @@ const deleteGroup = async()=>{
             <button
               onClick={() => {
                 setSelectedUserName(user.name);
-                setPhone(user.phone);
+                loadIdByPhone(user.phone);
               }}
               style={{
                 width: "100%",

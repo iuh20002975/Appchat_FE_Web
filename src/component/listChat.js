@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getApiNoneTokenConversation } from "../api/Callapi"; // Thay đổi hàm gọi API để lấy tin nhắn nhóm
 import styled from "styled-components";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
 // hình ảnh của file
@@ -12,24 +12,26 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
   const messagesEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
   
-  useEffect(() => {
-    const socket = io("ws://localhost:3000");
 
-    socket.on("newGroupMessage", (newMessage) => { // Thay đổi sự kiện mới tin nhắn nhóm
+    // const socket = io("ws://localhost:3000");
+
+    // socket.on("newGroupMessage", (newMessage) => { // Thay đổi sự kiện mới tin nhắn nhóm
+    //   loadGroupMessages();
+    // });
+
+    useEffect(() => {
+      const loadGroupMessages = async () => {
+        try {
+          const response = await getApiNoneTokenConversation(`/getGroupMessages/${groupId}`);
+          setMessages(response.data.messages);
+        } catch (error) {
+          console.error("Error loading group messages: asdgf ádg", error);
+          setMessages([]);
+        }
+      };
       loadGroupMessages();
-    });
+    }, [groupId]);
 
-    const loadGroupMessages = async () => {
-      try {
-        const response = await getApiNoneTokenConversation(`/getGroupMessages/${groupId}`);
-        setMessages(response.data.messages);
-      } catch (error) {
-        console.error("Error loading group messages:", error);
-        setMessages([]);
-      }
-    };
-    loadGroupMessages();
-  }, [groupId]);
 
   useEffect(() => {
     scrollToBottom();
@@ -107,6 +109,7 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
   };
 
   return (
+    
     <div style={{ boxSizing: "border-box", padding: "5px", overflowY: "visible" }}>
       {messages && messages.length > 0 ? (
         messages.map((message, index) => (
