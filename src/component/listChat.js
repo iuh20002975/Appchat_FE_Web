@@ -5,17 +5,18 @@ import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
 // hình ảnh của file
-import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint,FaFile } from 'react-icons/fa';
+import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaFile, FaEllipsisV } from 'react-icons/fa';
 
-const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thành groupId
+const ChatListGroup = ({ groupId, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
-  
+  const [hoveredMessage, setHoveredMessage] = useState(null);
+
   useEffect(() => {
     const socket = io("ws://localhost:3000");
 
-    socket.on("newGroupMessage", (newMessage) => { // Thay đổi sự kiện mới tin nhắn nhóm
+    socket.on("newGroupMessage", (newMessage) => {
       loadGroupMessages();
     });
 
@@ -80,30 +81,49 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
     link.click();
     link.remove();
   };
-  //load hình ảnh file
+
   const getFileIcon = (filename) => {
     const fileExtension = filename.slice(filename.lastIndexOf(".")).toLowerCase();
     switch (fileExtension) {
       case ".pdf":
-        return <FaFilePdf style={{height:50,width:70}} />;
+        return <FaFilePdf style={{ height: 50, width: 70 }} />;
       case ".doc":
       case ".docx":
-        return <FaFileWord style={{height:50,width:70}} />;
+        return <FaFileWord style={{ height: 50, width: 70 }} />;
       case ".xls":
       case ".xlsx":
-        return <FaFileExcel style={{height:50,width:70}} />;
+        return <FaFileExcel style={{ height: 50, width: 70 }} />;
       case ".ppt":
       case ".pptx":
-        return <FaFilePowerpoint style={{height:50,width:70}}/>;
+        return <FaFilePowerpoint style={{ height: 50, width: 70 }} />;
       default:
-        // Trả về một biểu tượng mặc định cho các loại tệp khác
-        return <FaFile style={{height:50,width:70}}/>;
+        return <FaFile style={{ height: 50, width: 70 }} />;
     }
   };
 
   const closeModal = () => {
     setIsZoomed(false);
     setSelectedImage(null);
+  };
+
+  const handleDeleteMessage = (message) => {
+    console.log("Xóa tin nhắn:", message);
+  };
+
+  const handleRecallMessage = (message) => {
+    console.log("Thu hồi tin nhắn:", message);
+  };
+
+  const handleForwardMessage = (message) => {
+    console.log("Chuyển tiếp tin nhắn:", message);
+  };
+
+  const handleShowMenu = (message) => {
+    setHoveredMessage(message);
+  };
+
+  const handleHideMenu = () => {
+    setHoveredMessage(null);
   };
 
   return (
@@ -115,8 +135,10 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
               ref={messagesEndRef}
               senderId={message.senderId}
               idLogin={idLogin}
+              onMouseEnter={() => handleShowMenu(message)}
+              onMouseLeave={handleHideMenu}
             >
-              {message.senderId !== idLogin ? ( // Hiển thị avatar phía trái nếu tin nhắn là của người nhận
+              {message.senderId !== idLogin ? (
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
               <ItemMessageContent>
@@ -177,9 +199,19 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
                 )}
                 <MessageTime>{extractTime(message.createdAt)}</MessageTime>
               </ItemMessageContent>
-              {message.senderId === idLogin ? ( // Hiển thị avatar phía phải nếu tin nhắn là của người gửi
+              {message.senderId === idLogin ? (
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
+              {hoveredMessage === message && (
+                <MessageMenu>
+                  <FaEllipsisV />
+                  <MenuOptions>
+                    <MenuItem onClick={() => handleDeleteMessage(message)}>Xóa</MenuItem>
+                    <MenuItem onClick={() => handleRecallMessage(message)}>Thu hồi</MenuItem>
+                    <MenuItem onClick={() => handleForwardMessage(message)}>Chuyển tiếp</MenuItem>
+                  </MenuOptions>
+                </MessageMenu>
+              )}
             </ItemMessageContainer>
             <br />
             <div />
@@ -194,12 +226,12 @@ const ChatListGroup = ({ groupId, idLogin }) => { // Thay đổi idSelector thà
 
 export default ChatListGroup;
 
-
 const ItemMessageContainer = styled.div`
   display: flex;
   justify-content: ${({ senderId, idLogin }) =>
     senderId === idLogin ? "flex-end" : "flex-start"};
   margin-bottom: 10px;
+  position: relative;
 `;
 
 const ItemMessageContent = styled.div`
@@ -219,3 +251,36 @@ const MessageTime = styled.p`
   margin: 1px;
 `;
 
+const MessageMenu = styled.div`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 280px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+`;
+
+const MenuOptions = styled.div`
+position: absolute;
+background-color: #fff;
+border: 1px solid #ccc;
+border-radius: 4px;
+padding: 8px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+z-index: 1;
+top: -40px;
+right: 0;
+`;
+
+const MenuItem = styled.div`
+  padding: 4px 8px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
