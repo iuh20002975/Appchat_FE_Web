@@ -1,16 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { getApiNoneTokenConversation } from "../api/Callapi"; // Thay Ä‘á»•i hÃ m gá»i API Ä‘á»ƒ láº¥y tin nháº¯n nhÃ³m
 import styled from "styled-components";
-import io from "socket.io-client";
 import { extractTime } from "../extractTime/extractTime";
 import ModalImg from "./modalViewImage";
-<<<<<<< HEAD
-// hÃ¬nh áº£nh cá»§a file
-=======
-// hình ảnh của file
->>>>>>> b47a0ad4bfcaf4ffeb2f595b8cf8b1696916d026
-import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaFile, FaEllipsisV } from 'react-icons/fa';
-
+  import { FaFilePdf, FaFileWord, FaFileExcel, FaFilePowerpoint, FaFile  } from 'react-icons/fa';
 const ChatListGroup = ({ groupId, idLogin }) => {
   const [messages, setMessages] = useState([]);
   const messagesEndRef = useRef(null);
@@ -18,12 +11,6 @@ const ChatListGroup = ({ groupId, idLogin }) => {
   const [hoveredMessage, setHoveredMessage] = useState(null);
 
   useEffect(() => {
-    const socket = io("ws://localhost:3000");
-
-    socket.on("newGroupMessage", (newMessage) => {
-      loadGroupMessages();
-    });
-
     const loadGroupMessages = async () => {
       try {
         const response = await getApiNoneTokenConversation(`/getGroupMessages/${groupId}`);
@@ -111,27 +98,15 @@ const ChatListGroup = ({ groupId, idLogin }) => {
   };
 
   const handleDeleteMessage = (message) => {
-<<<<<<< HEAD
-    console.log("XÃ³a tin nháº¯n:", message);
+    console.log("Xoá:", message);
   };
 
   const handleRecallMessage = (message) => {
-    console.log("Thu há»“i tin nháº¯n:", message);
+    console.log("Thu hồi:", message);
   };
 
   const handleForwardMessage = (message) => {
-    console.log("Chuyá»ƒn tiáº¿p tin nháº¯n:", message);
-=======
-    console.log("Xóa tin nhắn:", message);
-  };
-
-  const handleRecallMessage = (message) => {
-    console.log("Thu hồi tin nhắn:", message);
-  };
-
-  const handleForwardMessage = (message) => {
-    console.log("Chuyển tiếp tin nhắn:", message);
->>>>>>> b47a0ad4bfcaf4ffeb2f595b8cf8b1696916d026
+    console.log("Chuyển tiếp:", message);
   };
 
   const handleShowMenu = (message) => {
@@ -180,7 +155,7 @@ const ChatListGroup = ({ groupId, idLogin }) => {
                     <div>
                       <img
                         src={message.message}
-                        alt="áº£nh"
+                        alt="ảnh"
                         style={{
                           borderRadius: ".7em",
                           width: "150px",
@@ -219,20 +194,18 @@ const ChatListGroup = ({ groupId, idLogin }) => {
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
               {hoveredMessage === message && (
-                <MessageMenu>
-                  <FaEllipsisV />
-                  <MenuOptions>
-<<<<<<< HEAD
-                    <MenuItem onClick={() => handleDeleteMessage(message)}>XÃ³a</MenuItem>
-                    <MenuItem onClick={() => handleRecallMessage(message)}>Thu há»“i</MenuItem>
-                    <MenuItem onClick={() => handleForwardMessage(message)}>Chuyá»ƒn tiáº¿p</MenuItem>
-=======
-                    <MenuItem onClick={() => handleDeleteMessage(message)}>Xóa</MenuItem>
-                    <MenuItem onClick={() => handleRecallMessage(message)}>Thu hồi</MenuItem>
-                    <MenuItem onClick={() => handleForwardMessage(message)}>Chuyển tiếp</MenuItem>
->>>>>>> b47a0ad4bfcaf4ffeb2f595b8cf8b1696916d026
-                  </MenuOptions>
-                </MessageMenu>
+                <MessageOptions>
+                    <MessageOption onClick={() => handleDeleteMessage(message)}>
+                      Xoá
+                    </MessageOption>
+                    <MessageOption onClick={() => handleRecallMessage(
+                      message)}>
+                      Thu hồi
+                    </MessageOption>
+                    <MessageOption onClick={() => handleForwardMessage(message)}>
+                      Chuyển tiếp
+                    </MessageOption>
+                  </MessageOptions>
               )}
             </ItemMessageContainer>
             <br />
@@ -240,7 +213,7 @@ const ChatListGroup = ({ groupId, idLogin }) => {
           </div>
         ))
       ) : (
-        <div>HÃ£y chat ngay, Ä‘á»ƒ hiá»ƒu hÆ¡n vá» nhau </div>
+        <div>Hãy chat ngây để hiểu nhau nhiều hơn.</div>
       )}
     </div>
   );
@@ -259,6 +232,7 @@ const ItemMessageContainer = styled.div`
 const ItemMessageContent = styled.div`
   display: flex;
   flex-direction: column;
+  position: relative;
 `;
 
 const Avatar = styled.img`
@@ -273,34 +247,27 @@ const MessageTime = styled.p`
   margin: 1px;
 `;
 
-const MessageMenu = styled.div`
+const MessageOptions = styled.div`
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  right: 280px;
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  bottom: 100%; // Đặt ở phía trên của ItemMessageContent
+  justify-content: ${({ senderId, idLogin }) =>
+     senderId === idLogin
+      ? "right: 50px;"
+      : "left: 50px;"};
+  width: max-content;
 `;
 
-const MenuOptions = styled.div`
-position: absolute;
-background-color: #fff;
-border: 1px solid #ccc;
-border-radius: 4px;
-padding: 8px;
-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-z-index: 1;
-top: -40px;
-right: 0;
-`;
 
-const MenuItem = styled.div`
-  padding: 4px 8px;
+
+const MessageOption = styled.div`
   cursor: pointer;
+  padding: 4px 8px;
 
   &:hover {
     background-color: #f0f0f0;

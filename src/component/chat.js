@@ -128,7 +128,7 @@ const Chat = ({ idSelector, idLogin }) => {
   };
 
   const handleForwardMessage = (message) => {
-    // Hiá»ƒn thá»‹ giao diá»‡n chá»n ngÆ°á»i nháº­n Ä‘á»ƒ chuyá»ƒn tiáº¿p tin nháº¯n
+   
   };
 
   return (
@@ -207,14 +207,14 @@ const Chat = ({ idSelector, idLogin }) => {
                 {hoveredMessage === message && (
                   <MessageOptions>
                     <MessageOption onClick={() => handleDeleteMessage(message)}>
-                      XÃ³a
+                      Xoá
                     </MessageOption>
                     <MessageOption onClick={() => handleRecallMessage(
                       message)}>
-                      Thu há»“i
+                      Thu hồi
                     </MessageOption>
                     <MessageOption onClick={() => handleForwardMessage(message)}>
-                      Chuyá»ƒn tiáº¿p
+                      Chuyển tiếp
                     </MessageOption>
                   </MessageOptions>
                 )}
@@ -228,7 +228,7 @@ const Chat = ({ idSelector, idLogin }) => {
           </div>
         ))
       ) : (
-        <div>HÃ£y chat ngay, Ä‘á»ƒ hiá»ƒu hÆ¡n vá» nhau</div>
+        <div>Hãy chat ngây để hiểu nhau nhiều hơn.</div>
       )}
     </div>
   );
@@ -240,7 +240,6 @@ const ItemMessageContainer = styled.div`
   display: flex;
   justify-content: ${({ senderId, idLogin }) =>
     senderId === idLogin ? "flex-end" : "flex-start"};
-  margin-bottom: 10px;
   position: relative;
 `;
 
@@ -267,17 +266,24 @@ const MessageOptions = styled.div`
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 8px;
+  padding: 2px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   z-index: 1;
-  top: -120px;
-  right: -10px;
+  top: -95px;
+  right: ${({ senderId, idLogin }) =>
+    senderId === idLogin ? "0" : "unset"};
+  left: ${({ senderId, idLogin }) =>
+    senderId === idLogin ? "unset" : "50px"};
+  width: max-content;
+  min-width: 100px; /* Thay đổi giá trị tùy theo độ rộng tối thiểu mong muốn */
 `;
+
+
 
 const MessageOption = styled.div`
   cursor: pointer;
   padding: 4px 8px;
-
+  width: max-content;
   &:hover {
     background-color: #f0f0f0;
   }

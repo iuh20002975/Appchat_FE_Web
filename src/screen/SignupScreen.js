@@ -20,27 +20,26 @@ const SignupScreen = () => {
 
   //  xác thực
   const [code, setCode] = useState("");
-
   // eslint-disable-next-line no-unused-vars
-  const [user, setUser] = useState(null);
+  const [userx, setUserx] = useState("");
   const [isVerSignup, setIsVerSignup] = useState(false);
 
   const handleSubmit = async (e) => {
     try {
       const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
-      const confirmation = signInWithPhoneNumber(auth, phone, recaptcha);
-      setUser(confirmation);
+      const confirmation = await signInWithPhoneNumber(auth, phone, recaptcha);
+      setUserx(confirmation);
     } catch (error) {
       console.log(error);
     }
   };
-
   const confirmUser = async (e) => {
     try {
-      await user.confirm(code);
-      setIsVerSignup(true);
+      if( await userx.confirm(code))
+        setIsVerSignup(true);
+      else
+        alert("Mã xác thực không đúng");
     } catch (error) {
-      console.log(user.confirm(code));  
       console.error("Lỗi này nè: "+error);
     }
   }
