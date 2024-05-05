@@ -11,7 +11,6 @@ import img from "../images/image_background.webp";
 import {
   postApiNoneTokenConversation,
   getApiNoneToken,
-  postApiNoneTokenMessage,
   getApiNoneTokenConversation,
 } from "../api/Callapi";
 import {
@@ -135,10 +134,14 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
     const formData = new FormData();
     formData.append("file", file);
     console.log("formData:", formData);
-    postApiNoneTokenMessage(
-      "/uploadOnApp/" + idGroup + "?senderId=" + userLogin,
-      formData
-    )
+    postApiNoneTokenConversation(
+     "/uploadOnAppConver/" + idGroup +"?senderId=" + userLogin,
+      formData,
+      {
+        groupId: idGroup,
+        senderId: userLogin,
+      }
+    ) 
       .then((response) => {
         console.log("Upload lên S3 thành công:", response);
       })

@@ -4,12 +4,11 @@ import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import img from "../images/image_background.webp";
 import { FaSearch } from "react-icons/fa";
-
+import Modal from "react-modal";
 import {
-  postApiNoneTokenMessage,
   getApiNoneToken,
-  postApiNoneTokenConversation,
   getApiNoneTokenConversation,
+  postApiNoneTokenConversation,
 } from "../api/Callapi";
 
 import io from "socket.io-client";
@@ -69,21 +68,6 @@ export default function MessageScreen({ userLogin }) {
     // thêm để render
     setLoadGroups(false);
   }, [userLogin, loadGroups]);
-
-  // xóa nhóm
-  const deleteGroup = async () => {
-    try {
-      const respone = await postApiNoneTokenConversation(
-        "/deleteConversation/" + idGroup
-      );
-      alert("Giải tán thành công");
-      setLoadGroups(true);
-    } catch (error) {
-      console.error("xóa nhóm thất bại", error);
-    }
-  };
-
-  // useEffect(() => {
   const loadIdByPhone = async (phone) => {
     try {
       const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
@@ -94,8 +78,6 @@ export default function MessageScreen({ userLogin }) {
       console.error("Error loading ID by phone:", error);
     }
   };
-  //   loadIdByPhone();
-  // });
 
   useEffect(() => {
     const loadFriends = async () => {
@@ -136,10 +118,48 @@ export default function MessageScreen({ userLogin }) {
     setActiveContentTab(tab);
   };
 
+  // Xử lý sự kiện mở modal, tạo nhóm ======================================
   const handleModalAdd = () => {
     setShowModal(true);
   };
 
+  const closeModalAdd = () => {
+    setShowModal(false);
+  };
+
+  const handleFindUserIdByPhone = async (phone) => {
+    const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
+      phone: phone,
+    });
+    if (selectedMembers.includes(response.data.data._id)) {
+      setSelectedMembers((prevMembers) =>
+        prevMembers.filter((member) => member !== response.data.data._id)
+      );
+    } else {
+      setSelectedMembers((prevMembers) => [
+        ...prevMembers,
+        response.data.data._id,
+      ]);
+    }
+  };
+
+  const [selectedMembers, setSelectedMembers] = useState([]);
+  const [nameGroup, setNameGroup] = useState("");
+  const handleCreateGroup = async () => {
+    if (nameGroup === "") {
+      alert("Tên nhóm không được để trống");
+      return;
+    } else if (selectedMembers.length < 2) {
+      alert("Chọn ít nhất 2 thành viên");
+      return;
+    }
+    const response = await postApiNoneTokenConversation("/createGroup", {
+      groupName: nameGroup,
+      participants: selectedMembers,
+    });
+    alert("Tạo nhóm " + response.data.groupName + " thành công");
+    setShowModal(false);
+  };
   // eslint-disable-next-line no-unused-vars
   const renderContentMessage = ({ selectedUserName }) => {
     // Lấy tên người dùng từ state
@@ -225,7 +245,6 @@ export default function MessageScreen({ userLogin }) {
       );
     } else {
       return (
-        // <div style={{ overflow: "scroll", maxHeight: "90vb" }}>
         <div style={{ overflow: "scroll", flex: 1 }}>
           {users.map((user) => (
             <button
@@ -387,6 +406,66 @@ export default function MessageScreen({ userLogin }) {
           {renderContentMessage({ selectedUserName })}
         </ContentBody>
       </Content>
+      <Modal
+        style={{
+          overlay: {
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          },
+          content: {
+            width: "25%",
+            height: "55%",
+            border: "1px solid rgb(204, 204, 204)",
+            background: "rgb(255, 255, 255)",
+            borderRadius: "4px",
+            outline: "none",
+            padding: "20px",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          },
+        }}
+        isOpen={showModal}
+        onRequestClose={closeModalAdd}
+        contentLabel="Tạo nhóm chat"
+      >
+        <div>
+          <h2>Tạo nhóm chat</h2>
+        </div>
+        <div>
+          <h4>Đặt tên nhóm</h4>
+          <input
+            placeholder="Nhập tên group"
+            onChange={(e) => setNameGroup(e.target.value)}
+          />
+        </div>
+        <div>
+          <h4>Chọn thành viên tham gia</h4>
+          <form style={{ overflow: "scroll" }}>
+            {users.map((user) => (
+              <div style={{ marginBottom: "5px" }} key={user._id}>
+                <input
+                  type="checkbox"
+                  id={user._id}
+                  onChange={() => handleFindUserIdByPhone(user.phone)}
+                />
+                <label htmlFor={user._id}>{user.name}</label>
+              </div>
+            ))}
+          </form>
+        </div>
+        <div
+          style={{
+            justifyContent: "space-between",
+            display: "flex",
+            margin: "10px",
+          }}
+        >
+          <button onClick={closeModalAdd}>Đóng</button>
+          <button onClick={handleCreateGroup}>Tạo nhóm</button>
+        </div>
+      </Modal>
     </>
   );
 }
@@ -465,7 +544,15 @@ const Avatar = styled.div`
   margin: 15px auto;
   border-radius: 50%;
 `;
+// const customStyles = {
+//   content: {
 
+//     width: "25%", // Thiết lập chiều rộng modal
+//     // maxWidth: "600px", // Chiều rộng tối đa
+//     height: "50%", // Chiều cao tự động điều chỉnh dựa trên nội dung
+//     // maxHeight: "500px", // Chiều cao tối đa
+//   },
+// };
 const ChatMessage = styled.div`
   width: 100%;
   height: 100vb;
