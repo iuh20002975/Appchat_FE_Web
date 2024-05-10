@@ -462,9 +462,8 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
                 />
               )}
             </button>
-
             {showMembers && (
-              <ul style={{padding:0, overflow:"scroll"}}>
+              <ul style={{padding:0, overflowY:"scroll"}}>
                 {loadMember.map((user) => (
                   <StyledListItem key={user._id}>
                     <div style={{ display: "flex", alignItems: "center" }}>

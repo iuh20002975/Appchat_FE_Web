@@ -192,7 +192,7 @@ export default function MessageScreen({ userLogin }) {
     } else if (activeContentTab === "Group") {
       // return <ListGroup userLogin={userLogin} />;
       return (
-        <div style={{ overflow: "scroll", flex: 1 }}>
+        <div style={{ overflowY: "scroll", flex: 1 }}>
           {listGroup.map((group) => (
             <button
               onClick={() => {
@@ -243,7 +243,7 @@ export default function MessageScreen({ userLogin }) {
       );
     } else {
       return (
-        <div style={{ overflow: "scroll", flex: 1 }}>
+        <div style={{ overflowY: "scroll", flex: 1 }}>
           {users.map((user) => (
             <button
               onClick={() => {
