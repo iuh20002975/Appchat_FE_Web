@@ -35,7 +35,7 @@ const ModalContainer = styled.div`
 
 const SettingList = styled.ul`
   list-style-type: none;
-  padding: 0;
+  padding: 3px;
 `;
 
 const SettingItem = styled.li`
@@ -62,6 +62,13 @@ const CloseButton = styled.span`
   }
 `;
 
+const Content = styled.div`
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  box-sizing: border-box;
+`;
+
 export default function SettingScreen({ userLogin, onClose}) {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
@@ -76,7 +83,7 @@ export default function SettingScreen({ userLogin, onClose}) {
 };
 
   return (
-    <>
+    <Content>
       {isAccountModalOpen && <ModalAccountInfor userLogin={userLogin} closeModal={closeModalAccountInfo} />}
       {isModalOpen && (
         <BackgroundOverlay>
@@ -112,10 +119,10 @@ export default function SettingScreen({ userLogin, onClose}) {
             <FaSignOutAlt style={{ marginRight: "10px", fontSize: "25px" }} />
             Đăng xuất
         </SettingItem>
-            </SettingList>
+          </SettingList>
           </ModalContainer>
         </BackgroundOverlay>
       )}
-    </>
+    </Content>
   );
 }
