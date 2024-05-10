@@ -10,27 +10,33 @@ import { useLocation } from "react-router-dom";
 
 export default function HomeScreen (props) {
   const [active, setActive] = useState("MessageScreen");  
+  const [isSettingOpen, setIsSettingOpen] = useState(false);
   const location = useLocation();
   const userLogin = location.state?.userLogin;
 
-  const handleTab = (tab) =>{
-    setActive(tab);
+  const handleTab = (tab) => {
+    if (tab === "SettingScreen") {
+      setIsSettingOpen(true);
+    } else {
+      setIsSettingOpen(false);
+      setActive(tab);
+    }
   }
 
-  const renderLoadContent = () =>{
+  const closeSettingModal = () => {
+    setIsSettingOpen(false);
+  }
+
+  const renderLoadContent = () => {
     if (active === "MessageScreen") {
       return <MessageScreen userLogin={userLogin} />;
     } else if (active === "ContactScreen") {
       return <ContactScreen userLogin={userLogin}/>;
-    } else if (active === "SettingScreen") {
-      return <SettingScreen userLogin={userLogin} />;
-    } else {
-      return null;
     }
+    return null;
   }
 
   return (
-
     <AppContent>
       <Tabs className="Tabs">
         
@@ -53,7 +59,7 @@ export default function HomeScreen (props) {
         {/* Nút cài đặt */}
         <Tab
           className="Tab"
-          $active={active === "SettingScreen"}
+          $active={isSettingOpen}
           onClick={() => handleTab("SettingScreen")}
         >
           <IoSettings  style={{fontSize:'30px'}} />
@@ -62,6 +68,7 @@ export default function HomeScreen (props) {
       </Tabs>
       
       <Content>{renderLoadContent()}</Content>
+      {isSettingOpen && <SettingScreen userLogin={userLogin} onClose={closeSettingModal} />}
     </AppContent>
   );
 }
