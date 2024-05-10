@@ -13,13 +13,11 @@ import {
   getApiNoneToken,
   getApiNoneTokenConversation,
 } from "../api/Callapi";
-import {
-  AiOutlineUsergroupAdd,
-  AiOutlineUsergroupDelete
-} from "react-icons/ai";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import Modal from "react-modal";
 import ChatListGroup from "../component/listChat.js";
 import { useCallback } from "react";
+import ModalMenuMember from "../component/modalMenuMember.js";
 const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
   const [nameSender, setNameSender] = useState("");
   const [users, setUsers] = useState([]);
@@ -27,40 +25,28 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
   const [originalUsers, setOriginalUsers] = useState([]);
   // eslint-disable-next-line
   const [groupKey, setGroupKey] = useState(0);
+  // eslint-disable-next-line
   const [loadGroups, setLoadGroups] = useState(false);
   // eslint-disable-next-line
   const [showDeleteMemberModal, setShowDeleteMemberModal] = useState(false);
+  const [listId, setListId] = useState("");
   const [messageInput, setMessageInput] = useState("");
-  const handleDeleteMemberModal = () => {
-    setShowDeleteMemberModal(true);
-  };
-  // eslint-disable-next-line
-  const closeDeleteMemberModal = () => {
-    setShowDeleteMemberModal(false);
-  };
-  useEffect(() => {
-    const loadGroups = async () => {
-      try {
-        const response = await getApiNoneTokenConversation(`/${userLogin}`, {
-          id: userLogin,
-        });
 
-        // Lọc ra những object có ít nhất 3 người tham gia
-        const friendsWithAtLeastThreeParticipants = response.data.filter(
-          (friend) => friend.participants.length >= 3
-        );
+  // const handleDeleteMemberModal = () => {
+  //   setShowDeleteMemberModal(true);
+  // };
+  // // eslint-disable-next-line
+  // const closeDeleteMemberModal = () => {
+  //   setShowDeleteMemberModal(false);
+  // };
+  const [loadMember, setLoadMember] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  //const [showModalMenuMember, setShowModalMenuMember] = useState(false);
 
-        // Set state cho listFriend với những object đã lọc
-        setListGroup(friendsWithAtLeastThreeParticipants);
-      } catch (error) {
-        console.error("Lỗi khi tải danh sách bạn:", error);
-      }
-    };
-    loadGroups();
-    // thêm để render
-    setLoadGroups(false);
-  }, [userLogin, loadGroups]);
-  const [listGroup, setListGroup] = useState([]);
+  const handleMeuMember = () => {
+    <ModalMenuMember/>;
+  };
+
   const handleEmojiSelect = (emoji) => {
     setMessageInput((prevMessage) => prevMessage + emoji.character);
   };
@@ -68,6 +54,8 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
     setShowModal(false);
   };
   const [showMembers, setShowMembers] = useState(false);
+  // eslint-disable-next-line
+  const [showImages, setShowImages] = useState(false);
   const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
   // xóa nhóm
   const deleteGroup = async () => {
@@ -125,6 +113,25 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
     }
   }, [idGroup, messageInput, userLogin, nameSender]);
 
+
+  useEffect(() => {
+    const loadMemberGroup = async () => {
+      try {
+        const response = await getApiNoneTokenConversation(
+          "/getParticipant/" + idGroup,
+          {
+            id: idGroup,
+          }
+        );
+        setLoadMember(response.data);
+        console.log("loadMember:", response.data);
+      } catch (error) {
+        console.error("Error loading member group:", error);
+      }
+    };
+    loadMemberGroup();
+  }, [idGroup]);
+
   const uploadToS3Group = (file) => {
     if (!file) {
       alert("Không có file/ảnh group nào được chọn");
@@ -135,13 +142,13 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
     formData.append("file", file);
     console.log("formData:", formData);
     postApiNoneTokenConversation(
-     "/uploadOnAppConver/" + idGroup +"?senderId=" + userLogin,
+      "/uploadOnAppConver/" + idGroup + "?senderId=" + userLogin,
       formData,
       {
         groupId: idGroup,
         senderId: userLogin,
       }
-    ) 
+    )
       .then((response) => {
         console.log("Upload lên S3 thành công:", response);
       })
@@ -149,7 +156,7 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
         console.error("Lỗi khi upload lên S3:", error);
       });
   };
-  const [showModal, setShowModal] = useState(false);
+
   const handleModalAdd = () => {
     setShowModal(true);
   };
@@ -173,6 +180,29 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
     };
     input.click();
   };
+  const handleCheckboxChange = (event) => {
+    const { checked, _id } = event.target;
+    if (checked) {
+      setListId((prevListId) => [...prevListId, _id]);
+    } else {
+      setListId((prevListId) => prevListId.filter((itemId) => itemId !== _id));
+    }
+  };
+
+  const butAddMemberToGroup = async () => {
+    alert("Thêm thành viên thành công" + listId);
+    try {
+      await postApiNoneTokenConversation("/addParticipant", {
+        conversationId: idGroup,
+        userId: listId,
+      });
+      alert("Thêm thành viên thành công");
+      setLoadGroups(true);
+    } catch (error) {
+      console.error("Thêm thành viên thất bại", error);
+    }
+    closeModalAdd();
+  };
 
   return (
     <>
@@ -194,10 +224,7 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
           </IconGroupMessage>
         </HeaderContentMessage>
         <BodyContentMessage className="BodyContentMessage">
-          <ChatListGroup
-                  groupId={idGroup}
-                  idLogin={userLogin}
-                ></ChatListGroup>
+          <ChatListGroup groupId={idGroup} idLogin={userLogin}></ChatListGroup>
         </BodyContentMessage>
         <FooterContenMessate>
           <ChatButton>
@@ -240,7 +267,6 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
                   theme="light"
                   searchLabel="Procurar emoji"
                   searchDisabled={false}
-                  //onEmojiSelect={(emoji) => setMessageInput((emoji.character))}
                   onEmojiSelect={handleEmojiSelect}
                   categoryDisabled={false}
                 />
@@ -324,10 +350,14 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
                 <form style={{ flex: 1, overflowY: "auto" }}>
                   {users.map((user) => (
                     <div
-                      key={user.id}
+                      key={user._id}
                       style={{ display: "flex", alignItems: "center" }}
                     >
-                      <input type="checkbox" id={user.id} />
+                      <input
+                        type="checkbox"
+                        id={user._id}
+                        onChange={handleCheckboxChange}
+                      />
                       <AvatarModal className="AvatarModal"></AvatarModal>
                       <label htmlFor={user.id}>{user.name}</label>
                     </div>
@@ -355,7 +385,7 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
                     Đóng
                   </button>
                   <button
-                    type="submit"
+                    type="but"
                     form="modalForm"
                     style={{
                       width: 50,
@@ -367,29 +397,12 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
                       color: "white",
                       cursor: "pointer",
                     }}
+                    onClick={butAddMemberToGroup}
                   >
                     Thêm
                   </button>
                 </div>
               </Modal>
-              <DeleteMember className="DeleteMember">
-                <button
-                  style={{
-                    marginLeft: 20,
-                    width: "30px",
-                    height: "30px",
-                    background: "#f0f0f0",
-                    borderRadius: "50%",
-                    cursor: "pointer",
-                    borderColor: "gray",
-                  }}
-                  onClick={handleDeleteMemberModal}
-                >
-                  <AiOutlineUsergroupDelete />
-                </button>
-
-                <span style={{ fontSize: "13px" }}>Xóa thành viên</span>
-              </DeleteMember>
               <DeleteGroup className="DeleteGroup">
                 <button
                   style={{
@@ -408,81 +421,6 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
 
                 <span style={{ fontSize: "13px" }}>Xóa nhóm</span>
               </DeleteGroup>
-              {/* <Modal
-                      style={{
-                        overlay: {
-                          backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        content: {
-                          width: "50%",
-                          margin: "auto",
-                          maxHeight: "50%",
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "space-between",
-                        },
-                      }}
-                      isOpen={showDeleteMemberModal}
-                      onRequestClose={closeDeleteMemberModal}
-                      contentLabel="Delete Member Modal"
-                    >
-                      <div>
-                        <h2>Xóa thành viên</h2>
-                      </div>
-                      <form style={{ flex: 1, overflowY: "auto" }}>
-                        {users.map((user) => (
-                          <div
-                            key={user.id}
-                            style={{ display: "flex", alignItems: "center" }}
-                          >
-                            <input
-                              type="checkbox"
-                              id={user.id}
-                              checked={selectedMembers.includes(user.id)}
-                              onChange={() => handleSelectMember(user.id)}
-                            />
-                            <AvatarModal className="AvatarModal"></AvatarModal>
-                            <label htmlFor={user.id}>{user.name}</label>
-                          </div>
-                        ))}
-                      </form>
-                      <div
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        <button
-                          style={{
-                            width: 50,
-                            height: 35,
-                            borderRadius: 15,
-                            borderWidth: 1,
-                            outline: "none",
-                            cursor: "pointer",
-                          }}
-                          onClick={closeDeleteMemberModal}
-                        >
-                          Đóng
-                        </button>
-                        <button
-                          style={{
-                            width: 50,
-                            height: 35,
-                            borderRadius: 15,
-                            borderWidth: 1,
-                            outline: "none",
-                            backgroundColor: "#D22424",
-                            color: "white",
-                            cursor: "pointer",
-                          }}
-                          onClick={handleDeleteMembers}
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    </Modal> */}
             </MenutoGroup>
           </BodyInforTop>
 
@@ -526,20 +464,15 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
             </button>
 
             {showMembers && (
-              <ul>
-                {listGroup.map((user) => (
-                  <li
-                    style={{
-                      listStyleType: "none",
-                      paddingRight: "10px",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                    key={user._id}
-                  >
-                    <AvatarInGroup className="AvatarInGroup"></AvatarInGroup>
-                    {user.name}
-                  </li>
+              <ul style={{padding:0, overflow:"scroll"}}>
+                {loadMember.map((user) => (
+                  <StyledListItem key={user._id}>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <AvatarInGroup className="AvatarInGroup"></AvatarInGroup>
+                      {user.name}
+                    </div>
+                    <button type="button" onClick={handleMeuMember} style={{fontWeight:"500",marginRight:"25px"}}>...</button>
+                  </StyledListItem>
                 ))}
               </ul>
             )}
@@ -550,6 +483,31 @@ const ChatGroupScreen = ({ selectedGroupName, userLogin, idGroup }) => {
   );
 };
 export default ChatGroupScreen;
+
+const StyledListItem = styled.li`
+  justify-content: space-between;
+  list-style-type: none;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  button {
+    outline: none;
+    background: red;
+    border: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  &:hover button {
+    opacity: 1;
+  }
+`;
 const ImageButton = styled.div`
   margin-left: 10px;
   height: 30px;
@@ -684,5 +642,4 @@ const AvatarModal = styled.div`
   margin: 3px;
   border-radius: 50%;
 `;
-const DeleteMember = styled.div``;
 const DeleteGroup = styled.div``;

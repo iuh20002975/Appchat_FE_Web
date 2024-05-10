@@ -193,7 +193,7 @@ const ChatListGroup = ({ groupId, idLogin }) => {
               {message.senderId === idLogin ? (
                 <Avatar src={message.senderAvatar} alt="Avatar" />
               ) : null}
-              {hoveredMessage === message && (
+              { hoveredMessage === message && (
                 <MessageOptions>
                     <MessageOption onClick={() => handleDeleteMessage(message)}>
                       Xoá

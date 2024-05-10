@@ -10,8 +10,6 @@ import {
 } from "react-icons/fa";
 import ModalAccountInfor from "./ModalAccountInfor";
 
-//import { postApiNoneToken  } from "../api/Callapi";
-
 export default function SettingScreen({ userLogin }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   

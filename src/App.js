@@ -17,6 +17,7 @@ import ListGroup from "./component/listGroup.js";
 import ChatListGroup from "./component/listChat.js";
 import ChatScreen from "./screen/ChatScreen.js";
 import ChatGroupScreen from "./screen/ChatGroupScreen.js";
+import ModalMenuMember from "./component/modalMenuMember.js";
 function App() {
    
   return (
@@ -36,6 +37,7 @@ function App() {
           <Route                 element={<ListInvite />} />
           <Route                 element={<ChatGroupScreen />} />
           <Route                 element={<ListGroup />}/>
+          <Route                 element={<ModalMenuMember />} />
           <Route                 element={<ChatListGroup />} />
           <Route                 element={<ChatScreen />} />
           <Route  path="/chat"   element={<Chat />} />

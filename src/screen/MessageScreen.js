@@ -30,7 +30,7 @@ export default function MessageScreen({ userLogin }) {
   const socket = io("ws://localhost:3000");
   const [nameSender, setNameSender] = useState("");
   const [loadGroups, setLoadGroups] = useState(false);
-
+  const [selectedMembers, setSelectedMembers] = useState([userLogin]);
   const [listGroup, setListGroup] = useState([]);
   useEffect(() => {
     const loadInfor = async () => {
@@ -142,8 +142,6 @@ export default function MessageScreen({ userLogin }) {
       ]);
     }
   };
-
-  const [selectedMembers, setSelectedMembers] = useState([]);
   const [nameGroup, setNameGroup] = useState("");
   const handleCreateGroup = async () => {
     if (nameGroup === "") {

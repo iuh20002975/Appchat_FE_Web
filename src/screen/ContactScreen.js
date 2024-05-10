@@ -8,13 +8,14 @@ import ListFriend from "../component/listFriend.js";
 import { getApiNoneToken } from "../api/Callapi.js";
 import Friend from "../component/friend.js";
 import ListInvite from "../component/listInvite.js";
-
+import ModalMenuMember from "../component/modalMenuMember.js";
 const Contact = ({userLogin}) => {
   const [active, setActive] = useState('listFriend');
   //eslint-disable-next-line
   const [searchPhone, setSearchPhone] = useState('');
   const handler = (tab) => {
     setActive(tab);
+    
   };
   const handleFriendSearch =async (event) => {
     try{
@@ -107,7 +108,7 @@ const Contact = ({userLogin}) => {
     {active === "listFriend" ? (
       <ListFriend userLogin={userLogin} />
     ) : active === "listGroup" ? (
-      <div>listGroup</div>
+      <ModalMenuMember />
     ) : active === "listAdd" ? (
       <ListInvite userLogin={userLogin} />
     ) : (
