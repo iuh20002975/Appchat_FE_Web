@@ -27,7 +27,7 @@ export default function MessageScreen({ userLogin }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
-  const socket = io("ws://localhost:3000");
+  // const socket = io("ws://localhost:3000");
   const [nameSender, setNameSender] = useState("");
   const [loadGroups, setLoadGroups] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([userLogin]);
