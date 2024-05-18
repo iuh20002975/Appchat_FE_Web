@@ -52,6 +52,11 @@ export default function ModalAccountInfor({ userLogin, closeModal }) {
   
       const response = await putApiNoneToken(`/updateUser/${userLogin}`, {
         avatar: url,
+        name: name,
+        username: email,
+        phone: phoneNumber,
+        dateOfBirth: dateOfBirth,
+        gender: gender,
       });
   
       console.log("Response:", response);
