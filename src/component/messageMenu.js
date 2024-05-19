@@ -3,8 +3,10 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { FaShare } from "react-icons/fa6";
 import { RxUpdate } from "react-icons/rx";
 import { IoReload } from "react-icons/io5";
+import { IoCopyOutline } from "react-icons/io5";
+import { GoPin } from "react-icons/go";
 
-const MessageMenu = ({ onDelete, onForward,onUpdate }) => {
+const MessageMenu = ({ onDelete, onForward,onUpdate, onCopy,onPin }) => {
   const [menuVisible, setMenuVisible] = useState(false);
 
   const toggleMenu = () => {
@@ -28,7 +30,7 @@ const MessageMenu = ({ onDelete, onForward,onUpdate }) => {
             borderRadius: "5px",
             zIndex: "1",
             display:"flex",
-            width:"170px"
+            width:"210px"
           }}
         >
           <div onClick={onDelete} style={{ padding: "10px", cursor: "pointer" ,justifyContent:"center",alignItems:"center",flexDirection:"column"}}>
@@ -55,6 +57,26 @@ const MessageMenu = ({ onDelete, onForward,onUpdate }) => {
             </div>
             <div>
             <span style={{fontSize:"10px"}}>Sửa</span>
+            </div>
+        
+          </div>
+          <div onClick={onCopy} style={{ padding: "10px", cursor: "pointer" ,justifyContent:"center",alignItems:"center" }}>
+         
+            <div >
+            <IoCopyOutline />
+            </div>
+            <div>
+            <span style={{fontSize:"10px"}}>Copy</span>
+            </div>
+        
+          </div>
+          <div onClick={onPin} style={{ padding: "10px", cursor: "pointer" ,justifyContent:"center",alignItems:"center" }}>
+         
+            <div >
+            <GoPin />
+            </div>
+            <div>
+            <span style={{fontSize:"10px"}}>Ghim</span>
             </div>
         
           </div>

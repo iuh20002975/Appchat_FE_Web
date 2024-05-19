@@ -12,23 +12,36 @@ import img from "../images/image_background.webp";
 import { CiVideoOn } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
 import { MdOutlineGroupAdd } from "react-icons/md";
+import { MdEmojiEmotions } from "react-icons/md";
+import { useSocketContext } from "../context/SocketContext";
 const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
+
+  const [originalUsers, setOriginalUsers] = useState([]);
+  const [messageInput, setMessageInput] = useState("");
+  const [users, setUsers] = useState([]);
+  const [chatKey, setChatKey] = useState(0);
+  //const [nameGroup, setNameGroup] = useState("");
+  const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
+
+
+  const { socket } = useSocketContext();
+
   
+  useEffect(() => {
+    if (!socket) return;
+  
+    socket?.on("receiveMessage", (data) => {
+      // Xử lý tin nhắn nhận được từ máy chủ
+    });
+  
+    return () => {
+      socket?.off("receiveMessage");
+    };
+  }, [socket]);
   const toggleEmojiKeyboard = () => {
     setShowEmojiKeyboard(!showEmojiKeyboard);
   };
-  // eslint-disable-next-line
-  const [originalUsers, setOriginalUsers] = useState([]);
-  // eslint-disable-next-line
-  const [messageInput, setMessageInput] = useState("");
-  // eslint-disable-next-line
-  const [users, setUsers] = useState([]);
-  // eslint-disable-next-line
-  const [chatKey, setChatKey] = useState(0);
-  //const [nameGroup, setNameGroup] = useState("");
-  // emoji
-  //eslint-disable-next-line
-  const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
+  
   const sendMessage = useCallback(async () => {
     try {
       await postApiNoneTokenMessage("/sendMessage/" + idSelector, {
@@ -40,7 +53,7 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
     } catch (error) {
       console.log("Không thể gửi tin nhắn trống.");
     }
-  }, [idSelector, messageInput, userLogin]);
+  }, [socket,idSelector, messageInput, userLogin]);
 
   useEffect(() => {
     const loadFriends = async () => {
@@ -102,6 +115,7 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
     };
     input.click();
   };
+  
   return (
     <>
       <ContentMessage className="ContentMessage">
@@ -121,6 +135,7 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
             <CiVideoOn style={{ fontSize: "24px" }} className="VideoCall" />
           </IconGroupMessage>
         </HeaderContentMessage>
+        
         <BodyContentMessage className="BodyContentMessage">
           <Chat
             key={chatKey}
@@ -154,7 +169,7 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
                     flexDirection: "column",
                     justifyContent: "left",
                     alignContent: "left",
-                    overflow: "hidden",
+                    overflow: "hidden", 
                   },
                 }}
                 isOpen={showEmojiKeyboard}
@@ -175,7 +190,9 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
                 />
               </Modal>
             )}
-            <button onClick={toggleEmojiKeyboard}>💔</button>
+            <EmojiButton onClick={toggleEmojiKeyboard}>
+            <MdEmojiEmotions style={{color:"#FED15D",width: "100%", height: "100%"}} />
+            </EmojiButton>
           </ChatButton>
           <hr style={{ width: "100%" }} />
           <ChatInputContainer>
@@ -326,4 +343,9 @@ const IconGroupMessage = styled.div`
   float: right;
   align-items: center;
   width: 20%;
+`;
+const EmojiButton = styled.div`
+  height: 30px;
+  width: 30px;
+  cursor: pointer;
 `;

@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import img from "../images/image_background.webp";
@@ -9,14 +9,16 @@ import {
   getApiNoneToken,
   getApiNoneTokenConversation,
   postApiNoneTokenConversation,
+  getApiNoneTokenMessage,
 } from "../api/Callapi";
+
 
 import io from "socket.io-client";
 
 import ChatScreen from "./ChatScreen.js";
 import ChatGroupScreen from "./ChatGroupScreen.js";
-
-export default function MessageScreen({ userLogin }) {
+import { useSocketContext } from "../context/SocketContext";
+export default function MessageScreen({ idLogin, userLogin }) {
   const [activeName, setActiveName] = useState("");
   const [activeContentTab, setActiveContentTab] = useState("Prioritize");
   const [selectedUserName, setSelectedUserName] = useState("");
@@ -27,11 +29,47 @@ export default function MessageScreen({ userLogin }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
-  // const socket = io("ws://localhost:3000");
+ 
   const [nameSender, setNameSender] = useState("");
   const [loadGroups, setLoadGroups] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([userLogin]);
   const [listGroup, setListGroup] = useState([]);
+  const { socket, onlineUsers } = useSocketContext();
+
+  useEffect(() => {
+    if (socket) {
+        socket.on("newMessage", (newMessage) => {
+            // Xử lý sự kiện khi có tin nhắn mới từ backend
+            setMessages(prevMessages => [...prevMessages, newMessage]);
+        });
+    }
+  }, [socket]);
+  useEffect(() => {
+    const loadMessages = async () => {
+      try {
+        const response = await getApiNoneTokenMessage(
+          `/getMessages/${idLogin}?senderId=${idSelector}`
+        );
+        const messagesWithAvatar = await Promise.all(
+          response.data.map(async (message) => {
+            const senderDetails = await getApiNoneToken(
+              `/getDetails/${message.senderId}`
+            );
+            return {
+              ...message,
+              senderAvatar: senderDetails.data.data.avatar,
+            };
+          })
+        );
+        setMessages(messagesWithAvatar);
+      } catch (error) {
+        console.error("Error loading messages:", error);
+        setMessages([]);
+      }
+    };
+    loadMessages();
+  }, [idLogin, idSelector]);
+  
   useEffect(() => {
     const loadInfor = async () => {
       try {
@@ -52,20 +90,16 @@ export default function MessageScreen({ userLogin }) {
         const response = await getApiNoneTokenConversation(`/${userLogin}`, {
           id: userLogin,
         });
-
-        // Lọc ra những object có ít nhất 3 người tham gia
         const friendsWithAtLeastThreeParticipants = response.data.filter(
           (friend) => friend.participants.length >= 3
         );
 
-        // Set state cho listFriend với những object đã lọc
         setListGroup(friendsWithAtLeastThreeParticipants);
       } catch (error) {
         console.error("Lỗi khi tải danh sách bạn:", error);
       }
     };
     loadGroups();
-    // thêm để render
     setLoadGroups(false);
   }, [userLogin, loadGroups]);
   const loadIdByPhone = async (phone) => {
@@ -286,7 +320,7 @@ export default function MessageScreen({ userLogin }) {
                   >
                     {user.name}
                   </h3>
-                  <h5
+                  {/* <h5
                     style={{
                       fontWeight: "400",
                       margin: "0 0 0 5px",
@@ -299,7 +333,7 @@ export default function MessageScreen({ userLogin }) {
                     }}
                   >
                     Hoạt động 15 phút trước
-                  </h5>
+                  </h5> */}
                 </div>
               </ItemUser>
             </button>

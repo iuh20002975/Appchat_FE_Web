@@ -3,6 +3,9 @@ import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { FaShare } from "react-icons/fa6";
 // import { MdDelete } from "react-icons/md";
 import Modal from "react-modal"
+
+import { IoCopyOutline } from "react-icons/io5";
+import { GoPin } from "react-icons/go";
 import {
 
   getApiNoneToken,
@@ -10,7 +13,7 @@ import {
 } from "../api/Callapi";
 import styled from "styled-components";
 
-const MessageMenuForReceived = ({ onForward,userLogin}) => {
+const MessageMenuForReceived = ({ onForward,userLogin, onCopy,onPin}) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [showModal, setShowModal] = useState(false); 
   // const [idSelector, setIdSelector] = useState("");
@@ -96,7 +99,7 @@ const MessageMenuForReceived = ({ onForward,userLogin}) => {
             borderRadius: "5px",
             zIndex: "1",
             display: "flex",
-            width: "80px"
+            width: "150px"
           }}
         >
           <div
@@ -114,6 +117,26 @@ const MessageMenuForReceived = ({ onForward,userLogin}) => {
             <div>
               <span style={{ fontSize: "10px" }}>Chuyển tiếp</span>
             </div>
+          </div>
+          <div onClick={onCopy} style={{ padding: "10px", cursor: "pointer" ,justifyContent:"center",alignItems:"center" }}>
+         
+            <div >
+            <IoCopyOutline />
+            </div>
+            <div>
+            <span style={{fontSize:"10px"}}>Copy</span>
+            </div>
+        
+          </div>
+          <div onClick={onPin} style={{ padding: "10px", cursor: "pointer" ,justifyContent:"center",alignItems:"center" }}>
+         
+            <div >
+            <GoPin />
+            </div>
+            <div>
+            <span style={{fontSize:"10px"}}>Ghim</span>
+            </div>
+        
           </div>
         </div>
       )}<Modal

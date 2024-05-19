@@ -56,6 +56,7 @@ const SignupScreen = () => {
         password: password,
         confirmPassword: confirmPassword,
       });
+      
       if (response.data.status === "ERR") {
         if (response.data.message === undefined) {
           alert("Trùng số điện thoại ");
@@ -67,6 +68,7 @@ const SignupScreen = () => {
         alert("Đăng ký thành công ");
         return (window.location.href = "/"); // chuyen ve
       }
+      
     } catch (error) {
       console.error("error for signup", error);
       alert("Error while fetching token" + error.message);
