@@ -221,7 +221,7 @@ const SignInScreen = () => {
               $active={active === "Phone"}
               onClick={() => handleTab("Phone")}
             >
-              Số điện thoại
+              Với gmail
             </Tab>
           </Tabs>
           {renderContentTab()}

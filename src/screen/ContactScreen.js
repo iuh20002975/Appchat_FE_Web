@@ -110,7 +110,7 @@ const Contact = ({userLogin}) => {
     ) : active === "listGroup" ? (
       <ModalMenuMember />
     ) : active === "listAdd" ? (
-      <ListInvite userLogin={userLogin} />
+      <ListInvite userLogin={userLogin} idReceiveId={searchPhone} />
     ) : (
       <div>listAdd</div>
     )}

@@ -13,31 +13,33 @@ import { CiVideoOn } from "react-icons/ci";
 import { IoIosSearch } from "react-icons/io";
 import { MdOutlineGroupAdd } from "react-icons/md";
 import { MdEmojiEmotions } from "react-icons/md";
-import { useSocketContext } from "../context/SocketContext";
 const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
-
+  const [avatar, setAvatar] = useState(null);
+  //eslint-disable-next-line
   const [originalUsers, setOriginalUsers] = useState([]);
   const [messageInput, setMessageInput] = useState("");
+    // eslint-disable-next-line
   const [users, setUsers] = useState([]);
   const [chatKey, setChatKey] = useState(0);
   //const [nameGroup, setNameGroup] = useState("");
   const [showEmojiKeyboard, setShowEmojiKeyboard] = useState(false);
 
-
-  const { socket } = useSocketContext();
-
-  
   useEffect(() => {
-    if (!socket) return;
-  
-    socket?.on("receiveMessage", (data) => {
-      // Xử lý tin nhắn nhận được từ máy chủ
-    });
-  
-    return () => {
-      socket?.off("receiveMessage");
+    const fetchAvatar = async () => {
+      if (idSelector) {
+        try {
+          const response = await getApiNoneToken(`/getDetails/${idSelector}`);
+          if (response.data && response.data.data) {
+            setAvatar(response.data.data.avatar);
+          }
+        } catch (error) {
+          console.error("Error fetching avatar:", error);
+        }
+      }
     };
-  }, [socket]);
+
+    fetchAvatar();
+  }, [idSelector]);
   const toggleEmojiKeyboard = () => {
     setShowEmojiKeyboard(!showEmojiKeyboard);
   };
@@ -53,7 +55,7 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
     } catch (error) {
       console.log("Không thể gửi tin nhắn trống.");
     }
-  }, [socket,idSelector, messageInput, userLogin]);
+  }, [idSelector, messageInput, userLogin]);
 
   useEffect(() => {
     const loadFriends = async () => {
@@ -121,7 +123,7 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
       <ContentMessage className="ContentMessage">
         <HeaderContentMessage className="HeaderContentMessage">
           <LeftMessage>
-            <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+            <Avatar className="Avatar" avatar={avatar} />
             <InputName style={{ marginLeft: "10px" }}>
               {selectedUserName}
             </InputName>
@@ -223,7 +225,7 @@ const ChatScreen = ({ selectedUserName, userLogin, idSelector }) => {
         <BodyInforMessage className="BodyInforMessage">
           <BodyInforTop className="BodyInforTop">
             <Infor className="Infor">
-              <Avatar className="Avatar"></Avatar>
+            <Avatar className="Avatar" avatar={avatar} />
               <InputName>{selectedUserName}</InputName>
             </Infor>
           </BodyInforTop>
@@ -304,10 +306,11 @@ const InputName = styled.div`
   color: black;
 `;
 const Avatar = styled.div`
-  background: black;
-  width: 50px;
-  height: 50px;
-  margin: 15px auto;
+  background: ${({ avatar }) => (avatar ? `url(${avatar})` : 'black')} no-repeat center center;
+  background-size: cover;
+  width: 54px;
+  height: 54px;
+  margin: 5px;
   border-radius: 50%;
 `;
 const HeaderContentMessage = styled.div`

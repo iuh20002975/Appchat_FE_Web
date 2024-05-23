@@ -20,7 +20,7 @@ import ChatGroupScreen from "./ChatGroupScreen.js";
 import { useSocketContext } from "../context/SocketContext";
 export default function MessageScreen({ idLogin, userLogin }) {
   const [activeName, setActiveName] = useState("");
-  const [activeContentTab, setActiveContentTab] = useState("Prioritize");
+  const [activeContentTab, setActiveContentTab] = useState("Group");
   const [selectedUserName, setSelectedUserName] = useState("");
   const [selectedGroupName, setSelectedGroupName] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -29,7 +29,6 @@ export default function MessageScreen({ idLogin, userLogin }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
- 
   const [nameSender, setNameSender] = useState("");
   const [loadGroups, setLoadGroups] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([userLogin]);
@@ -76,7 +75,7 @@ export default function MessageScreen({ idLogin, userLogin }) {
         const response = await getApiNoneToken(`/getDetails/${userLogin}`, {
           id: userLogin,
         });
-        setNameSender(response.data.data.name);
+        setNameSender(response.data.data.name); 
       } catch (error) {
         console.error("Error while fetching user details:", error);
         alert("Error while fetching user details: " + error.message);
@@ -102,12 +101,14 @@ export default function MessageScreen({ idLogin, userLogin }) {
     loadGroups();
     setLoadGroups(false);
   }, [userLogin, loadGroups]);
+  const [avatar, setAvatar] = useState("");
   const loadIdByPhone = async (phone) => {
     try {
       const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
         phone: phone,
       });
       setIdSelector(response.data.data._id);
+      setAvatar(response.data.data.avatar);
     } catch (error) {
       console.error("Error loading ID by phone:", error);
     }
@@ -215,6 +216,7 @@ export default function MessageScreen({ idLogin, userLogin }) {
       </ChatMessage>
     );
   };
+
   // eslint-disable-next-line no-unused-vars
   const renderContentTab = ({ activeContentTab }) => {
     if (activeContentTab === "Orther") {
@@ -224,7 +226,6 @@ export default function MessageScreen({ idLogin, userLogin }) {
         </>
       );
     } else if (activeContentTab === "Group") {
-      // return <ListGroup userLogin={userLogin} />;
       return (
         <div style={{ overflowY: "scroll", flex: 1 }}>
           {listGroup.map((group) => (
@@ -298,12 +299,13 @@ export default function MessageScreen({ idLogin, userLogin }) {
                   handlerName("Name");
                 }}
               >
-                <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                <Avatar className="Avatar" avatar={user.avatar} />
                 <div
                   style={{
                     display: "block",
                     width: "80%",
                     padding: "5px 0 0 0",
+                    alignContent: "center",
                   }}
                 >
                   <h3
@@ -346,16 +348,7 @@ export default function MessageScreen({ idLogin, userLogin }) {
     return (
       <ListMessage className="ListMessage">
         <TabsList className="Tabs">
-          <TabList
-            className="Tab"
-            $activeContentTab={activeContentTab === "Prioritize"}
-            onClick={() =>
-              handleContentTab("Prioritize") && setSelectedUserName("")
-            }
-          >
-            Ưu tiên
-          </TabList>
-          <TabList
+        <TabList
             className="Tab"
             $activeContentTab={activeContentTab === "Group"}
             onClick={() =>
@@ -363,6 +356,15 @@ export default function MessageScreen({ idLogin, userLogin }) {
             }
           >
             Nhóm
+          </TabList>
+          <TabList
+            className="Tab"
+            $activeContentTab={activeContentTab === "Prioritize"}
+            onClick={() =>
+              handleContentTab("Prioritize") && setSelectedUserName("")
+            }
+          >
+            Chat
           </TabList>
           <TabList
             className="Tab"
@@ -570,10 +572,11 @@ const ListPerson = styled.div`
 `;
 
 const Avatar = styled.div`
-  background: black;
-  width: 50px;
-  height: 50px;
-  margin: 15px auto;
+  background: ${({ avatar }) => (avatar ? `url(${avatar})` : 'black')} no-repeat center center;
+  background-size: cover;
+  width: 54px;
+  height: 54px;
+  margin: 5px ;
   border-radius: 50%;
 `;
 // const customStyles = {
