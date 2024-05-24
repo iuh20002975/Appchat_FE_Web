@@ -102,7 +102,7 @@ const Contact = ({userLogin}) => {
         </ContentLeft>
         <ContentRight className="ContentBody">
         {searchPhone !== "" ? (
-  <Friend searchPhone={searchPhone} idUser={userLogin} />
+        <Friend searchPhone={searchPhone} idUser={userLogin} />
 ) : (
   <>
     {active === "listFriend" ? (
@@ -110,7 +110,7 @@ const Contact = ({userLogin}) => {
     ) : active === "listGroup" ? (
       <ModalMenuMember />
     ) : active === "listAdd" ? (
-      <ListInvite userLogin={userLogin} idReceiveId={searchPhone} />
+      <ListInvite userLogin={userLogin}/>
     ) : (
       <div>listAdd</div>
     )}

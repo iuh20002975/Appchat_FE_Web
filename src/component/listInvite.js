@@ -6,7 +6,7 @@ const ListInvite = ({ userLogin }) => {
   const [data, setData] = useState([]);
   const [nameU, setName] = useState("");
   const [phoneU, setPhone] = useState("");
-  const [avatarU, setAvatar] = useState("");
+  const [avatarU, setAvatarU] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -15,7 +15,7 @@ const ListInvite = ({ userLogin }) => {
         setData(response.data.data.invite);
         setPhone(response.data.data.phone);
         setName(response.data.data.name);
-        setAvatar(response.data.data.avatar);
+        setAvatarU(response.data.data.avatar);
       } catch (error) {
         console.error("Error loading data:", error);
       }
@@ -23,24 +23,29 @@ const ListInvite = ({ userLogin }) => {
     loadData();
   }, [userLogin]);
 
-  const addFriend = async (id, name, phone, avatar) => {
+  const addFriend = async (id, name, phone) => {
     try {
-      // Add the friend to the user's friend list
+      const response = await getApiNoneToken(`/getDetails/${id}`,{
+        id: id,
+      });
+      const avatar = response.data.data.avatar;
+
       await putApiNoneToken(`/addFriend/${userLogin}`, {
+        id:userLogin,
         name: name,
         phone: phone,
         avatar: avatar,
       });
-
       // Add the user to the friend's friend list
       await putApiNoneToken(`/addFriend/${id}`, {
+        id: id,
         name: nameU,
         phone: phoneU,
         avatar: avatarU,
       });
 
       // Remove the friend invitation
-      await postApiNoneToken(`/deleteInvite/${userLogin}`, {
+     await postApiNoneToken(`/deleteInvite/${userLogin}`, {
         phone: phone,
       });
 
@@ -62,13 +67,13 @@ const ListInvite = ({ userLogin }) => {
   return (
     <form style={{ flex: 1, overflowY: "auto" }}>
       {data.map((item) => (
-        <Itemdata key={item._id} style={{ display: "flex", alignItems: "center" }}>
-          <input type="checkbox" id={item._id} />
+        <Itemdata key={item.id} style={{ display: "flex", alignItems: "center" }}>
+          <input type="checkbox" id={item.id} />
           <Avatar style={{ backgroundImage: `url(${item.avatar})` }} />
-          <label htmlFor={item._id}>{item.name}</label>
+          <label htmlFor={item.id}>{item.name}</label>
           <ButtonDelete
             type="button"
-            onClick={() => addFriend(item._id, item.name, item.phone, item.avatar)}
+            onClick={() => addFriend(item.id, item.name, item.phone)}
           >
             Confirm friend
           </ButtonDelete>

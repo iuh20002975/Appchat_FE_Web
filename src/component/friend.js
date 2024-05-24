@@ -3,14 +3,14 @@ import styled from "styled-components";
 import { getApiNoneToken, putApiNoneToken } from "../api/Callapi";
 
 const Friend = ({ searchPhone, idUser }) => {
-  const [friend, setFriend] = useState([]);
+  const [friend, setFriend] = useState("");
   // eslint-disable-next-line
   const [phone, setPhone] = useState("");
 
   // eslint-disable-next-line
   const [listPhone, setListPhone] = useState([]);
   const [check, setCheck] = useState(false);
-
+  const [avatar, setAvatar] = useState("");
   const [style, setStyle] = useState("AddFriend");
 
   useEffect(() => {
@@ -20,6 +20,7 @@ const Friend = ({ searchPhone, idUser }) => {
           id: searchPhone,
         });
         setFriend(response.data.data);
+        setAvatar(response.data.data.avatar);
       } catch (error) {
         console.error("Error loading ID by phone:", error);
       }
@@ -82,7 +83,7 @@ const Friend = ({ searchPhone, idUser }) => {
         style={{ display: "flex", alignItems: "center" }}
       >
         <input type="checkbox" id={friend.id} />
-        <Avatar />
+        <Avatar className="Avatar" avatar={avatar} />
         <label htmlFor={friend.id}>{friend.name}</label>
         {check ? (
           <p></p>
@@ -111,15 +112,16 @@ const ItemUser = styled.div`
   padding: 10px;
   display: flex;
   cursor: pointer;
-  background-color: red;
+  background-color: rgb(255, 255, 255);
   display: flex;
   margin: 5px 2px;
 `;
 const Avatar = styled.div`
-  background: black;
-  width: 50px;
-  height: 50px;
-  margin: 15px;
+  background: ${({ avatar }) => (avatar ? `url(${avatar})` : 'black')} no-repeat center center;
+  background-size: cover;
+  width: 54px;
+  height: 54px;
+  margin: 5px ;
   border-radius: 50%;
 `;
 export default Friend;
