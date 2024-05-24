@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { FaShare } from "react-icons/fa6";
 // import { MdDelete } from "react-icons/md";
@@ -7,9 +7,6 @@ import Modal from "react-modal"
 import { IoCopyOutline } from "react-icons/io5";
 import { GoPin } from "react-icons/go";
 import {
-
-  getApiNoneToken,
-  
 } from "../api/Callapi";
 import styled from "styled-components";
 
@@ -19,6 +16,7 @@ const MessageMenuForReceived = ({ onForward,userLogin, onCopy,onPin}) => {
   // const [idSelector, setIdSelector] = useState("");
   // const [originalUsers, setOriginalUsers] = useState([]);
   // const [selectedMembers, setSelectedMembers] = useState([userLogin]);
+ // eslint-disable-next-line
   const [users, setUsers] = useState([]);
   const handleForward = () => {
     onForward(); // Gọi hàm onForward nhưng cũng có thể xử lý riêng tùy vào nhu cầu của bạn
@@ -40,50 +38,6 @@ const MessageMenuForReceived = ({ onForward,userLogin, onCopy,onPin}) => {
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
-  // useEffect(() => {
-  //   const loadIdByPhone = async (phone) => {
-  //     try {
-  //       const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
-  //         phone: phone,
-  //       });
-  //       setIdSelector(response.data.data._id);
-  //     } catch (error) {
-  //       console.error("Error loading ID by phone:", error);
-  //     }
-  //   };
-  //   loadIdByPhone();
-  // });
-
-  // useEffect(() => {
-  //   const loadFriends = async () => {
-  //     try {
-  //       const response = await getApiNoneToken(`/getAllFriend/${userLogin}`, {
-  //         id: userLogin,
-  //       });
-  //       setUsers(response.data.data);
-  //       setOriginalUsers(response.data.data);
-  //     } catch (error) {
-  //       console.error("Error loading ID by phone:", error);
-  //     }
-  //   };
-  //   loadFriends();
-  // }, [userLogin]);
- 
-  // const handleFindUserIdByPhone = async (phone) => {
-  //   const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
-  //     phone: phone,
-  //   });
-  //   if (selectedMembers.includes(response.data.data._id)) {
-  //     setSelectedMembers((prevMembers) =>
-  //       prevMembers.filter((member) => member !== response.data.data._id)
-  //     );
-  //   } else {
-  //     setSelectedMembers((prevMembers) => [
-  //       ...prevMembers,
-  //       response.data.data._id,
-  //     ]);
-  //   }
-  // };
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
       <HiOutlineDotsHorizontal onClick={toggleMenu} />

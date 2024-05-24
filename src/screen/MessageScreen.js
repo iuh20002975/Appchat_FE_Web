@@ -12,7 +12,6 @@ import {
   getApiNoneTokenMessage,
 } from "../api/Callapi";
 
-
 import io from "socket.io-client";
 
 import ChatScreen from "./ChatScreen.js";
@@ -37,10 +36,10 @@ export default function MessageScreen({ idLogin, userLogin }) {
 
   useEffect(() => {
     if (socket) {
-        socket.on("newMessage", (newMessage) => {
-            // Xử lý sự kiện khi có tin nhắn mới từ backend
-            setMessages(prevMessages => [...prevMessages, newMessage]);
-        });
+      socket.on("newMessage", (newMessage) => {
+        // Xử lý sự kiện khi có tin nhắn mới từ backend
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
     }
   }, [socket]);
   useEffect(() => {
@@ -68,14 +67,14 @@ export default function MessageScreen({ idLogin, userLogin }) {
     };
     loadMessages();
   }, [idLogin, idSelector]);
-  
+
   useEffect(() => {
     const loadInfor = async () => {
       try {
         const response = await getApiNoneToken(`/getDetails/${userLogin}`, {
           id: userLogin,
         });
-        setNameSender(response.data.data.name); 
+        setNameSender(response.data.data.name);
       } catch (error) {
         console.error("Error while fetching user details:", error);
         alert("Error while fetching user details: " + error.message);
@@ -228,52 +227,56 @@ export default function MessageScreen({ idLogin, userLogin }) {
     } else if (activeContentTab === "Group") {
       return (
         <div style={{ overflowY: "scroll", flex: 1 }}>
-          {listGroup.map((group) => (
-            <button
-              onClick={() => {
-                setSelectedGroupName(group.groupName);
-                setIdGroup(group._id);
-              }}
-              style={{
-                width: "100%",
-                outline: "0",
-                background: "white",
-                border: "none",
-              }}
-              key={group._id}
-            >
-              <ItemUser
-                $activeName={activeName === "Name"}
+          {listGroup && listGroup.length > 0 ? (
+            listGroup.map((group) => (
+              <button
                 onClick={() => {
-                  handlerName("Name");
+                  setSelectedGroupName(group.groupName);
+                  setIdGroup(group._id);
                 }}
+                style={{
+                  width: "100%",
+                  outline: "0",
+                  background: "white",
+                  border: "none",
+                }}
+                key={group._id}
               >
-                <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
-                <div
-                  style={{
-                    display: "block",
-                    width: "80%",
-                    padding: "5px 0 0 0",
+                <ItemUser
+                  $activeName={activeName === "Name"}
+                  onClick={() => {
+                    handlerName("Name");
                   }}
                 >
-                  <h3
+                  <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                  <div
                     style={{
-                      fontWeight: "530",
-                      fontSize: 18,
-                      margin: "0 0 0 5px",
-                      padding: "0",
-                      textAlign: "left",
-                      position: "relative",
-                      height: "50%",
-                      top: "5%",
+                      display: "block",
+                      width: "80%",
+                      padding: "5px 0 0 0",
                     }}
                   >
-                    {group.groupName}
-                  </h3>
-                </div>
-              </ItemUser>
-            </button>
-          ))}
+                    <h3
+                      style={{
+                        fontWeight: "530",
+                        fontSize: 18,
+                        margin: "0 0 0 5px",
+                        padding: "0",
+                        textAlign: "left",
+                        position: "relative",
+                        height: "50%",
+                        top: "5%",
+                      }}
+                    >
+                      {group.groupName}
+                    </h3>
+                  </div>
+                </ItemUser>
+              </button>
+            ))
+          ) : (
+            <h1>Trống</h1>
+          )}
         </div>
       );
     } else {
@@ -348,7 +351,7 @@ export default function MessageScreen({ idLogin, userLogin }) {
     return (
       <ListMessage className="ListMessage">
         <TabsList className="Tabs">
-        <TabList
+          <TabList
             className="Tab"
             $activeContentTab={activeContentTab === "Group"}
             onClick={() =>
@@ -572,11 +575,12 @@ const ListPerson = styled.div`
 `;
 
 const Avatar = styled.div`
-  background: ${({ avatar }) => (avatar ? `url(${avatar})` : 'black')} no-repeat center center;
+  background: ${({ avatar }) => (avatar ? `url(${avatar})` : "black")} no-repeat
+    center center;
   background-size: cover;
   width: 54px;
   height: 54px;
-  margin: 5px ;
+  margin: 5px;
   border-radius: 50%;
 `;
 // const customStyles = {

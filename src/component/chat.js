@@ -304,7 +304,6 @@ const Chat = ({ idSelector, idLogin,userLogin }) => {
                             theme="light"
                             searchLabel="Procurar emoji"
                             searchDisabled={false}
-                            //onEmojiSelect={(emoji) => setMessageInput((emoji.character))}
                             onEmojiSelect={handleEmojiSelect}
                             categoryDisabled={false}
                           />
