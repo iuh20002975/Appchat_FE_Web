@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import img from "../images/image_background.webp";
 
-import { postApiNoneToken } from "../api/Callapi";
+import { postApiNoneToken, getApiNoneToken } from "../api/Callapi";
 
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
@@ -27,7 +27,7 @@ const SignupScreen = () => {
   const handleSubmit = async (e) => {
     try {
       const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {});
-      const confirmation = await signInWithPhoneNumber(auth, phone, recaptcha);
+      const confirmation = await signInWithPhoneNumber(auth,"+84"+phone, recaptcha);
       setUserx(confirmation);
     } catch (error) {
       console.log(error);
@@ -35,8 +35,14 @@ const SignupScreen = () => {
   };
   const confirmUser = async (e) => {
     try {
-      if( await userx.confirm(code))
+      if( await userx.confirm(code)){
+        const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, { phone: phone });
+        if (response.data.status === "OK") {
+          alert("Số điện thoại đã tồn tại");
+          return;
+        }
         setIsVerSignup(true);
+      }
       else
         alert("Mã xác thực không đúng");
     } catch (error) {
@@ -56,6 +62,7 @@ const SignupScreen = () => {
         password: password,
         confirmPassword: confirmPassword,
       });
+      
       if (response.data.status === "ERR") {
         if (response.data.message === undefined) {
           alert("Trùng số điện thoại ");
@@ -67,6 +74,7 @@ const SignupScreen = () => {
         alert("Đăng ký thành công ");
         return (window.location.href = "/"); // chuyen ve
       }
+      
     } catch (error) {
       console.error("error for signup", error);
       alert("Error while fetching token" + error.message);

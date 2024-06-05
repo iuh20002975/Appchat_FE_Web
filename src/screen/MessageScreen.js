@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import { MdOutlineGroupAdd, MdOutlinePersonAddAlt1 } from "react-icons/md";
 import img from "../images/image_background.webp";
@@ -9,16 +9,17 @@ import {
   getApiNoneToken,
   getApiNoneTokenConversation,
   postApiNoneTokenConversation,
+  getApiNoneTokenMessage,
 } from "../api/Callapi";
 
 import io from "socket.io-client";
 
 import ChatScreen from "./ChatScreen.js";
 import ChatGroupScreen from "./ChatGroupScreen.js";
-
-export default function MessageScreen({ userLogin }) {
+import { useSocketContext } from "../context/SocketContext";
+export default function MessageScreen({ idLogin, userLogin }) {
   const [activeName, setActiveName] = useState("");
-  const [activeContentTab, setActiveContentTab] = useState("Prioritize");
+  const [activeContentTab, setActiveContentTab] = useState("Group");
   const [selectedUserName, setSelectedUserName] = useState("");
   const [selectedGroupName, setSelectedGroupName] = useState("");
   const [showModal, setShowModal] = useState(false);
@@ -27,11 +28,46 @@ export default function MessageScreen({ userLogin }) {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
   const [originalUsers, setOriginalUsers] = useState([]);
-  // const socket = io("ws://localhost:3000");
   const [nameSender, setNameSender] = useState("");
   const [loadGroups, setLoadGroups] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState([userLogin]);
   const [listGroup, setListGroup] = useState([]);
+  const { socket, onlineUsers } = useSocketContext();
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("newMessage", (newMessage) => {
+        // Xử lý sự kiện khi có tin nhắn mới từ backend
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      });
+    }
+  }, [socket]);
+  useEffect(() => {
+    const loadMessages = async () => {
+      try {
+        const response = await getApiNoneTokenMessage(
+          `/getMessages/${idLogin}?senderId=${idSelector}`
+        );
+        const messagesWithAvatar = await Promise.all(
+          response.data.map(async (message) => {
+            const senderDetails = await getApiNoneToken(
+              `/getDetails/${message.senderId}`
+            );
+            return {
+              ...message,
+              senderAvatar: senderDetails.data.data.avatar,
+            };
+          })
+        );
+        setMessages(messagesWithAvatar);
+      } catch (error) {
+        console.error("Error loading messages:", error);
+        setMessages([]);
+      }
+    };
+    loadMessages();
+  }, [idLogin, idSelector]);
+
   useEffect(() => {
     const loadInfor = async () => {
       try {
@@ -52,28 +88,26 @@ export default function MessageScreen({ userLogin }) {
         const response = await getApiNoneTokenConversation(`/${userLogin}`, {
           id: userLogin,
         });
-
-        // Lọc ra những object có ít nhất 3 người tham gia
         const friendsWithAtLeastThreeParticipants = response.data.filter(
           (friend) => friend.participants.length >= 3
         );
 
-        // Set state cho listFriend với những object đã lọc
         setListGroup(friendsWithAtLeastThreeParticipants);
       } catch (error) {
         console.error("Lỗi khi tải danh sách bạn:", error);
       }
     };
     loadGroups();
-    // thêm để render
     setLoadGroups(false);
   }, [userLogin, loadGroups]);
+  const [avatar, setAvatar] = useState("");
   const loadIdByPhone = async (phone) => {
     try {
       const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
         phone: phone,
       });
       setIdSelector(response.data.data._id);
+      setAvatar(response.data.data.avatar);
     } catch (error) {
       console.error("Error loading ID by phone:", error);
     }
@@ -181,6 +215,7 @@ export default function MessageScreen({ userLogin }) {
       </ChatMessage>
     );
   };
+
   // eslint-disable-next-line no-unused-vars
   const renderContentTab = ({ activeContentTab }) => {
     if (activeContentTab === "Orther") {
@@ -190,55 +225,58 @@ export default function MessageScreen({ userLogin }) {
         </>
       );
     } else if (activeContentTab === "Group") {
-      // return <ListGroup userLogin={userLogin} />;
       return (
         <div style={{ overflowY: "scroll", flex: 1 }}>
-          {listGroup.map((group) => (
-            <button
-              onClick={() => {
-                setSelectedGroupName(group.groupName);
-                setIdGroup(group._id);
-              }}
-              style={{
-                width: "100%",
-                outline: "0",
-                background: "white",
-                border: "none",
-              }}
-              key={group._id}
-            >
-              <ItemUser
-                $activeName={activeName === "Name"}
+          {listGroup && listGroup.length > 0 ? (
+            listGroup.map((group) => (
+              <button
                 onClick={() => {
-                  handlerName("Name");
+                  setSelectedGroupName(group.groupName);
+                  setIdGroup(group._id);
                 }}
+                style={{
+                  width: "100%",
+                  outline: "0",
+                  background: "white",
+                  border: "none",
+                }}
+                key={group._id}
               >
-                <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
-                <div
-                  style={{
-                    display: "block",
-                    width: "80%",
-                    padding: "5px 0 0 0",
+                <ItemUser
+                  $activeName={activeName === "Name"}
+                  onClick={() => {
+                    handlerName("Name");
                   }}
                 >
-                  <h3
+                  <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                  <div
                     style={{
-                      fontWeight: "530",
-                      fontSize: 18,
-                      margin: "0 0 0 5px",
-                      padding: "0",
-                      textAlign: "left",
-                      position: "relative",
-                      height: "50%",
-                      top: "5%",
+                      display: "block",
+                      width: "80%",
+                      padding: "5px 0 0 0",
                     }}
                   >
-                    {group.groupName}
-                  </h3>
-                </div>
-              </ItemUser>
-            </button>
-          ))}
+                    <h3
+                      style={{
+                        fontWeight: "530",
+                        fontSize: 18,
+                        margin: "0 0 0 5px",
+                        padding: "0",
+                        textAlign: "left",
+                        position: "relative",
+                        height: "50%",
+                        top: "5%",
+                      }}
+                    >
+                      {group.groupName}
+                    </h3>
+                  </div>
+                </ItemUser>
+              </button>
+            ))
+          ) : (
+            <h1>Trống</h1>
+          )}
         </div>
       );
     } else {
@@ -264,12 +302,13 @@ export default function MessageScreen({ userLogin }) {
                   handlerName("Name");
                 }}
               >
-                <Avatar style={{ margin: "0" }} className="Avatar"></Avatar>
+                <Avatar className="Avatar" avatar={user.avatar} />
                 <div
                   style={{
                     display: "block",
                     width: "80%",
                     padding: "5px 0 0 0",
+                    alignContent: "center",
                   }}
                 >
                   <h3
@@ -286,7 +325,7 @@ export default function MessageScreen({ userLogin }) {
                   >
                     {user.name}
                   </h3>
-                  <h5
+                  {/* <h5
                     style={{
                       fontWeight: "400",
                       margin: "0 0 0 5px",
@@ -299,7 +338,7 @@ export default function MessageScreen({ userLogin }) {
                     }}
                   >
                     Hoạt động 15 phút trước
-                  </h5>
+                  </h5> */}
                 </div>
               </ItemUser>
             </button>
@@ -314,21 +353,21 @@ export default function MessageScreen({ userLogin }) {
         <TabsList className="Tabs">
           <TabList
             className="Tab"
-            $activeContentTab={activeContentTab === "Prioritize"}
-            onClick={() =>
-              handleContentTab("Prioritize") && setSelectedUserName("")
-            }
-          >
-            Ưu tiên
-          </TabList>
-          <TabList
-            className="Tab"
             $activeContentTab={activeContentTab === "Group"}
             onClick={() =>
               handleContentTab("Group") && setSelectedGroupName("")
             }
           >
             Nhóm
+          </TabList>
+          <TabList
+            className="Tab"
+            $activeContentTab={activeContentTab === "Prioritize"}
+            onClick={() =>
+              handleContentTab("Prioritize") && setSelectedUserName("")
+            }
+          >
+            Chat
           </TabList>
           <TabList
             className="Tab"
@@ -536,10 +575,12 @@ const ListPerson = styled.div`
 `;
 
 const Avatar = styled.div`
-  background: black;
-  width: 50px;
-  height: 50px;
-  margin: 15px auto;
+  background: ${({ avatar }) => (avatar ? `url(${avatar})` : "black")} no-repeat
+    center center;
+  background-size: cover;
+  width: 54px;
+  height: 54px;
+  margin: 5px;
   border-radius: 50%;
 `;
 // const customStyles = {

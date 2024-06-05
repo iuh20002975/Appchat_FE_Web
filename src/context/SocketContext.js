@@ -9,7 +9,7 @@ export const useSocketContext = () => {
 
 export const SocketContextProvider = ({ children }) => {
 	const [socket, setSocket] = useState(null);
-	// const [onlineUsers, setOnlineUsers] = useState([]);
+	const [onlineUsers, setOnlineUsers] = useState([]);
     const { authUser } = useAuthContext();
 
 	useEffect(() => {
@@ -21,9 +21,9 @@ export const SocketContextProvider = ({ children }) => {
 			});
             console.log("Socket connected:", socket);
 			setSocket(socket);
-			// socket.on("getOnlineUsers", (users) => {
-			// 	setOnlineUsers(users);
-			// });
+			socket.on("getOnlineUsers", (users) => {
+				setOnlineUsers(users);
+			});
 
 			return () => socket.close();
 		} else {
@@ -32,7 +32,6 @@ export const SocketContextProvider = ({ children }) => {
 				setSocket(null);
 			}
 		}
-	}, []);
-    // , onlineUsers 
-	return <SocketContext.Provider value={{ socket}}>{children}</SocketContext.Provider>;
+	}, [authUser,socket]);
+	return <SocketContext.Provider value={{ socket, onlineUsers }}>{children}</SocketContext.Provider>;
 };

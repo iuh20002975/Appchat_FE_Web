@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { HiOutlineDotsHorizontal } from "react-icons/hi";
 import { FaShare } from "react-icons/fa6";
 // import { MdDelete } from "react-icons/md";
 import Modal from "react-modal"
-import {
 
-  getApiNoneToken,
-  
+import { IoCopyOutline } from "react-icons/io5";
+import { GoPin } from "react-icons/go";
+import {
 } from "../api/Callapi";
 import styled from "styled-components";
 
-const MessageMenuForReceived = ({ onForward,userLogin}) => {
+const MessageMenuForReceived = ({ onForward,userLogin, onCopy,onPin}) => {
   const [menuVisible, setMenuVisible] = useState(false);
   const [showModal, setShowModal] = useState(false); 
   // const [idSelector, setIdSelector] = useState("");
   // const [originalUsers, setOriginalUsers] = useState([]);
   // const [selectedMembers, setSelectedMembers] = useState([userLogin]);
+ // eslint-disable-next-line
   const [users, setUsers] = useState([]);
   const handleForward = () => {
     onForward(); // Gọi hàm onForward nhưng cũng có thể xử lý riêng tùy vào nhu cầu của bạn
@@ -37,50 +38,6 @@ const MessageMenuForReceived = ({ onForward,userLogin}) => {
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
   };
-  // useEffect(() => {
-  //   const loadIdByPhone = async (phone) => {
-  //     try {
-  //       const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
-  //         phone: phone,
-  //       });
-  //       setIdSelector(response.data.data._id);
-  //     } catch (error) {
-  //       console.error("Error loading ID by phone:", error);
-  //     }
-  //   };
-  //   loadIdByPhone();
-  // });
-
-  // useEffect(() => {
-  //   const loadFriends = async () => {
-  //     try {
-  //       const response = await getApiNoneToken(`/getAllFriend/${userLogin}`, {
-  //         id: userLogin,
-  //       });
-  //       setUsers(response.data.data);
-  //       setOriginalUsers(response.data.data);
-  //     } catch (error) {
-  //       console.error("Error loading ID by phone:", error);
-  //     }
-  //   };
-  //   loadFriends();
-  // }, [userLogin]);
- 
-  // const handleFindUserIdByPhone = async (phone) => {
-  //   const response = await getApiNoneToken(`/getDetailsByPhone/${phone}`, {
-  //     phone: phone,
-  //   });
-  //   if (selectedMembers.includes(response.data.data._id)) {
-  //     setSelectedMembers((prevMembers) =>
-  //       prevMembers.filter((member) => member !== response.data.data._id)
-  //     );
-  //   } else {
-  //     setSelectedMembers((prevMembers) => [
-  //       ...prevMembers,
-  //       response.data.data._id,
-  //     ]);
-  //   }
-  // };
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
       <HiOutlineDotsHorizontal onClick={toggleMenu} />
@@ -96,7 +53,7 @@ const MessageMenuForReceived = ({ onForward,userLogin}) => {
             borderRadius: "5px",
             zIndex: "1",
             display: "flex",
-            width: "80px"
+            width: "150px"
           }}
         >
           <div
@@ -114,6 +71,26 @@ const MessageMenuForReceived = ({ onForward,userLogin}) => {
             <div>
               <span style={{ fontSize: "10px" }}>Chuyển tiếp</span>
             </div>
+          </div>
+          <div onClick={onCopy} style={{ padding: "10px", cursor: "pointer" ,justifyContent:"center",alignItems:"center" }}>
+         
+            <div >
+            <IoCopyOutline />
+            </div>
+            <div>
+            <span style={{fontSize:"10px"}}>Copy</span>
+            </div>
+        
+          </div>
+          <div onClick={onPin} style={{ padding: "10px", cursor: "pointer" ,justifyContent:"center",alignItems:"center" }}>
+         
+            <div >
+            <GoPin />
+            </div>
+            <div>
+            <span style={{fontSize:"10px"}}>Ghim</span>
+            </div>
+        
           </div>
         </div>
       )}<Modal
